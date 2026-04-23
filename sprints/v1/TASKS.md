@@ -18,9 +18,10 @@
   - Files: Supabase auth actions, profile/metadata persistence logic, registration handlers
   - Completed: 2026-04-23 - Added a server-backed email signup action, persisted selected roles in Supabase auth metadata, surfaced validation/auth feedback in the registration UI, and covered the flow with unit plus Playwright tests.
 
-- [ ] Task 5: Implement Google OAuth signup and login for both roles (P0)
+- [x] Task 5: Implement Google OAuth signup and login for both roles (P0)
   - Acceptance: Users can authenticate with Google, complete role assignment when needed, and return to the app successfully.
   - Files: OAuth handlers, callback handling, role completion flow
+  - Completed: 2026-04-23 - Added Google OAuth start actions for register/login, a callback route that persists or reads role metadata, a role-completion recovery screen, and unit plus Playwright coverage for both direct and missing-role paths.
 
 - [ ] Task 6: Build the login screen for returning users (P0)
   - Acceptance: `/login` supports email/password and Google sign-in, with clear recovery and error states.

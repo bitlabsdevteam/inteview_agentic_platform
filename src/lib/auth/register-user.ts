@@ -1,9 +1,14 @@
-import { DEFAULT_ROLE_DESTINATION } from "@/lib/routes";
+import {
+  formatAccountRole,
+  getRoleDestination,
+  parseAccountRole,
+  type AccountRole
+} from "@/lib/auth/roles";
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const PASSWORD_MIN_LENGTH = 8;
 
-export type RegistrationRole = keyof typeof DEFAULT_ROLE_DESTINATION;
+export type RegistrationRole = AccountRole;
 
 export type RegisterUserInput = {
   email: string;
@@ -42,14 +47,6 @@ export const REGISTER_USER_INITIAL_STATE: RegisterUserResult = {
   status: "idle"
 };
 
-function isRegistrationRole(role: string): role is RegistrationRole {
-  return role === "employer" || role === "job_seeker";
-}
-
-function getRoleLabel(role: RegistrationRole) {
-  return role === "employer" ? "Employer" : "Job Seeker";
-}
-
 function normalizeEmail(email: string) {
   return email.trim().toLowerCase();
 }
@@ -71,10 +68,10 @@ export async function registerUser(
   const email = normalizeEmail(input.email);
   const password = input.password;
   const confirmPassword = input.confirmPassword;
-  const role = input.role.trim();
+  const role = parseAccountRole(input.role.trim());
   const fieldErrors: RegisterUserResult["fieldErrors"] = {};
 
-  if (!isRegistrationRole(role)) {
+  if (!role) {
     fieldErrors.role = "Choose Employer or Job Seeker before creating the account.";
   }
 
@@ -112,7 +109,7 @@ export async function registerUser(
       data: {
         role
       },
-      emailRedirectTo: `${siteUrl}${DEFAULT_ROLE_DESTINATION[role]}`
+      emailRedirectTo: `${siteUrl}${getRoleDestination(role)}`
     },
     password
   });
@@ -125,7 +122,7 @@ export async function registerUser(
   }
 
   return {
-    message: `Account created for ${getRoleLabel(role)}. Check your email to continue.`,
+    message: `Account created for ${formatAccountRole(role)}. Check your email to continue.`,
     status: "success"
   };
 }

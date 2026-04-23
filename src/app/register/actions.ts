@@ -1,5 +1,11 @@
 "use server";
 
+import { redirect } from "next/navigation";
+
+import {
+  beginGoogleOAuth,
+  buildAuthErrorRedirectPath
+} from "@/lib/auth/google-oauth";
 import { getPublicEnv } from "@/lib/env";
 import {
   registerUser,
@@ -49,6 +55,13 @@ async function createSignUpHandler() {
   return async (payload: Parameters<typeof supabase.auth.signUp>[0]) => supabase.auth.signUp(payload);
 }
 
+async function createGoogleOAuthHandler() {
+  const supabase = await createSupabaseServerClient();
+
+  return async (payload: Parameters<typeof supabase.auth.signInWithOAuth>[0]) =>
+    supabase.auth.signInWithOAuth(payload);
+}
+
 export async function submitRegistration(
   _previousState: RegisterUserResult,
   formData: FormData
@@ -67,4 +80,40 @@ export async function submitRegistration(
       siteUrl: getRegistrationSiteUrl()
     }
   );
+}
+
+export async function startGoogleRegistration(formData: FormData) {
+  const role = getFormValue(formData, "role");
+
+  if (useMockAuth()) {
+    const callbackUrl = new URL("/auth/callback", getRegistrationSiteUrl());
+
+    callbackUrl.searchParams.set("intent", "register");
+
+    if (role.trim()) {
+      callbackUrl.searchParams.set("role", role.trim());
+    }
+
+    redirect(callbackUrl.toString());
+  }
+
+  const signInWithOAuth = await createGoogleOAuthHandler();
+  const oauthResult = await beginGoogleOAuth({
+    intent: "register",
+    role,
+    signInWithOAuth,
+    siteUrl: getRegistrationSiteUrl()
+  });
+
+  if (oauthResult.status === "error") {
+    redirect(
+      buildAuthErrorRedirectPath({
+        intent: "register",
+        message: oauthResult.message,
+        role
+      })
+    );
+  }
+
+  redirect(oauthResult.url);
 }

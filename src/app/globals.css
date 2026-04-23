@@ -480,6 +480,12 @@ main {
   grid-template-columns: minmax(0, 1fr) auto;
 }
 
+.register-oauth-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
 .register-submit-button {
   min-width: 240px;
   min-height: 50px;
@@ -496,6 +502,13 @@ main {
     transform 180ms ease,
     opacity 180ms ease,
     box-shadow 180ms ease;
+}
+
+.register-submit-button--secondary {
+  border: 1px solid rgba(94, 47, 0, 0.14);
+  background: rgba(255, 252, 247, 0.94);
+  color: var(--accent-strong);
+  box-shadow: none;
 }
 
 .register-submit-button:hover:enabled,
@@ -538,6 +551,10 @@ main {
   .register-form {
     padding: 22px;
     border-radius: 22px;
+  }
+
+  .register-oauth-actions {
+    flex-direction: column;
   }
 
   .register-submit-button {

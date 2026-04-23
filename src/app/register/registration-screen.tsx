@@ -6,47 +6,29 @@ import { useSearchParams } from "next/navigation";
 
 import { RoleSelector } from "@/components/role-selector";
 import { REGISTER_USER_INITIAL_STATE } from "@/lib/auth/register-user";
-import { submitRegistration } from "./actions";
-
-type AccountRole = "employer" | "job_seeker";
-
-function getRoleFromSearchParam(value: string | null): AccountRole | null {
-  if (value === "employer" || value === "job_seeker") {
-    return value;
-  }
-
-  return null;
-}
-
-function formatRoleLabel(role: AccountRole | null) {
-  if (role === "employer") {
-    return "Employer";
-  }
-
-  if (role === "job_seeker") {
-    return "Job Seeker";
-  }
-
-  return null;
-}
+import { formatAccountRole, parseAccountRole, type AccountRole } from "@/lib/auth/roles";
+import { startGoogleRegistration, submitRegistration } from "./actions";
 
 export function RegistrationScreen() {
   const searchParams = useSearchParams();
   const [selectedRole, setSelectedRole] = useState<AccountRole | null>(() =>
-    getRoleFromSearchParam(searchParams.get("role"))
+    parseAccountRole(searchParams.get("role"))
   );
   const [formState, formAction, isPending] = useActionState(
     submitRegistration,
     REGISTER_USER_INITIAL_STATE
   );
+  const authError = searchParams.get("authError")?.trim();
 
   useEffect(() => {
-    const searchRole = getRoleFromSearchParam(searchParams.get("role"));
+    const searchRole = parseAccountRole(searchParams.get("role"));
 
     setSelectedRole(searchRole);
   }, [searchParams]);
 
-  const selectedRoleLabel = formatRoleLabel(selectedRole);
+  const selectedRoleLabel = formatAccountRole(selectedRole);
+  const feedbackMessage = formState.message ?? authError;
+  const feedbackStatus = formState.message ? formState.status : authError ? "error" : "idle";
 
   return (
     <main>
@@ -87,14 +69,14 @@ export function RegistrationScreen() {
         <form action={formAction} className="register-form">
           <RoleSelector selectedRole={selectedRole} onChange={setSelectedRole} />
 
-          {formState.message ? (
+          {feedbackMessage ? (
             <p
               aria-live="polite"
-              className={`register-form-feedback register-form-feedback--${formState.status}`}
+              className={`register-form-feedback register-form-feedback--${feedbackStatus}`}
               data-testid="register-form-feedback"
-              role={formState.status === "error" ? "alert" : "status"}
+              role={feedbackStatus === "error" ? "alert" : "status"}
             >
-              {formState.message}
+              {feedbackMessage}
             </p>
           ) : null}
 
@@ -166,14 +148,26 @@ export function RegistrationScreen() {
               Create the account with email/password and keep the selected role attached to the
               auth record from the first request.
             </p>
-            <button
-              className="register-submit-button"
-              data-testid="register-submit-button"
-              disabled={!selectedRole || isPending}
-              type="submit"
-            >
-              {isPending ? "Creating Account..." : "Create Account"}
-            </button>
+            <div className="register-oauth-actions">
+              <button
+                className="register-submit-button"
+                data-testid="register-submit-button"
+                disabled={!selectedRole || isPending}
+                type="submit"
+              >
+                {isPending ? "Creating Account..." : "Create Account"}
+              </button>
+              <button
+                className="register-submit-button register-submit-button--secondary"
+                data-testid="register-google-submit-button"
+                disabled={!selectedRole || isPending}
+                formAction={startGoogleRegistration}
+                formNoValidate
+                type="submit"
+              >
+                Continue With Google
+              </button>
+            </div>
           </div>
         </form>
       </div>
