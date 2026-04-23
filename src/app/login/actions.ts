@@ -6,10 +6,17 @@ import {
   beginGoogleOAuth,
   buildAuthErrorRedirectPath
 } from "@/lib/auth/google-oauth";
+import { loginUser } from "@/lib/auth/login-user";
 import { getPublicEnv } from "@/lib/env";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
-type LoginFormValueKey = "mockRole" | "mockMissingRole";
+type LoginFormValueKey = "email" | "password" | "mockRole" | "mockMissingRole";
+
+export type LoginFormState = {
+  status: "idle" | "error";
+  message?: string;
+  fieldErrors?: Partial<Record<"email" | "password", string>>;
+};
 
 function getFormValue(formData: FormData, key: LoginFormValueKey) {
   const value = formData.get(key);
@@ -34,6 +41,96 @@ async function createGoogleOAuthHandler() {
 
   return async (payload: Parameters<typeof supabase.auth.signInWithOAuth>[0]) =>
     supabase.auth.signInWithOAuth(payload);
+}
+
+async function createPasswordLoginHandler() {
+  if (useMockAuth()) {
+    return async ({ email, password }: { email: string; password: string }) => {
+      if (password !== "securepass123") {
+        return {
+          data: {
+            user: null
+          },
+          error: {
+            message: "Invalid login credentials"
+          }
+        };
+      }
+
+      if (email === "employer@example.com") {
+        return {
+          data: {
+            user: {
+              user_metadata: {
+                role: "employer"
+              }
+            }
+          },
+          error: null
+        };
+      }
+
+      if (email === "jobseeker@example.com") {
+        return {
+          data: {
+            user: {
+              user_metadata: {
+                role: "job_seeker"
+              }
+            }
+          },
+          error: null
+        };
+      }
+
+      if (email === "roleless@example.com") {
+        return {
+          data: {
+            user: {
+              user_metadata: {}
+            }
+          },
+          error: null
+        };
+      }
+
+      return {
+        data: {
+          user: null
+        },
+        error: {
+          message: "Invalid login credentials"
+        }
+      };
+    };
+  }
+
+  const supabase = await createSupabaseServerClient();
+
+  return async (payload: Parameters<typeof supabase.auth.signInWithPassword>[0]) =>
+    supabase.auth.signInWithPassword(payload);
+}
+
+export async function submitLogin(
+  _previousState: LoginFormState,
+  formData: FormData
+): Promise<LoginFormState> {
+  const signInWithPassword = await createPasswordLoginHandler();
+  const result = await loginUser(
+    {
+      email: getFormValue(formData, "email"),
+      password: getFormValue(formData, "password")
+    },
+    {
+      signInWithPassword
+    }
+  );
+
+  if (result.status === "error") {
+    return result;
+  }
+
+  redirect(result.redirectTo);
 }
 
 export async function startGoogleLogin(formData: FormData) {

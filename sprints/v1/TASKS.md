@@ -23,9 +23,10 @@
   - Files: OAuth handlers, callback handling, role completion flow
   - Completed: 2026-04-23 - Added Google OAuth start actions for register/login, a callback route that persists or reads role metadata, a role-completion recovery screen, and unit plus Playwright coverage for both direct and missing-role paths.
 
-- [ ] Task 6: Build the login screen for returning users (P0)
+- [x] Task 6: Build the login screen for returning users (P0)
   - Acceptance: `/login` supports email/password and Google sign-in, with clear recovery and error states.
   - Files: login page, auth form components, shared auth messaging
+  - Completed: 2026-04-23 - Added email/password login with role-based post-auth redirects, surfaced invalid-credential and recovery states on the login screen, and extended auth coverage with unit plus Playwright tests.
 
 - [ ] Task 7: Add session-aware route guards and role-based redirects (P0)
   - Acceptance: Authenticated users bypass public auth pages and are redirected to the correct destination based on saved role.

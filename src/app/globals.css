@@ -421,6 +421,10 @@ main {
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
+.register-field-grid--login {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
 .register-field {
   display: grid;
   gap: 8px;
@@ -484,6 +488,16 @@ main {
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
+}
+
+.login-recovery-row {
+  display: grid;
+  gap: 10px;
+}
+
+.login-recovery-link {
+  color: var(--accent-strong);
+  font-weight: 700;
 }
 
 .register-submit-button {

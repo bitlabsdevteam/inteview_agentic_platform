@@ -1,15 +1,23 @@
 "use client";
 
+import { useActionState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 
-import { startGoogleLogin } from "./actions";
+import { startGoogleLogin, submitLogin, type LoginFormState } from "./actions";
+
+const LOGIN_FORM_INITIAL_STATE: LoginFormState = {
+  status: "idle"
+};
 
 export function LoginScreen() {
   const searchParams = useSearchParams();
   const authError = searchParams.get("authError")?.trim();
   const mockRole = searchParams.get("mock-role")?.trim() ?? "";
   const mockMissingRole = searchParams.get("mock-missing-role") === "true" ? "true" : "";
+  const [formState, formAction, isPending] = useActionState(submitLogin, LOGIN_FORM_INITIAL_STATE);
+  const feedbackMessage = formState.message ?? authError;
+  const feedbackStatus = formState.message ? formState.status : authError ? "error" : "idle";
 
   return (
     <main>
@@ -25,54 +33,109 @@ export function LoginScreen() {
         <section className="register-hero">
           <div className="register-hero__copy">
             <p className="register-eyebrow">Public Auth Route</p>
-            <h1>Return with Google and recover the right role flow</h1>
+            <h1>Sign back in and recover the right workspace</h1>
             <p className="register-summary">
-              Google authentication is available for returning employers and job seekers now. The
-              fuller email/password login form arrives in the next sprint task.
+              Returning employers and job seekers can now sign in with email/password or Google.
+              The app resolves the saved role after authentication and routes each user into the
+              correct protected workspace.
             </p>
           </div>
 
           <div className="register-hero__panel">
-            <p className="register-section-label">Google Sign-In</p>
+            <p className="register-section-label">Recovery State</p>
             <p className="register-role-status">
-              Continue with Google to restore the saved role when it exists, or finish the role
-              setup if the account still needs it.
+              If password access fails, use the recovery guidance below or continue with Google if
+              that was the original sign-in method.
             </p>
           </div>
         </section>
 
-        <form action={startGoogleLogin} className="register-form">
-          {authError ? (
+        <form action={formAction} className="register-form">
+          {feedbackMessage ? (
             <p
               aria-live="polite"
-              className="register-form-feedback register-form-feedback--error"
+              className={`register-form-feedback register-form-feedback--${feedbackStatus}`}
               data-testid="login-form-feedback"
-              role="alert"
+              role={feedbackStatus === "error" ? "alert" : "status"}
             >
-              {authError}
+              {feedbackMessage}
             </p>
           ) : null}
 
-          <section aria-labelledby="login-google-title" className="register-form__section">
+          <section aria-labelledby="login-account-title" className="register-form__section">
             <div className="register-form__section-header">
-              <p className="register-section-label">Google Access</p>
-              <h2 id="login-google-title" className="register-section-title">
-                Start with the same Google account you used before.
+              <p className="register-section-label">Account Access</p>
+              <h2 id="login-account-title" className="register-section-title">
+                Use the same credentials you registered with.
               </h2>
             </div>
 
-            <p className="register-footer-copy">
-              The callback route will read the saved role metadata and send you to the correct
-              destination automatically.
-            </p>
+            <div className="register-field-grid register-field-grid--login">
+              <label className="register-field">
+                <span>Email Address</span>
+                <input
+                  autoComplete="email"
+                  aria-invalid={formState.fieldErrors?.email ? "true" : "false"}
+                  data-testid="login-email-input"
+                  name="email"
+                  placeholder="name@company.com"
+                  required
+                  type="email"
+                />
+                {formState.fieldErrors?.email ? (
+                  <span className="register-field__error">{formState.fieldErrors.email}</span>
+                ) : null}
+              </label>
+
+              <label className="register-field">
+                <span>Password</span>
+                <input
+                  autoComplete="current-password"
+                  aria-invalid={formState.fieldErrors?.password ? "true" : "false"}
+                  data-testid="login-password-input"
+                  name="password"
+                  placeholder="Enter your password"
+                  required
+                  type="password"
+                />
+                {formState.fieldErrors?.password ? (
+                  <span className="register-field__error">{formState.fieldErrors.password}</span>
+                ) : null}
+              </label>
+            </div>
 
             <input name="mockRole" type="hidden" value={mockRole} />
             <input name="mockMissingRole" type="hidden" value={mockMissingRole} />
 
+            <div className="login-recovery-row">
+              <p className="register-footer-copy">
+                Password reset flows are not wired yet. If you signed up with Google, use that path
+                instead. Otherwise contact support for recovery assistance.
+              </p>
+              <a
+                className="login-recovery-link"
+                data-testid="login-recovery-link"
+                href="mailto:support@interview-agent.local?subject=Login%20Recovery"
+              >
+                Need Recovery Help?
+              </a>
+            </div>
+
             <div className="register-oauth-actions">
+              <button
+                className="register-submit-button"
+                data-testid="login-submit-button"
+                disabled={isPending}
+                type="submit"
+              >
+                {isPending ? "Signing In..." : "Sign In"}
+              </button>
               <button
                 className="register-submit-button register-submit-button--secondary"
                 data-testid="login-google-submit-button"
+                disabled={isPending}
+                formAction={startGoogleLogin}
+                formNoValidate
                 type="submit"
               >
                 Continue With Google
