@@ -8,9 +8,10 @@
   - Files: landing page component, shared marketing sections, styles/assets
   - Completed: 2026-04-23 - Replaced the placeholder home route with a branded landing page, explicit auth CTAs, role-specific entry cards, and Playwright coverage with screenshots.
 
-- [ ] Task 3: Create the registration screen with mandatory role selection (P0)
+- [x] Task 3: Create the registration screen with mandatory role selection (P0)
   - Acceptance: `/register` requires choosing `Employer` or `Job Seeker` before account creation can continue.
   - Files: registration page, role selector component, form validation logic
+  - Completed: 2026-04-23 - Added a role-gated registration form shell, reusable role selector, query-param role prefilling, and Playwright coverage with screenshots.
 
 - [ ] Task 4: Implement email/password signup with Supabase and role persistence (P0)
   - Acceptance: New users can sign up, their selected role is saved, and auth errors are surfaced clearly.

@@ -265,3 +265,251 @@ main {
     width: 100%;
   }
 }
+
+.register-shell {
+  display: grid;
+  gap: 24px;
+  width: min(1080px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 48px 0 80px;
+}
+
+.register-shell__nav,
+.register-hero,
+.register-form {
+  border: 1px solid var(--surface-border);
+  border-radius: 28px;
+  background: rgba(255, 252, 247, 0.9);
+  box-shadow: var(--shadow);
+}
+
+.register-shell__nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding: 18px 24px;
+  font-size: 0.95rem;
+}
+
+.register-hero,
+.register-form {
+  padding: 28px;
+}
+
+.register-hero {
+  display: grid;
+  gap: 20px;
+  grid-template-columns: minmax(0, 1.5fr) minmax(280px, 0.9fr);
+}
+
+.register-eyebrow,
+.register-section-label,
+.register-role-card__eyebrow {
+  margin: 0;
+  font-family: "Courier New", Courier, monospace;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.register-hero h1,
+.register-section-title {
+  margin: 0;
+  line-height: 1.08;
+  letter-spacing: -0.03em;
+}
+
+.register-hero h1 {
+  max-width: 12ch;
+  font-size: clamp(2.4rem, 5vw, 4.2rem);
+}
+
+.register-summary,
+.register-helper-note,
+.register-footer-copy,
+.register-field span,
+.register-role-card span,
+.register-role-status {
+  margin: 0;
+  line-height: 1.65;
+  color: var(--text-muted);
+}
+
+.register-hero__copy,
+.register-hero__panel,
+.register-form,
+.register-form__section,
+.register-form__footer {
+  display: grid;
+  gap: 14px;
+}
+
+.register-hero__panel {
+  align-content: start;
+  padding: 20px;
+  border: 1px solid rgba(94, 47, 0, 0.1);
+  border-radius: 24px;
+  background: linear-gradient(180deg, rgba(255, 249, 240, 0.98), rgba(244, 228, 203, 0.86));
+}
+
+.register-role-status {
+  font-size: 1.02rem;
+  color: var(--text-primary);
+}
+
+.register-role-selector {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.register-role-selector__grid {
+  display: grid;
+  gap: 18px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.register-role-card {
+  display: grid;
+  gap: 10px;
+  padding: 22px;
+  border: 1px solid rgba(94, 47, 0, 0.12);
+  border-radius: 24px;
+  background: rgba(255, 252, 247, 0.92);
+  cursor: pointer;
+  transition:
+    transform 180ms ease,
+    border-color 180ms ease,
+    box-shadow 180ms ease,
+    background-color 180ms ease;
+}
+
+.register-role-card:hover,
+.register-role-card:focus-within {
+  transform: translateY(-1px);
+  border-color: rgba(94, 47, 0, 0.28);
+  box-shadow: 0 14px 30px rgba(65, 41, 18, 0.12);
+}
+
+.register-role-card--selected {
+  border-color: rgba(94, 47, 0, 0.42);
+  background: linear-gradient(180deg, rgba(244, 228, 203, 0.9), rgba(255, 252, 247, 0.98));
+  box-shadow: 0 18px 34px rgba(94, 47, 0, 0.16);
+}
+
+.register-role-card__input {
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  accent-color: var(--accent-strong);
+}
+
+.register-role-card strong {
+  font-size: 1.35rem;
+}
+
+.register-form__section-header {
+  display: grid;
+  gap: 10px;
+}
+
+.register-field-grid {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.register-field {
+  display: grid;
+  gap: 8px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.register-field input {
+  width: 100%;
+  min-height: 52px;
+  padding: 0 16px;
+  border: 1px solid rgba(94, 47, 0, 0.16);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.86);
+  color: var(--text-primary);
+  font: inherit;
+}
+
+.register-field input:focus-visible {
+  outline: 2px solid rgba(138, 75, 8, 0.4);
+  outline-offset: 2px;
+}
+
+.register-form__footer {
+  align-items: start;
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+
+.register-submit-button {
+  min-width: 240px;
+  min-height: 50px;
+  padding: 0 20px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--accent-strong);
+  color: #fff8ef;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 16px 30px rgba(94, 47, 0, 0.22);
+  transition:
+    transform 180ms ease,
+    opacity 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.register-submit-button:hover:enabled,
+.register-submit-button:focus-visible:enabled {
+  transform: translateY(-1px);
+}
+
+.register-submit-button:focus-visible {
+  outline: 2px solid rgba(138, 75, 8, 0.45);
+  outline-offset: 3px;
+}
+
+.register-submit-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+  box-shadow: none;
+}
+
+@media (max-width: 900px) {
+  .register-hero,
+  .register-form__footer,
+  .register-field-grid,
+  .register-role-selector__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .register-hero h1 {
+    max-width: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .register-shell {
+    width: min(100%, calc(100% - 20px));
+    padding-top: 24px;
+  }
+
+  .register-shell__nav,
+  .register-hero,
+  .register-form {
+    padding: 22px;
+    border-radius: 22px;
+  }
+
+  .register-submit-button {
+    width: 100%;
+  }
+}
