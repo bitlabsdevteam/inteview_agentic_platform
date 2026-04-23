@@ -1,10 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useActionState, useEffect, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 
 import { RoleSelector } from "@/components/role-selector";
+import { REGISTER_USER_INITIAL_STATE } from "@/lib/auth/register-user";
+import { submitRegistration } from "./actions";
 
 type AccountRole = "employer" | "job_seeker";
 
@@ -30,7 +32,13 @@ function formatRoleLabel(role: AccountRole | null) {
 
 export function RegistrationScreen() {
   const searchParams = useSearchParams();
-  const [selectedRole, setSelectedRole] = useState<AccountRole | null>(null);
+  const [selectedRole, setSelectedRole] = useState<AccountRole | null>(() =>
+    getRoleFromSearchParam(searchParams.get("role"))
+  );
+  const [formState, formAction, isPending] = useActionState(
+    submitRegistration,
+    REGISTER_USER_INITIAL_STATE
+  );
 
   useEffect(() => {
     const searchRole = getRoleFromSearchParam(searchParams.get("role"));
@@ -70,14 +78,25 @@ export function RegistrationScreen() {
                 : "Choose whether you are registering as an employer or a job seeker."}
             </p>
             <p className="register-helper-note">
-              The sign-up action stays locked until a role is selected. Auth wiring and Supabase
-              submission arrive in the next sprint task.
+              Email signup stores the selected role in auth metadata so downstream routing can use
+              the correct protected destination.
             </p>
           </div>
         </section>
 
-        <form className="register-form">
+        <form action={formAction} className="register-form">
           <RoleSelector selectedRole={selectedRole} onChange={setSelectedRole} />
+
+          {formState.message ? (
+            <p
+              aria-live="polite"
+              className={`register-form-feedback register-form-feedback--${formState.status}`}
+              data-testid="register-form-feedback"
+              role={formState.status === "error" ? "alert" : "status"}
+            >
+              {formState.message}
+            </p>
+          ) : null}
 
           <section aria-labelledby="account-details-title" className="register-form__section">
             <div className="register-form__section-header">
@@ -92,46 +111,68 @@ export function RegistrationScreen() {
                 <span>Email Address</span>
                 <input
                   autoComplete="email"
+                  aria-invalid={formState.fieldErrors?.email ? "true" : "false"}
+                  data-testid="register-email-input"
                   name="email"
                   placeholder="name@company.com"
+                  required
                   type="email"
                 />
+                {formState.fieldErrors?.email ? (
+                  <span className="register-field__error">{formState.fieldErrors.email}</span>
+                ) : null}
               </label>
 
               <label className="register-field">
                 <span>Password</span>
                 <input
                   autoComplete="new-password"
+                  aria-invalid={formState.fieldErrors?.password ? "true" : "false"}
+                  data-testid="register-password-input"
+                  minLength={8}
                   name="password"
                   placeholder="Create a secure password"
+                  required
                   type="password"
                 />
+                {formState.fieldErrors?.password ? (
+                  <span className="register-field__error">{formState.fieldErrors.password}</span>
+                ) : null}
               </label>
 
               <label className="register-field">
                 <span>Confirm Password</span>
                 <input
                   autoComplete="new-password"
+                  aria-invalid={formState.fieldErrors?.confirmPassword ? "true" : "false"}
+                  data-testid="register-confirm-password-input"
+                  minLength={8}
                   name="confirmPassword"
                   placeholder="Repeat your password"
+                  required
                   type="password"
                 />
+                {formState.fieldErrors?.confirmPassword ? (
+                  <span className="register-field__error">
+                    {formState.fieldErrors.confirmPassword}
+                  </span>
+                ) : null}
               </label>
             </div>
           </section>
 
           <div className="register-form__footer">
             <p className="register-footer-copy">
-              Continue only becomes available after role selection so the next task can create the
-              account with the correct role metadata.
+              Create the account with email/password and keep the selected role attached to the
+              auth record from the first request.
             </p>
             <button
               className="register-submit-button"
               data-testid="register-submit-button"
-              disabled={!selectedRole}
-              type="button"
+              disabled={!selectedRole || isPending}
+              type="submit"
             >
-              Continue To Account Creation
+              {isPending ? "Creating Account..." : "Create Account"}
             </button>
           </div>
         </form>

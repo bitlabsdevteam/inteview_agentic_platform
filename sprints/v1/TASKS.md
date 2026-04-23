@@ -13,9 +13,10 @@
   - Files: registration page, role selector component, form validation logic
   - Completed: 2026-04-23 - Added a role-gated registration form shell, reusable role selector, query-param role prefilling, and Playwright coverage with screenshots.
 
-- [ ] Task 4: Implement email/password signup with Supabase and role persistence (P0)
+- [x] Task 4: Implement email/password signup with Supabase and role persistence (P0)
   - Acceptance: New users can sign up, their selected role is saved, and auth errors are surfaced clearly.
   - Files: Supabase auth actions, profile/metadata persistence logic, registration handlers
+  - Completed: 2026-04-23 - Added a server-backed email signup action, persisted selected roles in Supabase auth metadata, surfaced validation/auth feedback in the registration UI, and covered the flow with unit plus Playwright tests.
 
 - [ ] Task 5: Implement Google OAuth signup and login for both roles (P0)
   - Acceptance: Users can authenticate with Google, complete role assignment when needed, and return to the app successfully.
