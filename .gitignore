@@ -1,0 +1,47 @@
+# Environment files
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+!.env.example
+aws_cred.md
+
+# Dependencies
+node_modules/
+app/node_modules/
+
+# Python
+__pycache__/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+
+# Build output
+dist/
+build/
+coverage/
+.next/
+out/
+app/dist/
+*.tsbuildinfo
+playwright-report/
+test-results/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Local tooling
+.codex/
+graphify-out/
+
+# OS / editor noise
+.DS_Store
+.idea/
+.vscode/
