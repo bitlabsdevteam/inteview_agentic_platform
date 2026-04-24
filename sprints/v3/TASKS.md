@@ -3,9 +3,10 @@
   - Files: `sprints/v3/PRD.md`, `sprints/v3/TASKS.md`, relevant auth/navigation files under `src/app/` and `src/components/`
   - Completed: 2026-04-24 - Added a concrete auth surface checklist to the v3 PRD covering landing, login, registration, role-completion, protected routes, shared shells, and the route-guard files that govern session-aware redirects.
 
-- [ ] Task 2: Add a shared server-side authenticated header/profile component contract (P0)
+- [x] Task 2: Add a shared server-side authenticated header/profile component contract (P0)
   - Acceptance: A reusable header or shell component can read the active session, derive the current user identity and role, and expose props or rendering branches for authenticated vs unauthenticated states.
-  - Files: `src/app/layout.tsx`, `src/components/route-shell.tsx`, new shared header/profile component files under `src/components/`
+  - Files: `src/components/account-header.tsx`, `src/components/route-shell.tsx`, `tests/auth/account-header.test.ts`
+  - Completed: 2026-04-24 - Added a shared server-side account header contract that reads the current Supabase session, derives authenticated identity and role state, and exposes anonymous versus authenticated navigation branches for reuse in shared shells.
 
 - [ ] Task 3: Hide public login and register actions once a session exists (P0)
   - Acceptance: Authenticated users no longer see public `Login` or `Register` actions in shared navigation, landing surfaces, or protected shells where a profile affordance is available.
