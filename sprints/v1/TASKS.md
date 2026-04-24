@@ -38,9 +38,10 @@
   - Files: `src/app/employer/page.tsx`, `src/components/employer-chat-shell.tsx`, `src/app/globals.css`, `tests/e2e/task8-employer-chat-shell.spec.ts`
   - Completed: 2026-04-24 - Replaced the employer placeholder with a dedicated chat-agent workspace shell, added targeted Playwright coverage for the protected employer flow, and validated the implementation with unit tests, production build, semgrep, and npm audit. Playwright execution was blocked in this sandbox by local port bind restrictions.
 
-- [ ] Task 9: Create the initial job seeker protected landing page (P1)
+- [x] Task 9: Create the initial job seeker protected landing page (P1)
   - Acceptance: Job seekers land on `/job-seeker` after auth and see a basic authenticated placeholder confirming the correct role flow.
-  - Files: job seeker dashboard/page, protected layout content
+  - Files: `src/app/job-seeker/page.tsx`, `src/components/job-seeker-shell.tsx`, `src/app/globals.css`, `tests/e2e/task9-job-seeker-landing.spec.ts`
+  - Completed: 2026-04-24 - Replaced the generic job seeker placeholder with a protected candidate landing shell, added targeted Playwright coverage for the role-based destination, and validated the implementation with unit tests, production build, semgrep, and npm audit. Playwright execution was blocked in this sandbox by local port and server reuse issues.
 
 - [ ] Task 10: Add end-to-end auth coverage for both roles and both sign-in methods (P1)
   - Acceptance: Tests cover landing page entry, employer registration/login, job seeker registration/login, role-based redirects, and protected-page access.
