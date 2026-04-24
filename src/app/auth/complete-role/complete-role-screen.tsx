@@ -1,7 +1,7 @@
 "use client";
 
+import type { ReactNode } from "react";
 import { useActionState, useState } from "react";
-import Link from "next/link";
 
 import { RoleSelector } from "@/components/role-selector";
 import { formatAccountRole, type AccountRole } from "@/lib/auth/roles";
@@ -14,7 +14,11 @@ const COMPLETE_ROLE_INITIAL_STATE: CompleteRoleResult = {
   status: "idle"
 };
 
-export function CompleteRoleScreen() {
+type CompleteRoleScreenProps = {
+  header: ReactNode;
+};
+
+export function CompleteRoleScreen({ header }: CompleteRoleScreenProps) {
   const [selectedRole, setSelectedRole] = useState<AccountRole | null>(null);
   const [formState, formAction, isPending] = useActionState(
     submitRoleCompletion,
@@ -25,13 +29,7 @@ export function CompleteRoleScreen() {
   return (
     <main>
       <div className="register-shell">
-        <nav aria-label="Primary" className="register-shell__nav">
-          <Link href="/">Home</Link>
-          <Link href="/login">Login</Link>
-          <Link href="/register">Register</Link>
-          <Link href="/employer">Employer</Link>
-          <Link href="/job-seeker">Job Seeker</Link>
-        </nav>
+        {header}
 
         <section className="register-hero">
           <div className="register-hero__copy">

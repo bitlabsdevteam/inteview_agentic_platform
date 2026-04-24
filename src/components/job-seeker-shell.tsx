@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { AccountHeader, getAccountHeaderState } from "@/components/account-header";
 
 const prepChecklist = [
   "Resume context and strongest project stories",
@@ -22,17 +22,13 @@ const preparationStreams = [
   }
 ];
 
-export function JobSeekerShell() {
+export async function JobSeekerShell() {
+  const accountHeaderState = await getAccountHeaderState();
+
   return (
     <main className="job-seeker-page">
       <div className="job-seeker-shell">
-        <nav aria-label="Primary" className="job-seeker-shell__nav">
-          <Link href="/">Home</Link>
-          <Link href="/login">Login</Link>
-          <Link href="/register">Register</Link>
-          <Link href="/employer">Employer</Link>
-          <Link href="/job-seeker">Job Seeker</Link>
-        </nav>
+        <AccountHeader state={accountHeaderState} />
 
         <section className="job-seeker-hero">
           <div className="job-seeker-hero__copy">

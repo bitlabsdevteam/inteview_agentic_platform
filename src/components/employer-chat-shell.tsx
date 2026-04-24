@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { AccountHeader, getAccountHeaderState } from "@/components/account-header";
 
 const workflowSteps = [
   {
@@ -43,17 +43,13 @@ const threadMessages = [
   }
 ];
 
-export function EmployerChatShell() {
+export async function EmployerChatShell() {
+  const accountHeaderState = await getAccountHeaderState();
+
   return (
     <main className="employer-page">
       <div className="employer-shell">
-        <nav aria-label="Primary" className="employer-shell__nav">
-          <Link href="/">Home</Link>
-          <Link href="/login">Login</Link>
-          <Link href="/register">Register</Link>
-          <Link href="/employer">Employer</Link>
-          <Link href="/job-seeker">Job Seeker</Link>
-        </nav>
+        <AccountHeader state={accountHeaderState} />
 
         <section className="employer-hero">
           <div className="employer-hero__copy">

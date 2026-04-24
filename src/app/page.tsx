@@ -1,10 +1,19 @@
 import Link from "next/link";
 
-export default function HomePage() {
+import { AccountHeader, getAccountHeaderState } from "@/components/account-header";
+import { getHomePageActions } from "@/components/home-page-actions";
+
+export const dynamic = "force-dynamic";
+
+export default async function HomePage() {
+  const accountHeaderState = await getAccountHeaderState();
+  const landingActions = getHomePageActions(accountHeaderState);
+
   return (
     <main className="landing-page">
       <section className="landing-hero">
         <div className="landing-hero__copy">
+          <AccountHeader state={accountHeaderState} />
           <p className="landing-eyebrow">Interview Agentic Platform</p>
           <h1>Interview agents for both sides of the hiring loop</h1>
           <p className="landing-summary">
@@ -12,12 +21,16 @@ export default function HomePage() {
             without losing the context of who the user is.
           </p>
           <div className="landing-actions">
-            <Link className="landing-action landing-action--secondary" href="/login" data-testid="landing-login-link">
-              Log In
-            </Link>
-            <Link className="landing-action landing-action--primary" href="/register" data-testid="landing-register-link">
-              Create Account
-            </Link>
+            {landingActions.map((action) => (
+              <Link
+                key={action.testId}
+                className={`landing-action landing-action--${action.tone}`}
+                href={action.href}
+                data-testid={action.testId}
+              >
+                {action.label}
+              </Link>
+            ))}
           </div>
         </div>
 
@@ -51,11 +64,7 @@ export default function HomePage() {
               Start with structured intake, refine the job description with an agent, and prepare a
               role package that is ready for approval.
             </p>
-            <Link
-              className="landing-path-card__link"
-              href="/register?role=employer"
-              data-testid="landing-employer-entry-link"
-            >
+            <Link className="landing-path-card__link" href="/register?role=employer" data-testid="landing-employer-entry-link">
               Enter as Employer
             </Link>
           </article>
@@ -67,11 +76,7 @@ export default function HomePage() {
               Register as a candidate to access interview preparation, scheduling, and future
               virtual interview sessions tailored to your role goals.
             </p>
-            <Link
-              className="landing-path-card__link"
-              href="/register?role=job_seeker"
-              data-testid="landing-job-seeker-entry-link"
-            >
+            <Link className="landing-path-card__link" href="/register?role=job_seeker" data-testid="landing-job-seeker-entry-link">
               Enter as Job Seeker
             </Link>
           </article>

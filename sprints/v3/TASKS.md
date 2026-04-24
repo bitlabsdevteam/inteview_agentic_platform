@@ -8,9 +8,10 @@
   - Files: `src/components/account-header.tsx`, `src/components/route-shell.tsx`, `tests/auth/account-header.test.ts`
   - Completed: 2026-04-24 - Added a shared server-side account header contract that reads the current Supabase session, derives authenticated identity and role state, and exposes anonymous versus authenticated navigation branches for reuse in shared shells.
 
-- [ ] Task 3: Hide public login and register actions once a session exists (P0)
+- [x] Task 3: Hide public login and register actions once a session exists (P0)
   - Acceptance: Authenticated users no longer see public `Login` or `Register` actions in shared navigation, landing surfaces, or protected shells where a profile affordance is available.
-  - Files: `src/app/page.tsx`, `src/components/route-shell.tsx`, related shared UI components, relevant tests
+  - Files: `src/app/page.tsx`, `src/app/login/page.tsx`, `src/app/login/login-screen.tsx`, `src/app/register/page.tsx`, `src/app/register/registration-screen.tsx`, `src/app/auth/complete-role/page.tsx`, `src/app/auth/complete-role/complete-role-screen.tsx`, `src/components/employer-chat-shell.tsx`, `src/components/job-seeker-shell.tsx`, `src/components/home-page-actions.ts`, `tests/auth/home-page-actions.test.ts`
+  - Completed: 2026-04-24 - Replaced hardcoded public auth nav links with the shared account header across landing, auth, and protected shells, and added an authenticated landing-page CTA branch so signed-in users no longer see `Login` or `Register` actions.
 
 - [ ] Task 4: Show a user profile area with a logout action as the authenticated account control (P0)
   - Acceptance: When a user is signed in, the UI shows a profile section and the only account action presented there is `Logout`.

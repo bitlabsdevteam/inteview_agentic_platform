@@ -1,7 +1,7 @@
 "use client";
 
+import type { ReactNode } from "react";
 import { useActionState, useEffect, useState } from "react";
-import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 
 import { RoleSelector } from "@/components/role-selector";
@@ -9,7 +9,11 @@ import { REGISTER_USER_INITIAL_STATE } from "@/lib/auth/register-user";
 import { formatAccountRole, parseAccountRole, type AccountRole } from "@/lib/auth/roles";
 import { startGoogleRegistration, submitRegistration } from "./actions";
 
-export function RegistrationScreen() {
+type RegistrationScreenProps = {
+  header: ReactNode;
+};
+
+export function RegistrationScreen({ header }: RegistrationScreenProps) {
   const searchParams = useSearchParams();
   const [selectedRole, setSelectedRole] = useState<AccountRole | null>(() =>
     parseAccountRole(searchParams.get("role"))
@@ -33,13 +37,7 @@ export function RegistrationScreen() {
   return (
     <main>
       <div className="register-shell">
-        <nav aria-label="Primary" className="register-shell__nav">
-          <Link href="/">Home</Link>
-          <Link href="/login">Login</Link>
-          <Link href="/register">Register</Link>
-          <Link href="/employer">Employer</Link>
-          <Link href="/job-seeker">Job Seeker</Link>
-        </nav>
+        {header}
 
         <section className="register-hero">
           <div className="register-hero__copy">

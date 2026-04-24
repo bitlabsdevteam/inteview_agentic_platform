@@ -1,7 +1,7 @@
 "use client";
 
+import type { ReactNode } from "react";
 import { useActionState } from "react";
-import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 
 import { startGoogleLogin, submitLogin, type LoginFormState } from "./actions";
@@ -10,11 +10,13 @@ const LOGIN_FORM_INITIAL_STATE: LoginFormState = {
   status: "idle"
 };
 
-export function LoginScreen() {
+type LoginScreenProps = {
+  header: ReactNode;
+};
+
+export function LoginScreen({ header }: LoginScreenProps) {
   const searchParams = useSearchParams();
   const authError = searchParams.get("authError")?.trim();
-  const mockRole = searchParams.get("mock-role")?.trim() ?? "";
-  const mockMissingRole = searchParams.get("mock-missing-role") === "true" ? "true" : "";
   const [formState, formAction, isPending] = useActionState(submitLogin, LOGIN_FORM_INITIAL_STATE);
   const feedbackMessage = formState.message ?? authError;
   const feedbackStatus = formState.message ? formState.status : authError ? "error" : "idle";
@@ -22,13 +24,7 @@ export function LoginScreen() {
   return (
     <main>
       <div className="register-shell">
-        <nav aria-label="Primary" className="register-shell__nav">
-          <Link href="/">Home</Link>
-          <Link href="/login">Login</Link>
-          <Link href="/register">Register</Link>
-          <Link href="/employer">Employer</Link>
-          <Link href="/job-seeker">Job Seeker</Link>
-        </nav>
+        {header}
 
         <section className="register-hero">
           <div className="register-hero__copy">
@@ -103,9 +99,6 @@ export function LoginScreen() {
                 ) : null}
               </label>
             </div>
-
-            <input name="mockRole" type="hidden" value={mockRole} />
-            <input name="mockMissingRole" type="hidden" value={mockMissingRole} />
 
             <div className="login-recovery-row">
               <p className="register-footer-copy">
