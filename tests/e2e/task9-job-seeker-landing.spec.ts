@@ -1,10 +1,18 @@
 import { expect, test } from "@playwright/test";
+import { getJobSeekerCredentials, hasCredentials } from "./real-auth-env";
 
 test("job seeker login lands on the protected orientation shell", async ({ page }) => {
-  await page.goto("/login?mock-role=job_seeker");
+  const jobSeekerCredentials = getJobSeekerCredentials();
 
-  await page.getByTestId("login-email-input").fill("jobseeker@example.com");
-  await page.getByTestId("login-password-input").fill("securepass123");
+  test.skip(
+    !hasCredentials(jobSeekerCredentials),
+    "Requires E2E_SUPABASE_JOB_SEEKER_EMAIL and E2E_SUPABASE_JOB_SEEKER_PASSWORD."
+  );
+
+  await page.goto("/login");
+
+  await page.getByTestId("login-email-input").fill(jobSeekerCredentials.email!);
+  await page.getByTestId("login-password-input").fill(jobSeekerCredentials.password!);
   await page.getByTestId("login-submit-button").click();
 
   await expect(page).toHaveURL(/\/job-seeker$/);

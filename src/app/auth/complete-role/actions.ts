@@ -1,6 +1,5 @@
 "use server";
 
-import { persistMockAuthSession } from "@/lib/auth/mock-session";
 import { redirect } from "next/navigation";
 
 import { getRoleDestination, parseAccountRole } from "@/lib/auth/roles";
@@ -13,10 +12,6 @@ export type CompleteRoleResult = {
     role?: string;
   };
 };
-
-function useMockAuth() {
-  return process.env.INTERVIEW_AGENT_MOCK_AUTH === "true";
-}
 
 export async function submitRoleCompletion(
   _previousState: CompleteRoleResult,
@@ -34,11 +29,6 @@ export async function submitRoleCompletion(
       message: "Choose Employer or Job Seeker before continuing.",
       status: "error"
     };
-  }
-
-  if (useMockAuth()) {
-    await persistMockAuthSession(role);
-    redirect(getRoleDestination(role));
   }
 
   const supabase = await createSupabaseServerClient();

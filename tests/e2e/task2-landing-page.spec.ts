@@ -15,8 +15,8 @@ test("landing page explains the platform and exposes employer and job seeker ent
   const employerEntryLink = page.getByTestId("landing-employer-entry-link");
   const jobSeekerEntryLink = page.getByTestId("landing-job-seeker-entry-link");
 
-  await expect(loginLink).toHaveAttribute("href", "/login");
-  await expect(registerLink).toHaveAttribute("href", "/register");
+  await expect(loginLink).toHaveAttribute("href", "/auth/google?intent=login");
+  await expect(registerLink).toHaveAttribute("href", "/auth/google?intent=register");
   await expect(employerEntryLink).toHaveAttribute("href", "/register?role=employer");
   await expect(jobSeekerEntryLink).toHaveAttribute("href", "/register?role=job_seeker");
 

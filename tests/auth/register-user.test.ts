@@ -56,7 +56,12 @@ describe("registerUser", () => {
   });
 
   it("persists the selected role in Supabase user metadata", async () => {
-    const signUp = vi.fn().mockResolvedValue({ error: null });
+    const signUp = vi.fn().mockResolvedValue({
+      data: {
+        session: null
+      },
+      error: null
+    });
 
     const result = await registerUser(
       {
@@ -87,8 +92,69 @@ describe("registerUser", () => {
     });
   });
 
+  it("returns a redirect destination when Supabase creates an active session during signup", async () => {
+    const signUp = vi.fn().mockResolvedValue({
+      data: {
+        session: {
+          access_token: "session-token"
+        }
+      },
+      error: null
+    });
+
+    const result = await registerUser(
+      {
+        email: "person@example.com",
+        password: "securepass123",
+        confirmPassword: "securepass123",
+        role: "employer"
+      },
+      {
+        signUp,
+        siteUrl: "http://localhost:3000"
+      }
+    );
+
+    expect(result).toEqual({
+      redirectTo: "/employer",
+      status: "success"
+    });
+  });
+
+  it("redirects active-session job seeker signups to /job-seeker", async () => {
+    const signUp = vi.fn().mockResolvedValue({
+      data: {
+        session: {
+          access_token: "session-token"
+        }
+      },
+      error: null
+    });
+
+    const result = await registerUser(
+      {
+        email: "jobseeker@example.com",
+        password: "securepass123",
+        confirmPassword: "securepass123",
+        role: "job_seeker"
+      },
+      {
+        signUp,
+        siteUrl: "http://localhost:3000"
+      }
+    );
+
+    expect(result).toEqual({
+      redirectTo: "/job-seeker",
+      status: "success"
+    });
+  });
+
   it("surfaces Supabase signup errors clearly", async () => {
     const signUp = vi.fn().mockResolvedValue({
+      data: {
+        session: null
+      },
       error: {
         message: "User already registered"
       }

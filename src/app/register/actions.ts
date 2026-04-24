@@ -1,7 +1,6 @@
 "use server";
 
-import { persistMockAuthSession } from "@/lib/auth/mock-session";
-import { getRoleDestination, parseAccountRole } from "@/lib/auth/roles";
+import { parseAccountRole } from "@/lib/auth/roles";
 import { redirect } from "next/navigation";
 
 import {
@@ -23,35 +22,11 @@ function getFormValue(formData: FormData, key: FormValueKey) {
   return typeof value === "string" ? value : "";
 }
 
-function useMockAuth() {
-  return process.env.INTERVIEW_AGENT_MOCK_AUTH === "true";
-}
-
 function getRegistrationSiteUrl() {
-  if (useMockAuth()) {
-    return process.env.NEXT_PUBLIC_SITE_URL?.trim() || "http://127.0.0.1:3000";
-  }
-
   return getPublicEnv().siteUrl;
 }
 
 async function createSignUpHandler() {
-  if (useMockAuth()) {
-    return async ({ email }: { email: string }) => {
-      if (email === "already-taken@example.com") {
-        return {
-          error: {
-            message: "User already registered"
-          }
-        };
-      }
-
-      return {
-        error: null
-      };
-    };
-  }
-
   const supabase = await createSupabaseServerClient();
 
   return async (payload: Parameters<typeof supabase.auth.signUp>[0]) => supabase.auth.signUp(payload);
@@ -68,40 +43,31 @@ export async function submitRegistration(
   _previousState: RegisterUserResult,
   formData: FormData
 ): Promise<RegisterUserResult> {
+  const role = getFormValue(formData, "role");
   const signUp = await createSignUpHandler();
-
-  return registerUser(
+  const result = await registerUser(
     {
       confirmPassword: getFormValue(formData, "confirmPassword"),
       email: getFormValue(formData, "email"),
       password: getFormValue(formData, "password"),
-      role: getFormValue(formData, "role")
+      role
     },
     {
       signUp,
       siteUrl: getRegistrationSiteUrl()
     }
   );
+
+  if (result.status === "success" && result.redirectTo) {
+    redirect(result.redirectTo);
+  }
+
+  return result;
 }
 
 export async function startGoogleRegistration(formData: FormData) {
   const role = getFormValue(formData, "role");
   const parsedRole = parseAccountRole(role.trim());
-
-  if (useMockAuth()) {
-    if (!parsedRole) {
-      redirect(
-        buildAuthErrorRedirectPath({
-          intent: "register",
-          message: "Choose Employer or Job Seeker before continuing with Google.",
-          role
-        })
-      );
-    }
-
-    await persistMockAuthSession(parsedRole);
-    redirect(getRoleDestination(parsedRole));
-  }
 
   const signInWithOAuth = await createGoogleOAuthHandler();
   const oauthResult = await beginGoogleOAuth({

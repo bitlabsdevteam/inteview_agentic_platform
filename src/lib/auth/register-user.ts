@@ -21,6 +21,7 @@ export type RegisterUserResult = {
   status: "idle" | "success" | "error";
   message?: string;
   fieldErrors?: Partial<Record<"email" | "password" | "confirmPassword" | "role", string>>;
+  redirectTo?: string;
 };
 
 type SignUpPayload = {
@@ -36,6 +37,9 @@ type SignUpPayload = {
 
 type RegisterUserDependencies = {
   signUp: (payload: SignUpPayload) => Promise<{
+    data?: {
+      session: object | null;
+    } | null;
     error: {
       message: string;
     } | null;
@@ -127,6 +131,13 @@ export async function registerUser(
     return {
       message: formatErrorMessage(signUpResult.error.message),
       status: "error"
+    };
+  }
+
+  if (signUpResult.data?.session) {
+    return {
+      redirectTo: getRoleDestination(registrationRole),
+      status: "success"
     };
   }
 

@@ -1,7 +1,6 @@
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { type NextRequest, NextResponse } from "next/server";
 
-import { readMockAuthSession } from "@/lib/auth/mock-session";
 import { parseAccountRole } from "@/lib/auth/roles";
 import { resolveRouteGuardRedirect } from "@/lib/auth/route-guard";
 import { getPublicEnv } from "@/lib/env";
@@ -13,23 +12,6 @@ type CookieToSet = {
 };
 
 export function updateSession(request: NextRequest) {
-  if (process.env.INTERVIEW_AGENT_MOCK_AUTH === "true") {
-    const mockSession = readMockAuthSession(request);
-    const mockRedirect = resolveRouteGuardRedirect({
-      isAuthenticated: mockSession.isAuthenticated,
-      pathname: request.nextUrl.pathname,
-      role: mockSession.role
-    });
-
-    if (mockRedirect) {
-      return NextResponse.redirect(new URL(mockRedirect, request.url));
-    }
-
-    return NextResponse.next({
-      request
-    });
-  }
-
   const env = getPublicEnv();
   const cookiesToSet: CookieToSet[] = [];
 

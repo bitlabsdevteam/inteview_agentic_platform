@@ -1,6 +1,12 @@
 import { expect, test } from "@playwright/test";
+import { isRealGoogleOAuthEnabled } from "./real-auth-env";
 
 test("Google registration carries the selected employer role into the app", async ({ page }) => {
+  test.skip(
+    !isRealGoogleOAuthEnabled(),
+    "Requires E2E_ENABLE_REAL_GOOGLE_OAUTH=true with a configured real Google OAuth environment."
+  );
+
   await page.goto("/register?role=employer");
 
   await expect(page.getByTestId("register-google-submit-button")).toBeEnabled();
@@ -22,7 +28,12 @@ test("Google registration carries the selected employer role into the app", asyn
 });
 
 test("Google login routes users without a saved role through role completion", async ({ page }) => {
-  await page.goto("/login?mock-missing-role=true");
+  test.skip(
+    !isRealGoogleOAuthEnabled(),
+    "Requires E2E_ENABLE_REAL_GOOGLE_OAUTH=true with a configured real Google OAuth environment."
+  );
+
+  await page.goto("/login");
 
   await expect(page.getByTestId("login-google-submit-button")).toBeVisible();
 

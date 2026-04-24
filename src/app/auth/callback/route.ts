@@ -3,11 +3,9 @@ import { NextRequest, NextResponse } from "next/server";
 
 import {
   buildAuthErrorRedirectPath,
-  buildRoleCompletionPath,
   resolveOAuthDestination,
   type GoogleOAuthIntent
 } from "@/lib/auth/google-oauth";
-import { persistMockAuthSessionOnResponse } from "@/lib/auth/mock-session";
 import { parseAccountRole } from "@/lib/auth/roles";
 import { getPublicEnv } from "@/lib/env";
 
@@ -16,10 +14,6 @@ type CookieToSet = {
   value: string;
   options?: CookieOptions;
 };
-
-function useMockAuth() {
-  return process.env.INTERVIEW_AGENT_MOCK_AUTH === "true";
-}
 
 function parseIntent(value: string | null): GoogleOAuthIntent {
   return value === "login" ? "login" : "register";
@@ -64,21 +58,6 @@ function createSupabaseRouteClient(request: NextRequest) {
 export async function GET(request: NextRequest) {
   const intent = parseIntent(request.nextUrl.searchParams.get("intent"));
 
-  if (useMockAuth()) {
-    const requestedRole = parseAccountRole(request.nextUrl.searchParams.get("role"));
-    const mockRole = parseAccountRole(request.nextUrl.searchParams.get("mockRole"));
-    const shouldRequireRoleCompletion =
-      request.nextUrl.searchParams.get("mockMissingRole") === "true";
-    const destination = shouldRequireRoleCompletion
-      ? buildRoleCompletionPath(intent)
-      : resolveOAuthDestination(requestedRole ?? mockRole, intent);
-
-    return persistMockAuthSessionOnResponse(
-      createRedirectResponse(request, destination),
-      shouldRequireRoleCompletion ? null : requestedRole ?? mockRole
-    );
-  }
-
   const code = request.nextUrl.searchParams.get("code");
 
   if (!code) {
@@ -110,6 +89,18 @@ export async function GET(request: NextRequest) {
 
   let resolvedRole = parseAccountRole(sessionResult.data.user.user_metadata?.role);
   const requestedRole = parseAccountRole(request.nextUrl.searchParams.get("role"));
+
+  if (intent === "register" && !resolvedRole && !requestedRole) {
+    return applyCookies(
+      createRedirectResponse(
+        request,
+        buildAuthErrorRedirectPath({
+          intent,
+          message: "Choose Employer or Job Seeker before continuing with Google."
+        })
+      )
+    );
+  }
 
   if (!resolvedRole && requestedRole) {
     const updateResult = await supabase.auth.updateUser({

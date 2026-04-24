@@ -47,6 +47,19 @@ describe("home page actions", () => {
     ]);
   });
 
+  it("removes public auth actions once a user is authenticated", () => {
+    const labels = getHomePageActions({
+      email: "jobseeker@example.com",
+      identityLabel: "jobseeker@example.com",
+      isAuthenticated: true,
+      role: "job_seeker",
+      roleLabel: "Job Seeker"
+    }).map((action) => action.label);
+
+    expect(labels).not.toContain("Log In");
+    expect(labels).not.toContain("Create Account");
+  });
+
   it("routes authenticated users without a role to role completion instead of public auth", () => {
     expect(
       getHomePageActions({

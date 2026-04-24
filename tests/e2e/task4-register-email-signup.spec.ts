@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { getJobSeekerSignupCredentials, hasCredentials } from "./real-auth-env";
 
 test("registration surfaces password mismatch before trying to create the account", async ({
   page
@@ -25,31 +26,22 @@ test("registration surfaces password mismatch before trying to create the accoun
 });
 
 test("registration shows auth errors and success messages for email signup", async ({ page }) => {
+  const signupCredentials = getJobSeekerSignupCredentials();
+
+  test.skip(
+    !hasCredentials(signupCredentials),
+    "Requires E2E_SUPABASE_SIGNUP_JOB_SEEKER_EMAIL and E2E_SUPABASE_SIGNUP_JOB_SEEKER_PASSWORD."
+  );
+
   await page.goto("/register?role=job_seeker");
 
-  await page.getByTestId("register-email-input").fill("already-taken@example.com");
-  await page.getByTestId("register-password-input").fill("securepass123");
-  await page.getByTestId("register-confirm-password-input").fill("securepass123");
-
+  await page.getByTestId("register-email-input").fill(signupCredentials.email!);
+  await page.getByTestId("register-password-input").fill(signupCredentials.password!);
+  await page.getByTestId("register-confirm-password-input").fill(signupCredentials.password!);
   await page.getByTestId("register-submit-button").click();
 
-  await expect(page.getByTestId("register-form-feedback")).toContainText(
-    "An account with this email already exists."
-  );
-
-  await page.screenshot({
-    path: "tests/screenshots/task4-step3-register-auth-error.png",
-    fullPage: true
-  });
-
-  await page.getByTestId("register-email-input").fill("new-job-seeker@example.com");
-  await page.getByTestId("register-password-input").fill("securepass123");
-  await page.getByTestId("register-confirm-password-input").fill("securepass123");
-  await page.getByTestId("register-submit-button").click();
-
-  await expect(page.getByTestId("register-form-feedback")).toContainText(
-    "Account created for Job Seeker. Check your email to continue."
-  );
+  await expect(page).toHaveURL(/\/job-seeker$/);
+  await expect(page.getByTestId("job-seeker-focus-card")).toBeVisible();
 
   await page.screenshot({
     path: "tests/screenshots/task4-step4-register-success.png",

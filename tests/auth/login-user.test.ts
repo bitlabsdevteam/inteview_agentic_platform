@@ -80,6 +80,34 @@ describe("loginUser", () => {
     });
   });
 
+  it("routes job seeker users with a saved role to /job-seeker", async () => {
+    const signInWithPassword = vi.fn().mockResolvedValue({
+      data: {
+        user: {
+          user_metadata: {
+            role: "job_seeker"
+          }
+        }
+      },
+      error: null
+    });
+
+    const result = await loginUser(
+      {
+        email: "jobseeker@example.com",
+        password: "securepass123"
+      },
+      {
+        signInWithPassword
+      }
+    );
+
+    expect(result).toEqual({
+      redirectTo: "/job-seeker",
+      status: "success"
+    });
+  });
+
   it("routes users without a saved role to the role completion step", async () => {
     const signInWithPassword = vi.fn().mockResolvedValue({
       data: {

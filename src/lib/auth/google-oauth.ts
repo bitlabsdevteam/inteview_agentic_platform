@@ -28,6 +28,7 @@ type BeginGoogleOAuthDependencies = {
   intent: GoogleOAuthIntent;
   role: string;
   siteUrl: string;
+  requireRole?: boolean;
   signInWithOAuth: (payload: SignInWithOAuthPayload) => Promise<SignInWithOAuthResult>;
 };
 
@@ -43,6 +44,14 @@ type BeginGoogleOAuthResult =
 
 export function getGoogleAuthEntryPath(intent: GoogleOAuthIntent) {
   return intent === "login" ? "/login" : "/register";
+}
+
+export function buildGoogleAuthStartPath(intent: GoogleOAuthIntent) {
+  const url = new URL("/auth/google", "http://localhost");
+
+  url.searchParams.set("intent", intent);
+
+  return `${url.pathname}${url.search}`;
 }
 
 export function buildGoogleOAuthCallbackUrl({
@@ -117,11 +126,12 @@ export async function beginGoogleOAuth({
   intent,
   role,
   siteUrl,
+  requireRole = intent === "register",
   signInWithOAuth
 }: BeginGoogleOAuthDependencies): Promise<BeginGoogleOAuthResult> {
   const parsedRole = parseAccountRole(role);
 
-  if (intent === "register" && !parsedRole) {
+  if (requireRole && intent === "register" && !parsedRole) {
     return {
       message: "Choose Employer or Job Seeker before continuing with Google.",
       status: "error"

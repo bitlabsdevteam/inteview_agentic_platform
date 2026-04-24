@@ -33,6 +33,16 @@ describe("resolveRouteGuardRedirect", () => {
     ).toBe("/employer");
   });
 
+  it("bypasses register page for authenticated users with a saved role", () => {
+    expect(
+      resolveRouteGuardRedirect({
+        isAuthenticated: true,
+        pathname: "/register",
+        role: "job_seeker"
+      })
+    ).toBe("/job-seeker");
+  });
+
   it("redirects authenticated users away from the wrong protected workspace", () => {
     expect(
       resolveRouteGuardRedirect({

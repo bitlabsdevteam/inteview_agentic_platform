@@ -81,6 +81,19 @@ describe("account header state", () => {
     ).toEqual(["Home", "Employer", "Job Seeker"]);
   });
 
+  it("never exposes Login or Register nav links for authenticated users", () => {
+    const authenticatedLabels = getAccountHeaderNavLinks({
+      email: "jobseeker@example.com",
+      identityLabel: "jobseeker@example.com",
+      isAuthenticated: true,
+      role: "job_seeker",
+      roleLabel: "Job Seeker"
+    }).map((link) => link.label);
+
+    expect(authenticatedLabels).not.toContain("Login");
+    expect(authenticatedLabels).not.toContain("Register");
+  });
+
   it("exposes a logout-only account action for authenticated users", () => {
     expect(
       getAccountHeaderAccountActions({

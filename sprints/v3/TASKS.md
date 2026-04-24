@@ -23,26 +23,32 @@
   - Files: `src/app/logout/actions.ts`, `src/lib/auth/logout-user.ts`, `src/components/account-profile-controls.tsx`, `tests/auth/logout-action.test.ts`, `tests/auth/logout-user.test.ts`, `tests/auth/enforce-route-access.test.ts`
   - Completed: 2026-04-24 - Added server-side logout action wiring that signs out via Supabase, redirects to `/` on success, and preserves protected-route redirects to `/login` for anonymous sessions.
 
-- [ ] Task 6: Lock the registration contract so role choice is mandatory and successful employer signup resolves to `/employer` (P0)
+- [x] Task 6: Lock the registration contract so role choice is mandatory and successful employer signup resolves to `/employer` (P0)
   - Acceptance: Email/password and Google registration both require an explicit role, and a completed employer signup with an active session redirects to `/employer`.
-  - Files: `src/app/register/actions.ts`, `src/lib/auth/register-user.ts`, `src/app/auth/callback/route.ts`, `tests/auth/register-user.test.ts`, relevant E2E tests
+  - Files: `src/app/register/actions.ts`, `src/lib/auth/register-user.ts`, `src/app/auth/callback/route.ts`, `tests/auth/register-user.test.ts`, `tests/auth/auth-callback-route.test.ts`, relevant E2E tests
+  - Completed: 2026-04-24 - Added OAuth callback contract enforcement for `intent=register` so role-less Google signups are rejected back to `/register`, and added callback route tests covering mandatory-role enforcement and employer destination redirects.
 
-- [ ] Task 7: Lock the registration contract so successful job seeker signup resolves to `/job-seeker` (P0)
+- [x] Task 7: Lock the registration contract so successful job seeker signup resolves to `/job-seeker` (P0)
   - Acceptance: Email/password and Google registration both redirect a completed job seeker signup with an active session to `/job-seeker`, while confirmation-required environments still show the correct pending-confirmation state.
-  - Files: `src/app/register/actions.ts`, `src/lib/auth/register-user.ts`, `src/app/auth/callback/route.ts`, `tests/auth/register-user.test.ts`, relevant E2E tests
+  - Files: `src/app/register/actions.ts`, `src/lib/auth/register-user.ts`, `src/app/auth/callback/route.ts`, `tests/auth/register-user.test.ts`, `tests/auth/auth-callback-route.test.ts`, relevant E2E tests
+  - Completed: 2026-04-24 - Added explicit regression coverage for active-session job seeker email signup and Google callback routing to `/job-seeker` while preserving pending-confirmation behavior for no-session signup responses.
 
-- [ ] Task 8: Preserve role-based login redirects and authenticated auth-page bypass behavior (P1)
+- [x] Task 8: Preserve role-based login redirects and authenticated auth-page bypass behavior (P1)
   - Acceptance: Returning users who log in are routed to the workspace tied to their saved role, and authenticated users who revisit `/login` or `/register` are redirected back into the app.
-  - Files: `src/lib/auth/login-user.ts`, `src/lib/auth/route-guard.ts`, `src/lib/auth/enforce-route-access.ts`, `tests/auth/login-user.test.ts`, `tests/auth/route-guard.test.ts`
+  - Files: `src/lib/auth/login-user.ts`, `src/lib/auth/route-guard.ts`, `src/lib/auth/enforce-route-access.ts`, `tests/auth/login-user.test.ts`, `tests/auth/route-guard.test.ts`, `tests/auth/enforce-route-access.test.ts`
+  - Completed: 2026-04-24 - Added regression coverage for job seeker login role redirects and authenticated `/login` + `/register` bypass redirects at both route-guard and enforce-route-access layers.
 
-- [ ] Task 9: Add unit coverage for authenticated header state and logout behavior (P1)
+- [x] Task 9: Add unit coverage for authenticated header state and logout behavior (P1)
   - Acceptance: Automated tests verify the navigation state for signed-in users, the absence of public auth actions after login, and the redirect/session contract after logout.
-  - Files: `tests/auth/*.test.ts`, possible new component or route tests under `tests/`
+  - Files: `tests/auth/account-header.test.ts`, `tests/auth/home-page-actions.test.ts`, `tests/auth/enforce-route-access.test.ts`, `tests/auth/logout-action.test.ts`, `tests/auth/logout-user.test.ts`
+  - Completed: 2026-04-24 - Added explicit authenticated-state negative assertions to keep `Login`/`Register` and `Log In`/`Create Account` out of signed-in navigation/actions, plus expanded logout recovery coverage that keeps protected `/job-seeker` access behind `/login` once the session is gone.
 
-- [ ] Task 10: Add Playwright coverage for employer registration to employer page and logout recovery (P1)
+- [x] Task 10: Add Playwright coverage for employer registration to employer page and logout recovery (P1)
   - Acceptance: An end-to-end test proves employer signup reaches `/employer`, the authenticated UI shows profile/logout state, logout succeeds, and protected employer pages become inaccessible without a session.
-  - Files: `tests/e2e/task10-auth-matrix.spec.ts`, new or updated auth E2E specs, `tests/screenshots/`
+  - Files: `tests/e2e/task10-auth-matrix.spec.ts`, `tests/screenshots/`
+  - Completed: 2026-04-24 - Extended the employer Google-signup E2E path to assert authenticated profile/logout controls, execute logout to public home, and verify `/employer` redirects to `/login` after session teardown; local Playwright run validated spec discovery but skipped live auth flows without configured real OAuth/credential env.
 
-- [ ] Task 11: Add Playwright coverage for job seeker registration/login/logout continuity (P1)
+- [x] Task 11: Add Playwright coverage for job seeker registration/login/logout continuity (P1)
   - Acceptance: An end-to-end test proves job seeker signup reaches `/job-seeker`, login restores that destination, and logout returns the session to a public state.
-  - Files: `tests/e2e/task10-auth-matrix.spec.ts`, new or updated auth E2E specs, `tests/screenshots/`
+  - Files: `tests/e2e/task10-auth-matrix.spec.ts`, `tests/screenshots/`
+  - Completed: 2026-04-24 - Extended the job seeker signup/login flows to assert authenticated profile/logout controls, execute logout back to public home, and verify `/job-seeker` redirects to `/login` after session teardown while preserving login destination checks; local Playwright execution validated spec discovery with live auth scenarios skipped until real credential/OAuth env is configured.

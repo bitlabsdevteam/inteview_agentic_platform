@@ -32,6 +32,7 @@ describe("submitLogout", () => {
 
     expect(createSupabaseServerClient).toHaveBeenCalledTimes(1);
     expect(signOut).toHaveBeenCalledTimes(1);
+    expect(redirect).toHaveBeenCalledTimes(1);
     expect(redirect).toHaveBeenCalledWith("/");
   });
 

@@ -3,6 +3,7 @@ import { describe, expect, it, vi } from "vitest";
 import {
   beginGoogleOAuth,
   buildAuthErrorRedirectPath,
+  buildGoogleAuthStartPath,
   buildGoogleOAuthCallbackUrl,
   resolveOAuthDestination
 } from "@/lib/auth/google-oauth";
@@ -21,6 +22,11 @@ describe("google oauth helpers", () => {
   it("routes users without a saved role to role completion", () => {
     expect(resolveOAuthDestination(null, "login")).toBe("/auth/complete-role?intent=login");
     expect(resolveOAuthDestination("job_seeker", "login")).toBe("/job-seeker");
+  });
+
+  it("builds a direct Google auth start path for public entry points", () => {
+    expect(buildGoogleAuthStartPath("login")).toBe("/auth/google?intent=login");
+    expect(buildGoogleAuthStartPath("register")).toBe("/auth/google?intent=register");
   });
 
   it("returns a register error when Google signup starts without a selected role", async () => {
@@ -59,6 +65,28 @@ describe("google oauth helpers", () => {
     expect(result).toEqual({
       status: "success",
       url: "https://accounts.google.com/mock"
+    });
+  });
+
+  it("allows a role-less Google register flow when role completion is expected later", async () => {
+    const signInWithOAuth = vi.fn().mockResolvedValue({
+      data: {
+        url: "https://accounts.google.com/mock-register"
+      },
+      error: null
+    });
+
+    const result = await beginGoogleOAuth({
+      intent: "register",
+      role: "",
+      requireRole: false,
+      signInWithOAuth,
+      siteUrl: "http://localhost:3000"
+    });
+
+    expect(result).toEqual({
+      status: "success",
+      url: "https://accounts.google.com/mock-register"
     });
   });
 
