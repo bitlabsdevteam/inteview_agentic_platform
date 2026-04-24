@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   deriveAccountHeaderState,
+  getAccountHeaderAccountActions,
   getAccountHeaderNavLinks,
   getAccountHeaderState
 } from "@/components/account-header";
@@ -78,5 +79,29 @@ describe("account header state", () => {
         roleLabel: "Employer"
       }).map((link) => link.label)
     ).toEqual(["Home", "Employer", "Job Seeker"]);
+  });
+
+  it("exposes a logout-only account action for authenticated users", () => {
+    expect(
+      getAccountHeaderAccountActions({
+        email: "employer@example.com",
+        identityLabel: "employer@example.com",
+        isAuthenticated: true,
+        role: "employer",
+        roleLabel: "Employer"
+      }).map((action) => action.label)
+    ).toEqual(["Logout"]);
+  });
+
+  it("does not expose account actions for anonymous users", () => {
+    expect(
+      getAccountHeaderAccountActions({
+        email: null,
+        identityLabel: "Guest",
+        isAuthenticated: false,
+        role: null,
+        roleLabel: null
+      })
+    ).toEqual([]);
   });
 });

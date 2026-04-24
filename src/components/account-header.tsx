@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { AccountProfileControls } from "@/components/account-profile-controls";
 import { buildGoogleAuthStartPath } from "@/lib/auth/google-oauth";
 import { formatAccountRole, parseAccountRole, type AccountRole } from "@/lib/auth/roles";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
@@ -34,6 +35,12 @@ type AccountHeaderProps = {
   state: AccountHeaderState;
 };
 
+export type AccountHeaderAction = {
+  id: "logout";
+  label: "Logout";
+  testId: "account-header-logout-button";
+};
+
 const baseNavLinks = [
   { href: "/", label: "Home" },
   { href: "/employer", label: "Employer" },
@@ -64,6 +71,20 @@ export function getAccountHeaderNavLinks(state: AccountHeaderState) {
     : [baseNavLinks[0], ...publicAuthLinks, ...baseNavLinks.slice(1)];
 }
 
+export function getAccountHeaderAccountActions(state: AccountHeaderState): AccountHeaderAction[] {
+  if (!state.isAuthenticated) {
+    return [];
+  }
+
+  return [
+    {
+      id: "logout",
+      label: "Logout",
+      testId: "account-header-logout-button"
+    }
+  ];
+}
+
 export async function getAccountHeaderState(
   reader?: Partial<AccountHeaderStateReader>
 ): Promise<AccountHeaderState> {
@@ -80,17 +101,11 @@ export async function getAccountHeaderState(
 }
 
 export function AccountHeader({ state }: AccountHeaderProps) {
+  const accountActions = getAccountHeaderAccountActions(state);
+
   return (
-    <header
-      style={{
-        display: "grid",
-        gap: "16px"
-      }}
-    >
-      <nav
-        aria-label="Primary"
-        style={{ display: "flex", gap: "16px", flexWrap: "wrap", fontSize: "0.95rem" }}
-      >
+    <header className="account-header">
+      <nav aria-label="Primary" className="account-header__nav">
         {getAccountHeaderNavLinks(state).map((link) => (
           <Link key={link.href} href={link.href}>
             {link.label}
@@ -98,37 +113,7 @@ export function AccountHeader({ state }: AccountHeaderProps) {
         ))}
       </nav>
 
-      <section
-        aria-label="Account State"
-        data-testid={state.isAuthenticated ? "account-header-profile" : "account-header-public-state"}
-        style={{
-          display: "grid",
-          gap: "6px",
-          padding: "16px",
-          borderRadius: "18px",
-          background: "rgba(244, 247, 251, 0.92)",
-          border: "1px solid rgba(31, 41, 51, 0.12)"
-        }}
-      >
-        <p
-          style={{
-            margin: 0,
-            textTransform: "uppercase",
-            letterSpacing: "0.12em",
-            fontSize: "0.76rem"
-          }}
-        >
-          {state.isAuthenticated ? "Profile State" : "Public State"}
-        </p>
-        <strong>{state.identityLabel}</strong>
-        <span style={{ lineHeight: 1.5 }}>
-          {state.isAuthenticated
-            ? state.roleLabel
-              ? `${state.roleLabel} session detected.`
-              : "Authenticated account with role setup still pending."
-            : "Browse public routes or authenticate to enter a protected workspace."}
-        </span>
-      </section>
+      <AccountProfileControls actions={accountActions} state={state} />
     </header>
   );
 }

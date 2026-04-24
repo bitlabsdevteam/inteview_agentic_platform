@@ -13,9 +13,10 @@
   - Files: `src/app/page.tsx`, `src/app/login/page.tsx`, `src/app/login/login-screen.tsx`, `src/app/register/page.tsx`, `src/app/register/registration-screen.tsx`, `src/app/auth/complete-role/page.tsx`, `src/app/auth/complete-role/complete-role-screen.tsx`, `src/components/employer-chat-shell.tsx`, `src/components/job-seeker-shell.tsx`, `src/components/home-page-actions.ts`, `tests/auth/home-page-actions.test.ts`
   - Completed: 2026-04-24 - Replaced hardcoded public auth nav links with the shared account header across landing, auth, and protected shells, and added an authenticated landing-page CTA branch so signed-in users no longer see `Login` or `Register` actions.
 
-- [ ] Task 4: Show a user profile area with a logout action as the authenticated account control (P0)
+- [x] Task 4: Show a user profile area with a logout action as the authenticated account control (P0)
   - Acceptance: When a user is signed in, the UI shows a profile section and the only account action presented there is `Logout`.
-  - Files: `src/components/route-shell.tsx`, new profile menu component files under `src/components/`, `src/app/globals.css`, relevant tests
+  - Files: `src/components/account-header.tsx`, `src/components/account-profile-controls.tsx`, `src/app/globals.css`, `tests/auth/account-header.test.ts`
+  - Completed: 2026-04-24 - Added a shared account profile controls component and updated the authenticated header contract so signed-in state exposes a profile section with a logout-only account action.
 
 - [ ] Task 5: Implement a secure logout action that signs out from Supabase and redirects to the public app (P0)
   - Acceptance: Triggering logout clears the current session, returns the user to `/`, and causes protected routes to redirect back through the public auth flow.
