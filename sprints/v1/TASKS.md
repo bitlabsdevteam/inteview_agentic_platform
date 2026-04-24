@@ -33,9 +33,10 @@
   - Files: `middleware.ts`, `src/lib/supabase/middleware.ts`, `src/lib/auth/route-guard.ts`, `src/lib/auth/mock-session.ts`, auth actions/pages
   - Completed: 2026-04-24 - Added role-aware middleware redirects for auth and protected routes, persisted mock auth session state for guarded test/dev flows, and validated the changes with unit tests, production build, semgrep, and npm audit.
 
-- [ ] Task 8: Create the employer chat agent UI shell as the first protected destination (P0)
+- [x] Task 8: Create the employer chat agent UI shell as the first protected destination (P0)
   - Acceptance: Employers land on `/employer` after auth and see an initial chat-agent interface ready for future job-description workflows.
-  - Files: employer dashboard/page, chat shell components, protected layout
+  - Files: `src/app/employer/page.tsx`, `src/components/employer-chat-shell.tsx`, `src/app/globals.css`, `tests/e2e/task8-employer-chat-shell.spec.ts`
+  - Completed: 2026-04-24 - Replaced the employer placeholder with a dedicated chat-agent workspace shell, added targeted Playwright coverage for the protected employer flow, and validated the implementation with unit tests, production build, semgrep, and npm audit. Playwright execution was blocked in this sandbox by local port bind restrictions.
 
 - [ ] Task 9: Create the initial job seeker protected landing page (P1)
   - Acceptance: Job seekers land on `/job-seeker` after auth and see a basic authenticated placeholder confirming the correct role flow.
