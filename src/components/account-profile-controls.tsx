@@ -1,4 +1,5 @@
 import type { AccountHeaderAction, AccountHeaderState } from "@/components/account-header";
+import { submitLogout } from "@/app/logout/actions";
 
 type AccountProfileControlsProps = {
   actions: AccountHeaderAction[];
@@ -27,14 +28,15 @@ export function AccountProfileControls({ actions, state }: AccountProfileControl
       {actions.length ? (
         <div className="account-header__actions" data-testid="account-header-account-actions">
           {actions.map((action) => (
-            <button
-              key={action.id}
-              className="account-header__action-button"
-              data-testid={action.testId}
-              type="button"
-            >
-              {action.label}
-            </button>
+            <form key={action.id} action={submitLogout}>
+              <button
+                className="account-header__action-button"
+                data-testid={action.testId}
+                type="submit"
+              >
+                {action.label}
+              </button>
+            </form>
           ))}
         </div>
       ) : null}

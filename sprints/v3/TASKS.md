@@ -18,9 +18,10 @@
   - Files: `src/components/account-header.tsx`, `src/components/account-profile-controls.tsx`, `src/app/globals.css`, `tests/auth/account-header.test.ts`
   - Completed: 2026-04-24 - Added a shared account profile controls component and updated the authenticated header contract so signed-in state exposes a profile section with a logout-only account action.
 
-- [ ] Task 5: Implement a secure logout action that signs out from Supabase and redirects to the public app (P0)
+- [x] Task 5: Implement a secure logout action that signs out from Supabase and redirects to the public app (P0)
   - Acceptance: Triggering logout clears the current session, returns the user to `/`, and causes protected routes to redirect back through the public auth flow.
-  - Files: new logout action/route files under `src/app/` or `src/lib/auth/`, `src/lib/supabase/server.ts`, `src/lib/auth/enforce-route-access.ts`, relevant tests
+  - Files: `src/app/logout/actions.ts`, `src/lib/auth/logout-user.ts`, `src/components/account-profile-controls.tsx`, `tests/auth/logout-action.test.ts`, `tests/auth/logout-user.test.ts`, `tests/auth/enforce-route-access.test.ts`
+  - Completed: 2026-04-24 - Added server-side logout action wiring that signs out via Supabase, redirects to `/` on success, and preserves protected-route redirects to `/login` for anonymous sessions.
 
 - [ ] Task 6: Lock the registration contract so role choice is mandatory and successful employer signup resolves to `/employer` (P0)
   - Acceptance: Email/password and Google registration both require an explicit role, and a completed employer signup with an active session redirects to `/employer`.
