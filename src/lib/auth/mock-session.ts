@@ -17,16 +17,35 @@ export type MockAuthSession = {
   role: AccountRole | null;
 };
 
-export function readMockAuthSession(request: NextRequest): MockAuthSession {
-  const isAuthenticated =
-    request.cookies.get(MOCK_AUTH_SESSION_COOKIE)?.value === "authenticated";
+function parseMockAuthSession({
+  sessionValue,
+  roleValue
+}: {
+  sessionValue?: string;
+  roleValue?: string;
+}): MockAuthSession {
+  const isAuthenticated = sessionValue === "authenticated";
 
   return {
     isAuthenticated,
-    role: isAuthenticated
-      ? parseAccountRole(request.cookies.get(MOCK_AUTH_ROLE_COOKIE)?.value)
-      : null
+    role: isAuthenticated ? parseAccountRole(roleValue) : null
   };
+}
+
+export function readMockAuthSession(request: NextRequest): MockAuthSession {
+  return parseMockAuthSession({
+    roleValue: request.cookies.get(MOCK_AUTH_ROLE_COOKIE)?.value,
+    sessionValue: request.cookies.get(MOCK_AUTH_SESSION_COOKIE)?.value
+  });
+}
+
+export async function readMockAuthSessionFromCookies(): Promise<MockAuthSession> {
+  const cookieStore = await cookies();
+
+  return parseMockAuthSession({
+    roleValue: cookieStore.get(MOCK_AUTH_ROLE_COOKIE)?.value,
+    sessionValue: cookieStore.get(MOCK_AUTH_SESSION_COOKIE)?.value
+  });
 }
 
 export async function persistMockAuthSession(role: AccountRole | null) {

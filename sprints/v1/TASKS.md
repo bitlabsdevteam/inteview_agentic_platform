@@ -43,6 +43,7 @@
   - Files: `src/app/job-seeker/page.tsx`, `src/components/job-seeker-shell.tsx`, `src/app/globals.css`, `tests/e2e/task9-job-seeker-landing.spec.ts`
   - Completed: 2026-04-24 - Replaced the generic job seeker placeholder with a protected candidate landing shell, added targeted Playwright coverage for the role-based destination, and validated the implementation with unit tests, production build, semgrep, and npm audit. Playwright execution was blocked in this sandbox by local port and server reuse issues.
 
-- [ ] Task 10: Add end-to-end auth coverage for both roles and both sign-in methods (P1)
+- [x] Task 10: Add end-to-end auth coverage for both roles and both sign-in methods (P1)
   - Acceptance: Tests cover landing page entry, employer registration/login, job seeker registration/login, role-based redirects, and protected-page access.
-  - Files: `tests/e2e/`, screenshots, auth test fixtures/config
+  - Files: `tests/e2e/task10-auth-matrix.spec.ts`, `playwright.config.ts`, `playwright.manual.config.ts`, auth route guards/pages, `tests/screenshots/task10-*.png`
+  - Completed: 2026-04-24 - Added a consolidated auth E2E matrix for both roles and both sign-in methods, hardened mock auth redirects and page-level route enforcement, and validated the full Playwright suite plus unit tests, production build, semgrep, and npm audit.

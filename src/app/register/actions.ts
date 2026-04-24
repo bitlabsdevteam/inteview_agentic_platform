@@ -1,5 +1,7 @@
 "use server";
 
+import { persistMockAuthSession } from "@/lib/auth/mock-session";
+import { getRoleDestination, parseAccountRole } from "@/lib/auth/roles";
 import { redirect } from "next/navigation";
 
 import {
@@ -84,23 +86,27 @@ export async function submitRegistration(
 
 export async function startGoogleRegistration(formData: FormData) {
   const role = getFormValue(formData, "role");
+  const parsedRole = parseAccountRole(role.trim());
 
   if (useMockAuth()) {
-    const callbackUrl = new URL("/auth/callback", getRegistrationSiteUrl());
-
-    callbackUrl.searchParams.set("intent", "register");
-
-    if (role.trim()) {
-      callbackUrl.searchParams.set("role", role.trim());
+    if (!parsedRole) {
+      redirect(
+        buildAuthErrorRedirectPath({
+          intent: "register",
+          message: "Choose Employer or Job Seeker before continuing with Google.",
+          role
+        })
+      );
     }
 
-    redirect(callbackUrl.toString());
+    await persistMockAuthSession(parsedRole);
+    redirect(getRoleDestination(parsedRole));
   }
 
   const signInWithOAuth = await createGoogleOAuthHandler();
   const oauthResult = await beginGoogleOAuth({
     intent: "register",
-    role,
+    role: parsedRole ?? role,
     signInWithOAuth,
     siteUrl: getRegistrationSiteUrl()
   });

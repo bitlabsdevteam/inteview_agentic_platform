@@ -1,11 +1,13 @@
 "use server";
 
 import { persistMockAuthSession } from "@/lib/auth/mock-session";
+import { buildRoleCompletionPath, resolveOAuthDestination } from "@/lib/auth/google-oauth";
+import { parseAccountRole } from "@/lib/auth/roles";
 import { redirect } from "next/navigation";
 
 import {
   beginGoogleOAuth,
-  buildAuthErrorRedirectPath
+  buildAuthErrorRedirectPath,
 } from "@/lib/auth/google-oauth";
 import { loginUser } from "@/lib/auth/login-user";
 import { getPublicEnv } from "@/lib/env";
@@ -149,19 +151,16 @@ export async function startGoogleLogin(formData: FormData) {
   const mockMissingRole = getFormValue(formData, "mockMissingRole");
 
   if (useMockAuth()) {
-    const callbackUrl = new URL("/auth/callback", getSiteUrl());
-
-    callbackUrl.searchParams.set("intent", "login");
-
     if (mockMissingRole === "true") {
-      callbackUrl.searchParams.set("mockMissingRole", "true");
+      await persistMockAuthSession(null);
+      redirect(buildRoleCompletionPath("login"));
     }
 
-    if (mockRole.trim()) {
-      callbackUrl.searchParams.set("mockRole", mockRole.trim());
-    }
+    const parsedRole = parseAccountRole(mockRole.trim());
 
-    redirect(callbackUrl.toString());
+    await persistMockAuthSession(parsedRole);
+
+    redirect(resolveOAuthDestination(parsedRole, "login"));
   }
 
   const signInWithOAuth = await createGoogleOAuthHandler();
