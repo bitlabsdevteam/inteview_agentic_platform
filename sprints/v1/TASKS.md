@@ -28,9 +28,10 @@
   - Files: login page, auth form components, shared auth messaging
   - Completed: 2026-04-23 - Added email/password login with role-based post-auth redirects, surfaced invalid-credential and recovery states on the login screen, and extended auth coverage with unit plus Playwright tests.
 
-- [ ] Task 7: Add session-aware route guards and role-based redirects (P0)
+- [x] Task 7: Add session-aware route guards and role-based redirects (P0)
   - Acceptance: Authenticated users bypass public auth pages and are redirected to the correct destination based on saved role.
-  - Files: middleware/guard logic, session bootstrap utilities, redirect helpers
+  - Files: `middleware.ts`, `src/lib/supabase/middleware.ts`, `src/lib/auth/route-guard.ts`, `src/lib/auth/mock-session.ts`, auth actions/pages
+  - Completed: 2026-04-24 - Added role-aware middleware redirects for auth and protected routes, persisted mock auth session state for guarded test/dev flows, and validated the changes with unit tests, production build, semgrep, and npm audit.
 
 - [ ] Task 8: Create the employer chat agent UI shell as the first protected destination (P0)
   - Acceptance: Employers land on `/employer` after auth and see an initial chat-agent interface ready for future job-description workflows.

@@ -1,5 +1,6 @@
 "use server";
 
+import { persistMockAuthSession } from "@/lib/auth/mock-session";
 import { redirect } from "next/navigation";
 
 import { getRoleDestination, parseAccountRole } from "@/lib/auth/roles";
@@ -36,6 +37,7 @@ export async function submitRoleCompletion(
   }
 
   if (useMockAuth()) {
+    await persistMockAuthSession(role);
     redirect(getRoleDestination(role));
   }
 

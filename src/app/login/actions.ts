@@ -1,5 +1,6 @@
 "use server";
 
+import { persistMockAuthSession } from "@/lib/auth/mock-session";
 import { redirect } from "next/navigation";
 
 import {
@@ -128,6 +129,16 @@ export async function submitLogin(
 
   if (result.status === "error") {
     return result;
+  }
+
+  if (useMockAuth()) {
+    await persistMockAuthSession(
+      result.redirectTo === "/employer"
+        ? "employer"
+        : result.redirectTo === "/job-seeker"
+          ? "job_seeker"
+          : null
+    );
   }
 
   redirect(result.redirectTo);

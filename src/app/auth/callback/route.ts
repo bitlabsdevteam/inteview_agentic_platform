@@ -7,6 +7,7 @@ import {
   resolveOAuthDestination,
   type GoogleOAuthIntent
 } from "@/lib/auth/google-oauth";
+import { persistMockAuthSessionOnResponse } from "@/lib/auth/mock-session";
 import { parseAccountRole } from "@/lib/auth/roles";
 import { getPublicEnv } from "@/lib/env";
 
@@ -72,7 +73,10 @@ export async function GET(request: NextRequest) {
       ? buildRoleCompletionPath(intent)
       : resolveOAuthDestination(requestedRole ?? mockRole, intent);
 
-    return createRedirectResponse(request, destination);
+    return persistMockAuthSessionOnResponse(
+      createRedirectResponse(request, destination),
+      shouldRequireRoleCompletion ? null : requestedRole ?? mockRole
+    );
   }
 
   const code = request.nextUrl.searchParams.get("code");

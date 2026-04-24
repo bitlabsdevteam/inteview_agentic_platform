@@ -103,13 +103,22 @@ export async function registerUser(
     };
   }
 
+  const registrationRole = role;
+
+  if (!registrationRole) {
+    return {
+      message: "Choose Employer or Job Seeker before creating the account.",
+      status: "error"
+    };
+  }
+
   const signUpResult = await signUp({
     email,
     options: {
       data: {
-        role
+        role: registrationRole
       },
-      emailRedirectTo: `${siteUrl}${getRoleDestination(role)}`
+      emailRedirectTo: `${siteUrl}${getRoleDestination(registrationRole)}`
     },
     password
   });
@@ -122,7 +131,7 @@ export async function registerUser(
   }
 
   return {
-    message: `Account created for ${formatAccountRole(role)}. Check your email to continue.`,
+    message: `Account created for ${formatAccountRole(registrationRole)}. Check your email to continue.`,
     status: "success"
   };
 }
