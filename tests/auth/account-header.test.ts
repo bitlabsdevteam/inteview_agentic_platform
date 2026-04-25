@@ -69,16 +69,24 @@ describe("account header state", () => {
         roleLabel: null
       }).map((link) => link.label)
     ).toEqual(["Home", "Login", "Register", "Employer", "Job Seeker"]);
+  });
 
-    expect(
-      getAccountHeaderNavLinks({
-        email: "employer@example.com",
-        identityLabel: "employer@example.com",
-        isAuthenticated: true,
-        role: "employer",
-        roleLabel: "Employer"
-      }).map((link) => link.label)
-    ).toEqual(["Home", "Employer", "Job Seeker"]);
+  it("scopes authenticated employer navigation to employer-only links and logout", () => {
+    const employerState = {
+      email: "employer@example.com",
+      identityLabel: "employer@example.com",
+      isAuthenticated: true,
+      role: "employer" as const,
+      roleLabel: "Employer"
+    };
+    const navLabels = getAccountHeaderNavLinks(employerState).map((link) => link.label);
+    const accountActions = getAccountHeaderAccountActions(employerState).map(
+      (action) => action.label
+    );
+
+    expect(navLabels).toEqual(["Home", "Employer"]);
+    expect(navLabels).not.toContain("Job Seeker");
+    expect(accountActions).toEqual(["Logout"]);
   });
 
   it("never exposes Login or Register nav links for authenticated users", () => {

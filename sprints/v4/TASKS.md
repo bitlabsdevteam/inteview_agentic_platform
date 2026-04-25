@@ -12,9 +12,10 @@
     - Authenticated role mismatches already redirect to the saved role destination through `resolveRouteGuardRedirect`, including employer access to `/job-seeker` -> `/employer` and job seeker access to `/employer` -> `/job-seeker`.
   - Completed: 2026-04-25 — Reviewed current header and guard contracts, verified the baseline with `npx vitest run tests/auth/account-header.test.ts tests/auth/route-guard.test.ts` (15 tests passed), ran `npx semgrep --config auto src/ --quiet`, and cleared `npm audit` by pinning patched PostCSS through npm overrides.
 
-- [ ] Task 2: Add failing unit coverage for employer-scoped top-menu links (P0)
+- [x] Task 2: Add failing unit coverage for employer-scoped top-menu links (P0)
   - Acceptance: A test proves an authenticated employer sees `Home` and `Employer`, does not see `Job Seeker`, and still receives the logout-only account action.
   - Files: `tests/auth/account-header.test.ts`, `src/components/account-header.tsx`
+  - Completed: 2026-04-25 — Added the employer-scoped navigation regression in `tests/auth/account-header.test.ts`. The focused test target is intentionally red until Task 4 implements role-scoped links: `npx vitest run tests/auth/account-header.test.ts` fails because the current employer nav still returns `Home`, `Employer`, and `Job Seeker`. Security checks passed with `npx semgrep --config auto src/ --quiet` and `npm audit`.
 
 - [ ] Task 3: Add failing unit coverage for employer denial from job-seeker routes (P0)
   - Acceptance: A test proves an authenticated employer requesting `/job-seeker` resolves to `/employer` before the job-seeker page can render.
