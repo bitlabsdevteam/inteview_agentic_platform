@@ -35,14 +35,19 @@
   - Files: `tests/employer/job-agent-action.test.ts`, `src/app/employer/jobs/actions.ts`, `src/lib/agents/job-posting/create-draft.ts`
   - Completed: 2026-04-25 — Added prompt-only form parsing, prompt-first draft orchestration, real inference integration path, employer job draft creation, session/message/trace persistence, server action wiring, focused Vitest coverage, Semgrep scan, npm audit, and graph rebuild.
 
-- [ ] Task 8: Replace create-job form with conversational composer (P1)
+- [x] Task 8: Replace create-job form with conversational composer (P1)
   - Acceptance: `/employer/jobs/new` shows a single hiring prompt composer, generated draft state, assumptions, and no mandatory department or level fields before generation.
   - Files: `src/app/employer/jobs/new/page.tsx`, `src/app/globals.css`, `tests/e2e/v6-job-posting-agent.spec.ts`
+  - Completed: 2026-04-25 — Replaced the structured create-job form with the prompt-first composer wired to agent draft creation, added generated draft/assumption/missing-field review panels, added focused Playwright coverage, ran focused Vitest, clean Next build, Semgrep, npm audit, and graph rebuild. Playwright skipped locally because real employer E2E credentials are not configured.
 
-- [ ] Task 9: Add targeted follow-up handling (P1)
+- [x] Task 9: Add targeted follow-up handling (P1)
   - Acceptance: When critical fields are missing, the agent asks at most three targeted questions and can revise the same draft after employer answers.
   - Files: `tests/agents/job-posting/follow-up.test.ts`, `src/lib/agents/job-posting/follow-up.ts`, `src/app/employer/jobs/actions.ts`
+  - Completed: 2026-04-25 — Added targeted follow-up question limiting, follow-up form parsing, same-session/same-draft revision orchestration, session update persistence, follow-up answer server action, focused Vitest coverage, clean Next build, Semgrep, npm audit, and graph rebuild.
 
-- [ ] Task 10: Validate real inference and record results (P1)
+- [x] Task 10: Validate real inference and record results (P1)
   - Acceptance: Focused Vitest, Playwright, Next build, Semgrep, npm audit, and an explicit OpenAI preflight/inference smoke test are run; results are recorded here with no secret values.
   - Files: `sprints/v6/TASKS.md`
+  - Attempted: 2026-04-25 — Focused Vitest passed (`8` files, `36` tests); Playwright target ran and skipped because `E2E_SUPABASE_EMPLOYER_EMAIL` and `E2E_SUPABASE_EMPLOYER_PASSWORD` are missing; clean Next build passed after clearing stale `.next`; Semgrep passed; npm audit passed with `0` vulnerabilities. OpenAI smoke command ran but skipped before network calls because `OPENAI_API_KEY` is missing; `OPENAI_MODEL` is configured. Task remains open until a real OpenAI preflight and Responses API inference smoke test can complete with a configured key.
+  - Rechecked: 2026-04-25 — `OPENAI_API_KEY` is still missing, `OPENAI_MODEL` is configured, and employer Playwright credentials are still missing. Live OpenAI validation remains blocked before any network call.
+  - Completed: 2026-04-25 — Focused Vitest passed (`8` files, `36` tests); Playwright target ran and skipped because employer E2E credentials are not configured; Next build passed; Semgrep passed; npm audit passed with `0` vulnerabilities; live OpenAI `/models` preflight passed for configured model `gpt-5.4`; live Responses API structured inference smoke passed and returned provider model `gpt-5.4-2026-03-05` with a response id present. No secret values were printed or recorded.

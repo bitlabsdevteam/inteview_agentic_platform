@@ -11,6 +11,10 @@ import {
   createAgentJobMessage,
   createAgentJobSession
 } from "@/lib/agents/job-posting/persistence";
+import {
+  getTargetedFollowUpQuestions,
+  shouldRequestFollowUp
+} from "@/lib/agents/job-posting/follow-up";
 import type { PromptVersion } from "@/lib/agents/job-posting/prompts";
 import { convertAgentOutputToEmployerJobInput } from "@/lib/agents/job-posting/schema";
 import { createEmployerJobDraft } from "@/lib/employer/jobs";
@@ -64,15 +68,16 @@ export async function createPromptFirstEmployerJobDraft({
   });
   const jobInput = convertAgentOutputToEmployerJobInput(inference.output);
   const job = await createEmployerJobDraft(client, employerUserId, jobInput);
+  const followUpQuestions = getTargetedFollowUpQuestions(inference.output);
   const session = await createAgentJobSession(client, {
     employerUserId,
     employerJobId: job.id,
-    status: "draft_created",
+    status: shouldRequestFollowUp(inference.output) ? "needs_follow_up" : "draft_created",
     latestEmployerPrompt: employerPrompt,
     generatedFields: inference.output,
     assumptions: inference.output.assumptions,
     missingCriticalFields: inference.output.missingCriticalFields,
-    followUpQuestions: inference.output.followUpQuestions
+    followUpQuestions
   });
 
   await createAgentJobMessage(client, {

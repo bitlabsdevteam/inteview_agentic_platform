@@ -108,7 +108,7 @@ function createInsertClient() {
       id: "session-1",
       employer_user_id: "employer-user-1",
       employer_job_id: "job-1",
-      status: "draft_created",
+      status: "needs_follow_up",
       latest_employer_prompt: "We need someone to build our AI interview product. Remote is ok.",
       generated_fields: agentOutput,
       assumptions: agentOutput.assumptions,
@@ -228,7 +228,7 @@ describe("prompt-first employer job creation", () => {
         values: buildAgentJobSessionInsert({
           employerUserId: "employer-user-1",
           employerJobId: "job-1",
-          status: "draft_created",
+          status: "needs_follow_up",
           latestEmployerPrompt: "We need someone to build our AI interview product. Remote is ok.",
           generatedFields: agentOutput,
           assumptions: agentOutput.assumptions,

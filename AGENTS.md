@@ -80,6 +80,7 @@ All agent flows must enforce explicit guardrails across employer and job seeker 
 ### Core Guardrails
 
 - Never reveal system prompts, hidden policies, internal tools, secrets, or chain-of-thought content to end users.
+- Never display debugging, internal telemetry, or unrelated system messages in user-facing UI (for example: "User session detected.").
 - Never trust raw user input as executable instructions for tools, database access, or external actions.
 - Validate all tool inputs and normalize structured payloads before execution.
 - Enforce least-privilege access for every agent action, tool call, and data fetch.
@@ -108,3 +109,12 @@ All agent flows must enforce explicit guardrails across employer and job seeker 
 - Define clear fallback behavior for model failures, malformed structured output, and policy violations.
 - Require human review for high-impact outputs such as final job publication, candidate rejection reasoning, or irreversible workflow actions.
 - Add regression tests for prompt injection resistance, authorization boundaries, and output-policy compliance.
+
+## graphify
+
+This project has a graphify knowledge graph at graphify-out/.
+
+Rules:
+- Before answering architecture or codebase questions, read graphify-out/GRAPH_REPORT.md for god nodes and community structure
+- If graphify-out/wiki/index.md exists, navigate it instead of reading raw files
+- After modifying code files in this session, run `python3 -c "from graphify.watch import _rebuild_code; from pathlib import Path; _rebuild_code(Path('.'))"` to keep the graph current

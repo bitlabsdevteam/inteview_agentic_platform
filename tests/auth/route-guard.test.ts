@@ -73,6 +73,16 @@ describe("resolveRouteGuardRedirect", () => {
     ).toBe("/job-seeker");
   });
 
+  it("redirects authenticated job seekers away from employer job routes", () => {
+    expect(
+      resolveRouteGuardRedirect({
+        isAuthenticated: true,
+        pathname: "/employer/jobs/new",
+        role: "job_seeker"
+      })
+    ).toBe("/job-seeker");
+  });
+
   it("sends authenticated users without a saved role to role completion", () => {
     expect(
       resolveRouteGuardRedirect({
@@ -109,6 +119,16 @@ describe("resolveRouteGuardRedirect", () => {
         isAuthenticated: true,
         pathname: "/job-seeker/interviews",
         role: "job_seeker"
+      })
+    ).toBeNull();
+  });
+
+  it("allows employer sessions to reach nested employer job routes", () => {
+    expect(
+      resolveRouteGuardRedirect({
+        isAuthenticated: true,
+        pathname: "/employer/jobs",
+        role: "employer"
       })
     ).toBeNull();
   });

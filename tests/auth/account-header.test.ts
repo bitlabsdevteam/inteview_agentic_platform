@@ -87,7 +87,7 @@ describe("account header state", () => {
       (action) => action.label
     );
 
-    expect(navLabels).toEqual(["Home", "Employer"]);
+    expect(navLabels).toEqual(["Home", "Employer", "Jobs"]);
     expect(navLabels).not.toContain("Job Seeker");
     expect(accountActions).toEqual(["Logout"]);
   });
@@ -162,6 +162,7 @@ describe("account header state", () => {
     expect(markup).toContain('data-testid="account-header-profile"');
     expect(markup).toContain('data-testid="account-header-logout-button"');
     expect(markup).toContain(">Employer</a>");
+    expect(markup).toContain(">Jobs</a>");
     expect(markup).not.toContain(">Job Seeker</a>");
     expect(markup).not.toContain(">Login</a>");
     expect(markup).not.toContain(">Register</a>");

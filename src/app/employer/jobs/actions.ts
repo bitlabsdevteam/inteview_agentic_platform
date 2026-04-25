@@ -6,6 +6,11 @@ import {
   createPromptFirstEmployerJobDraft,
   getEmployerPromptFromFormData
 } from "@/lib/agents/job-posting/create-draft";
+import {
+  getFollowUpAnswerFromFormData,
+  getFollowUpSessionIdFromFormData,
+  reviseEmployerJobDraftFromFollowUp
+} from "@/lib/agents/job-posting/follow-up";
 import { getOpenAIClientConfig } from "@/lib/agents/job-posting/openai-client";
 import { createStaticJobCreatorPromptVersion } from "@/lib/agents/job-posting/prompts";
 import { parseAccountRole } from "@/lib/auth/roles";
@@ -62,6 +67,20 @@ export async function createEmployerJobWithAgentAction(formData: FormData) {
     client: supabase,
     employerUserId: userId,
     employerPrompt: getEmployerPromptFromFormData(formData),
+    config: getOpenAIClientConfig(),
+    promptVersion: createStaticJobCreatorPromptVersion()
+  });
+
+  redirect(`/employer/jobs/${result.job.id}`);
+}
+
+export async function reviseEmployerJobWithAgentFollowUpAction(formData: FormData) {
+  const { supabase, userId } = await getEmployerContext();
+  const result = await reviseEmployerJobDraftFromFollowUp({
+    client: supabase,
+    employerUserId: userId,
+    sessionId: getFollowUpSessionIdFromFormData(formData),
+    answer: getFollowUpAnswerFromFormData(formData),
     config: getOpenAIClientConfig(),
     promptVersion: createStaticJobCreatorPromptVersion()
   });

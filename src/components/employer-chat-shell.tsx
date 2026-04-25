@@ -1,4 +1,5 @@
 import React from "react";
+import Link from "next/link";
 
 import { AccountHeader, getAccountHeaderState } from "@/components/account-header";
 
@@ -108,9 +109,15 @@ export async function EmployerChatShell() {
                 defaultValue=""
               />
               <div className="employer-composer__actions">
-                <button className="employer-composer__button" type="button">
-                  Start Intake
-                </button>
+                <Link className="employer-composer__button employer-link-button" href="/employer/jobs/new">
+                  Create Job
+                </Link>
+                <Link
+                  className="employer-composer__button employer-composer__button--secondary employer-link-button"
+                  href="/employer/jobs"
+                >
+                  View Jobs
+                </Link>
                 <button
                   className="employer-composer__button employer-composer__button--secondary"
                   type="button"

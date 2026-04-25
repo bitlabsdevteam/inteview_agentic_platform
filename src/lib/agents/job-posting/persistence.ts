@@ -45,6 +45,18 @@ export type AgentJobSessionInsert = Omit<
   "id" | "created_at" | "updated_at"
 >;
 
+export type AgentJobSessionPatch = Partial<
+  Pick<
+    AgentJobSessionInsert,
+    | "status"
+    | "latest_employer_prompt"
+    | "generated_fields"
+    | "assumptions"
+    | "missing_critical_fields"
+    | "follow_up_questions"
+  >
+>;
+
 export type AgentJobMessageInput = {
   sessionId: string;
   employerUserId: string;
@@ -127,6 +139,24 @@ export function buildAgentJobSessionInsert(
   return {
     employer_user_id: input.employerUserId,
     employer_job_id: input.employerJobId,
+    status: input.status,
+    latest_employer_prompt: input.latestEmployerPrompt,
+    generated_fields: input.generatedFields,
+    assumptions: input.assumptions,
+    missing_critical_fields: input.missingCriticalFields,
+    follow_up_questions: input.followUpQuestions
+  };
+}
+
+export function buildAgentJobSessionPatch(input: {
+  status: AgentJobSessionStatus;
+  latestEmployerPrompt: string;
+  generatedFields: Record<string, unknown>;
+  assumptions: string[];
+  missingCriticalFields: string[];
+  followUpQuestions: string[];
+}): AgentJobSessionPatch {
+  return {
     status: input.status,
     latest_employer_prompt: input.latestEmployerPrompt,
     generated_fields: input.generatedFields,
@@ -219,5 +249,48 @@ export async function listAgentJobSessions(
   return assertQueryResult(
     await query.eq("employer_user_id", employerUserId).order("updated_at", { ascending: false }),
     "list agent job sessions"
+  );
+}
+
+export async function getAgentJobSession(
+  client: AgentPersistenceClient,
+  employerUserId: string,
+  sessionId: string
+) {
+  const query = client.from("agent_job_sessions").select("*") as {
+    eq: (column: string, value: string) => {
+      eq: (column: string, value: string) => {
+        maybeSingle: () => Promise<QueryResult<AgentJobSessionRecord | null>>;
+      };
+    };
+  };
+
+  return assertQueryResult(
+    await query.eq("id", sessionId).eq("employer_user_id", employerUserId).maybeSingle(),
+    "load agent job session"
+  );
+}
+
+export async function updateAgentJobSession(
+  client: AgentPersistenceClient,
+  employerUserId: string,
+  sessionId: string,
+  patch: AgentJobSessionPatch
+) {
+  const query = (client.from("agent_job_sessions") as unknown as {
+    update: (values: AgentJobSessionPatch) => {
+      eq: (column: string, value: string) => {
+        eq: (column: string, value: string) => {
+          select: (columns: string) => {
+            single: () => Promise<QueryResult<AgentJobSessionRecord>>;
+          };
+        };
+      };
+    };
+  }).update(patch);
+
+  return assertQueryResult(
+    await query.eq("id", sessionId).eq("employer_user_id", employerUserId).select("*").single(),
+    "update agent job session"
   );
 }

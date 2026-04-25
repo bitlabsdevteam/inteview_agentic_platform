@@ -1,4 +1,5 @@
-import { EmployerChatShell } from "@/components/employer-chat-shell";
+import { redirect } from "next/navigation";
+
 import { enforceRouteAccess } from "@/lib/auth/enforce-route-access";
 
 export const dynamic = "force-dynamic";
@@ -6,5 +7,5 @@ export const dynamic = "force-dynamic";
 export default async function EmployerPage() {
   await enforceRouteAccess("/employer");
 
-  return <EmployerChatShell />;
+  redirect("/employer/jobs");
 }

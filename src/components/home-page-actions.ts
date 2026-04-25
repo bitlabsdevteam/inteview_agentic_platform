@@ -20,7 +20,7 @@ export function getHomePageActions(state: AccountHeaderState): HomePageAction[] 
         tone: "secondary"
       },
       {
-        href: "/auth/google?intent=register",
+        href: "/register",
         label: "Create Account",
         testId: "landing-register-link",
         tone: "primary"

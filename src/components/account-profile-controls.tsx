@@ -16,15 +16,15 @@ export function AccountProfileControls({ actions, state }: AccountProfileControl
       data-testid={state.isAuthenticated ? "account-header-profile" : "account-header-public-state"}
     >
       <p className="account-header__profile-label">
-        {state.isAuthenticated ? "Profile State" : "Public State"}
+        {state.isAuthenticated ? "Account" : "Visitor"}
       </p>
       <strong className="account-header__identity">{state.identityLabel}</strong>
       <span className="account-header__summary">
         {state.isAuthenticated
           ? state.roleLabel
-            ? `${state.roleLabel} session detected.`
-            : "Authenticated account with role setup still pending."
-          : "Browse public routes or authenticate to enter a protected workspace."}
+            ? `Signed in as ${state.roleLabel}.`
+            : "Signed in. Finish role setup to continue."
+          : "Sign in or register to access your workspace."}
       </span>
 
       {actions.length ? (
