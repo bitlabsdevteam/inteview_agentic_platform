@@ -20,9 +20,10 @@
   - Files: `tests/agents/job-posting/prompt-assembly.test.ts`, `src/lib/agents/job-posting/prompts.ts`
   - Completed: 2026-04-25 — Added server-side prompt version metadata, checksum generation, separated system/developer/user prompt assembly, untrusted employer prompt wrapping, canonical system prompt loading, focused Vitest coverage, Semgrep scan, npm audit, and graph rebuild.
 
-- [ ] Task 5: Add live job posting inference service (P0)
+- [x] Task 5: Add live job posting inference service (P0)
   - Acceptance: Service calls the real OpenAI Responses API in production mode, parses structured JSON, validates required fields, and reports provider response id and model used.
   - Files: `tests/agents/job-posting/inference.test.ts`, `src/lib/agents/job-posting/inference.ts`
+  - Completed: 2026-04-25 — Added Responses API request construction, strict structured-output JSON schema, real fetch-based inference path, sanitized provider/network errors, validated output parsing, focused Vitest coverage, Semgrep scan, npm audit, and graph rebuild.
 
 - [ ] Task 6: Add agent session persistence migration and helpers (P0)
   - Acceptance: SQL creates owner-scoped tables for job agent sessions, messages, assumptions, and execution traces with RLS; helpers insert and load employer-owned sessions.
