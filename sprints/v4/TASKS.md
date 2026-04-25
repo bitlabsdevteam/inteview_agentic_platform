@@ -42,9 +42,10 @@
   - Files: `src/components/route-shell.tsx`, `src/components/employer-chat-shell.tsx`, `src/components/job-seeker-shell.tsx`, `src/app/page.tsx`, `src/app/globals.css`
   - Completed: 2026-04-25 — Added shared `app-page` and `product-shell` structure across public, employer, job seeker, and generic route shells; moved `RouteShell` off inline styles; and replaced route/debug-facing labels with product-facing workspace language. Added render-level coverage that verifies shared shell classes and blocks internal UI terms. Validation: `npx vitest run tests/shells/visual-language.test.ts tests/auth/account-header.test.ts` (12 tests passed), `npx semgrep --config auto src/ --quiet`, and `npm audit`.
 
-- [ ] Task 8: Add responsive top-menu behavior (P1)
+- [x] Task 8: Add responsive top-menu behavior (P1)
   - Acceptance: The top menu remains usable at mobile and desktop widths, labels do not overlap profile controls, and account actions remain reachable.
   - Files: `src/components/account-header.tsx`, `src/components/account-profile-controls.tsx`, `src/app/globals.css`, `tests/e2e/v4-top-menu-responsive.spec.ts`
+  - Completed: 2026-04-25 — Added stable top-menu test IDs for the header, brand link, primary nav, and individual nav links, then tightened mobile nav/profile sizing so header controls remain reachable without collisions. Added Playwright coverage for desktop and mobile public top-menu layouts with screenshots at `tests/screenshots/v4-task8-desktop-top-menu.png` and `tests/screenshots/v4-task8-mobile-top-menu.png`. Validation: `npx playwright test tests/e2e/v4-top-menu-responsive.spec.ts` (2 tests passed), `npx vitest run tests/auth/account-header.test.ts` (10 tests passed), `npx semgrep --config auto src/ --quiet`, and `npm audit`.
 
 - [ ] Task 9: Add Playwright coverage for employer login menu isolation (P1)
   - Acceptance: An employer-authenticated browser flow verifies the top menu does not show `Job Seeker`, shows the employer profile state, and retains logout.

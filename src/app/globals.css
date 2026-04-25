@@ -166,6 +166,7 @@ main {
   justify-content: center;
   flex-wrap: wrap;
   gap: 8px;
+  min-width: 0;
   font-size: 0.95rem;
 }
 
@@ -198,6 +199,7 @@ main {
   justify-content: end;
   gap: 10px;
   min-width: 0;
+  max-width: 100%;
 }
 
 .account-header__profile-label {
@@ -269,6 +271,7 @@ main {
 
   .account-header__profile {
     justify-content: space-between;
+    width: 100%;
   }
 }
 
@@ -285,6 +288,7 @@ main {
   .account-header__profile {
     align-items: flex-start;
     flex-direction: column;
+    gap: 6px;
   }
 
   .account-header__identity {

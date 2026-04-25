@@ -43,14 +43,14 @@ export type AccountHeaderAction = {
 };
 
 const baseNavLinks = [
-  { href: "/", label: "Home" },
-  { href: "/employer", label: "Employer" },
-  { href: "/job-seeker", label: "Job Seeker" }
+  { href: "/", label: "Home", testId: "account-header-nav-home" },
+  { href: "/employer", label: "Employer", testId: "account-header-nav-employer" },
+  { href: "/job-seeker", label: "Job Seeker", testId: "account-header-nav-job-seeker" }
 ] as const;
 
 const publicAuthLinks = [
-  { href: buildGoogleAuthStartPath("login"), label: "Login" },
-  { href: buildGoogleAuthStartPath("register"), label: "Register" }
+  { href: buildGoogleAuthStartPath("login"), label: "Login", testId: "account-header-nav-login" },
+  { href: buildGoogleAuthStartPath("register"), label: "Register", testId: "account-header-nav-register" }
 ] as const;
 
 const roleNavLinks = {
@@ -115,9 +115,14 @@ export function AccountHeader({ state }: AccountHeaderProps) {
     : "account-header account-header--public";
 
   return (
-    <header className={headerClassName}>
+    <header className={headerClassName} data-testid="account-header">
       <div className="account-header__bar">
-        <Link aria-label="Interview Agent home" className="account-header__brand" href="/">
+        <Link
+          aria-label="Interview Agent home"
+          className="account-header__brand"
+          data-testid="account-header-brand-link"
+          href="/"
+        >
           <span aria-hidden="true" className="account-header__brand-mark">
             IA
           </span>
@@ -127,9 +132,18 @@ export function AccountHeader({ state }: AccountHeaderProps) {
           </span>
         </Link>
 
-        <nav aria-label="Primary workspace navigation" className="account-header__nav">
+        <nav
+          aria-label="Primary workspace navigation"
+          className="account-header__nav"
+          data-testid="account-header-primary-nav"
+        >
           {getAccountHeaderNavLinks(state).map((link) => (
-            <Link className="account-header__nav-link" key={link.href} href={link.href}>
+            <Link
+              className="account-header__nav-link"
+              data-testid={link.testId}
+              key={link.href}
+              href={link.href}
+            >
               {link.label}
             </Link>
           ))}
