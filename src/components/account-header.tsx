@@ -52,6 +52,11 @@ const publicAuthLinks = [
   { href: buildGoogleAuthStartPath("register"), label: "Register" }
 ] as const;
 
+const roleNavLinks = {
+  employer: baseNavLinks[1],
+  job_seeker: baseNavLinks[2]
+} as const satisfies Record<AccountRole, (typeof baseNavLinks)[number]>;
+
 export function deriveAccountHeaderState(user: SessionUserLike): AccountHeaderState {
   const email = typeof user?.email === "string" && user.email.trim() ? user.email.trim() : null;
   const role = parseAccountRole(user?.user_metadata?.role);
@@ -66,9 +71,11 @@ export function deriveAccountHeaderState(user: SessionUserLike): AccountHeaderSt
 }
 
 export function getAccountHeaderNavLinks(state: AccountHeaderState) {
-  return state.isAuthenticated
-    ? [...baseNavLinks]
-    : [baseNavLinks[0], ...publicAuthLinks, ...baseNavLinks.slice(1)];
+  if (!state.isAuthenticated) {
+    return [baseNavLinks[0], ...publicAuthLinks, ...baseNavLinks.slice(1)];
+  }
+
+  return state.role ? [baseNavLinks[0], roleNavLinks[state.role]] : [baseNavLinks[0]];
 }
 
 export function getAccountHeaderAccountActions(state: AccountHeaderState): AccountHeaderAction[] {

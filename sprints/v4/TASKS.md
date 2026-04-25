@@ -22,9 +22,10 @@
   - Files: `tests/auth/route-guard.test.ts`, `tests/auth/enforce-route-access.test.ts`, `src/lib/auth/route-guard.ts`, `src/lib/auth/enforce-route-access.ts`
   - Completed: 2026-04-25 — Added explicit regression coverage for employer access to `/job-seeker` at the route resolver and server enforcement layers. The focused target passed immediately because the existing mismatch redirect implementation already routes employers back to `/employer`: `npx vitest run tests/auth/route-guard.test.ts tests/auth/enforce-route-access.test.ts` (15 tests passed). Security checks passed with `npx semgrep --config auto src/ --quiet` and `npm audit`.
 
-- [ ] Task 4: Implement role-scoped authenticated navigation links (P0)
+- [x] Task 4: Implement role-scoped authenticated navigation links (P0)
   - Acceptance: `getAccountHeaderNavLinks` returns public links for anonymous users, employer-only links for employer users, and job-seeker-only links for job seeker users.
   - Files: `src/components/account-header.tsx`, `tests/auth/account-header.test.ts`
+  - Completed: 2026-04-25 — Implemented role-derived authenticated navigation so employer sessions receive `Home` and `Employer`, job seeker sessions receive `Home` and `Job Seeker`, anonymous users keep public auth and workspace links, and authenticated no-role users receive `Home` only while route guards send them to role completion. Added job-seeker scoped nav coverage and verified the pre-existing employer regression now passes. Validation: `npx vitest run tests/auth/account-header.test.ts` (9 tests passed), `npx semgrep --config auto src/ --quiet`, and `npm audit`.
 
 - [ ] Task 5: Implement protected-route mismatch redirects (P0)
   - Acceptance: Employer sessions are redirected from `/job-seeker` to `/employer`, job seeker sessions are redirected from `/employer` to `/job-seeker`, anonymous users still redirect to `/login`, and no-role users still redirect to `/auth/complete-role`.

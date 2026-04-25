@@ -89,6 +89,19 @@ describe("account header state", () => {
     expect(accountActions).toEqual(["Logout"]);
   });
 
+  it("scopes authenticated job seeker navigation to job-seeker-only links", () => {
+    const navLabels = getAccountHeaderNavLinks({
+      email: "jobseeker@example.com",
+      identityLabel: "jobseeker@example.com",
+      isAuthenticated: true,
+      role: "job_seeker",
+      roleLabel: "Job Seeker"
+    }).map((link) => link.label);
+
+    expect(navLabels).toEqual(["Home", "Job Seeker"]);
+    expect(navLabels).not.toContain("Employer");
+  });
+
   it("never exposes Login or Register nav links for authenticated users", () => {
     const authenticatedLabels = getAccountHeaderNavLinks({
       email: "jobseeker@example.com",
