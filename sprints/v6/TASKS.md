@@ -5,9 +5,10 @@
   - Files: `tests/agents/job-posting/schema.test.ts`, `src/lib/agents/job-posting/schema.ts`
   - Completed: 2026-04-25 — Added schema contracts, runtime validation, conversion into `EmployerJobInput`, focused Vitest coverage, Semgrep scan, npm audit, and graph rebuild.
 
-- [ ] Task 2: Add OpenAI server client configuration (P0)
+- [x] Task 2: Add OpenAI server client configuration (P0)
   - Acceptance: Server-only helper reads `OPENAI_API_KEY` and `OPENAI_MODEL`, defaults to `gpt-5.5`, rejects missing keys, and never exposes secrets through public config.
   - Files: `tests/agents/job-posting/openai-config.test.ts`, `src/lib/agents/job-posting/openai-client.ts`, `.env.example`
+  - Completed: 2026-04-25 — Added server-only OpenAI config defaults, API key validation, request header helper, `.env.example` default model alignment, focused Vitest coverage, Semgrep scan, npm audit, and graph rebuild.
 
 - [ ] Task 3: Add model availability preflight (P0)
   - Acceptance: A server helper checks the configured model against OpenAI's models endpoint and returns a clear unavailable-model error instead of silently using another model.
