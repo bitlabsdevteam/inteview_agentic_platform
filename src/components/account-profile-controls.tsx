@@ -1,3 +1,5 @@
+import React from "react";
+
 import type { AccountHeaderAction, AccountHeaderState } from "@/components/account-header";
 import { submitLogout } from "@/app/logout/actions";
 

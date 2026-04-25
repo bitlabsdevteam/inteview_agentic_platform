@@ -32,9 +32,10 @@
   - Files: `src/lib/auth/route-guard.ts`, `src/lib/auth/enforce-route-access.ts`, `tests/auth/route-guard.test.ts`, `tests/auth/enforce-route-access.test.ts`
   - Completed: 2026-04-25 — Added explicit resolver and server enforcement coverage for job seeker sessions denied from `/employer` and authenticated no-role sessions redirected from protected routes to role completion. The existing generic protected-route mismatch implementation already satisfied the full redirect matrix, so no production changes were needed. Validation: `npx vitest run tests/auth/route-guard.test.ts tests/auth/enforce-route-access.test.ts` (19 tests passed), `npx semgrep --config auto src/ --quiet`, and `npm audit`.
 
-- [ ] Task 6: Redesign the account header as a professional top menu bar (P1)
+- [x] Task 6: Redesign the account header as a professional top menu bar (P1)
   - Acceptance: The header includes a clear brand area, role-scoped primary navigation, accessible focus states, and a compact profile/logout area without public auth actions after login.
   - Files: `src/components/account-header.tsx`, `src/components/account-profile-controls.tsx`, `src/app/globals.css`, `tests/auth/account-header.test.ts`
+  - Completed: 2026-04-25 — Reworked `AccountHeader` into a branded top menu with an Interview Agent home link, role-scoped primary workspace navigation, compact account/logout placement, and focused CSS states. Added render-level coverage proving authenticated employer sessions expose the branded top menu, retain logout/profile controls, and omit public auth plus job-seeker links. Validation: `npx vitest run tests/auth/account-header.test.ts` (10 tests passed), `npx semgrep --config auto src/ --quiet`, and `npm audit`.
 
 - [ ] Task 7: Apply the refined AI agentic company visual language to shared shells (P1)
   - Acceptance: Public, employer, and job seeker shells share consistent spacing, typography, color tokens, and surface styling without nested card-heavy layouts or visible debug/session text.

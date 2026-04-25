@@ -1,6 +1,9 @@
 import { describe, expect, it } from "vitest";
+import { createElement } from "react";
+import { renderToStaticMarkup } from "react-dom/server";
 
 import {
+  AccountHeader,
   deriveAccountHeaderState,
   getAccountHeaderAccountActions,
   getAccountHeaderNavLinks,
@@ -137,5 +140,30 @@ describe("account header state", () => {
         roleLabel: null
       })
     ).toEqual([]);
+  });
+
+  it("renders authenticated sessions as a branded role-scoped top menu", () => {
+    const markup = renderToStaticMarkup(
+      createElement(AccountHeader, {
+        state: {
+          email: "employer@example.com",
+          identityLabel: "employer@example.com",
+          isAuthenticated: true,
+          role: "employer",
+          roleLabel: "Employer"
+        }
+      })
+    );
+
+    expect(markup).toContain('class="account-header account-header--authenticated"');
+    expect(markup).toContain('class="account-header__brand"');
+    expect(markup).toContain('aria-label="Interview Agent home"');
+    expect(markup).toContain('aria-label="Primary workspace navigation"');
+    expect(markup).toContain('data-testid="account-header-profile"');
+    expect(markup).toContain('data-testid="account-header-logout-button"');
+    expect(markup).toContain(">Employer</a>");
+    expect(markup).not.toContain(">Job Seeker</a>");
+    expect(markup).not.toContain(">Login</a>");
+    expect(markup).not.toContain(">Register</a>");
   });
 });

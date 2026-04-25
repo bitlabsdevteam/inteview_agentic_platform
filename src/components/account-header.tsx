@@ -1,3 +1,4 @@
+import React from "react";
 import Link from "next/link";
 
 import { AccountProfileControls } from "@/components/account-profile-controls";
@@ -109,18 +110,33 @@ export async function getAccountHeaderState(
 
 export function AccountHeader({ state }: AccountHeaderProps) {
   const accountActions = getAccountHeaderAccountActions(state);
+  const headerClassName = state.isAuthenticated
+    ? "account-header account-header--authenticated"
+    : "account-header account-header--public";
 
   return (
-    <header className="account-header">
-      <nav aria-label="Primary" className="account-header__nav">
-        {getAccountHeaderNavLinks(state).map((link) => (
-          <Link key={link.href} href={link.href}>
-            {link.label}
-          </Link>
-        ))}
-      </nav>
+    <header className={headerClassName}>
+      <div className="account-header__bar">
+        <Link aria-label="Interview Agent home" className="account-header__brand" href="/">
+          <span aria-hidden="true" className="account-header__brand-mark">
+            IA
+          </span>
+          <span className="account-header__brand-copy">
+            <strong>Interview Agent</strong>
+            <span>Hiring OS</span>
+          </span>
+        </Link>
 
-      <AccountProfileControls actions={accountActions} state={state} />
+        <nav aria-label="Primary workspace navigation" className="account-header__nav">
+          {getAccountHeaderNavLinks(state).map((link) => (
+            <Link className="account-header__nav-link" key={link.href} href={link.href}>
+              {link.label}
+            </Link>
+          ))}
+        </nav>
+
+        <AccountProfileControls actions={accountActions} state={state} />
+      </div>
     </header>
   );
 }
