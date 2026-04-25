@@ -25,9 +25,10 @@
   - Files: `tests/agents/job-posting/inference.test.ts`, `src/lib/agents/job-posting/inference.ts`
   - Completed: 2026-04-25 — Added Responses API request construction, strict structured-output JSON schema, real fetch-based inference path, sanitized provider/network errors, validated output parsing, focused Vitest coverage, Semgrep scan, npm audit, and graph rebuild.
 
-- [ ] Task 6: Add agent session persistence migration and helpers (P0)
+- [x] Task 6: Add agent session persistence migration and helpers (P0)
   - Acceptance: SQL creates owner-scoped tables for job agent sessions, messages, assumptions, and execution traces with RLS; helpers insert and load employer-owned sessions.
   - Files: `supabase/migrations/20260425000001_job_posting_agent.sql`, `tests/agents/job-posting/persistence.test.ts`, `src/lib/agents/job-posting/persistence.ts`
+  - Completed: 2026-04-25 — Added owner-scoped agent session, message, and execution trace migration with RLS; added persistence insert/list helpers, audit metadata builders, focused Vitest coverage, Semgrep scan, npm audit, and graph rebuild.
 
 - [ ] Task 7: Add prompt-first job creation server action (P0)
   - Acceptance: Employer prompt creates an agent session, calls inference, persists trace metadata, and creates or updates an `employer_jobs` draft without requiring manual department, level, or location input.
