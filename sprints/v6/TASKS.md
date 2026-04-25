@@ -10,9 +10,10 @@
   - Files: `tests/agents/job-posting/openai-config.test.ts`, `src/lib/agents/job-posting/openai-client.ts`, `.env.example`
   - Completed: 2026-04-25 — Added server-only OpenAI config defaults, API key validation, request header helper, `.env.example` default model alignment, focused Vitest coverage, Semgrep scan, npm audit, and graph rebuild.
 
-- [ ] Task 3: Add model availability preflight (P0)
+- [x] Task 3: Add model availability preflight (P0)
   - Acceptance: A server helper checks the configured model against OpenAI's models endpoint and returns a clear unavailable-model error instead of silently using another model.
   - Files: `tests/agents/job-posting/model-preflight.test.ts`, `src/lib/agents/job-posting/openai-client.ts`
+  - Completed: 2026-04-25 — Added OpenAI `/models` preflight, unavailable-model handling, provider/network/malformed-response errors without key leakage, focused Vitest coverage, Semgrep scan, npm audit, and graph rebuild.
 
 - [ ] Task 4: Add prompt version and assembly layer (P0)
   - Acceptance: Tests verify prompt assembly separates system policy, product instructions, tool/output rules, and untrusted employer prompt content.
