@@ -52,9 +52,10 @@
   - Files: `tests/e2e/v4-employer-menu-isolation.spec.ts`, `tests/screenshots/`
   - Completed: 2026-04-25 — Added a dedicated employer-authenticated Playwright flow that logs in with `E2E_SUPABASE_EMPLOYER_EMAIL` and `E2E_SUPABASE_EMPLOYER_PASSWORD`, verifies the top menu shows `Home` and `Employer`, omits `Job Seeker` plus public auth links, shows the employer profile state, and keeps logout visible. Validation: `npx playwright test tests/e2e/v4-employer-menu-isolation.spec.ts` (1 skipped because employer E2E credentials are not configured in this environment), `npx vitest run tests/auth/account-header.test.ts` (10 tests passed), `npx semgrep --config auto src/ --quiet`, and `npm audit`. The screenshot path is `tests/screenshots/v4-task9-employer-menu-isolation.png` when credentials are available.
 
-- [ ] Task 10: Add Playwright coverage for employer direct-route denial (P1)
+- [x] Task 10: Add Playwright coverage for employer direct-route denial (P1)
   - Acceptance: An employer-authenticated browser flow navigates directly to `/job-seeker` and verifies the app redirects to `/employer` without rendering job-seeker-only content.
   - Files: `tests/e2e/v4-employer-route-denial.spec.ts`, `tests/screenshots/`
+  - Completed: 2026-04-25 — Added a dedicated employer-authenticated Playwright flow that logs in with `E2E_SUPABASE_EMPLOYER_EMAIL` and `E2E_SUPABASE_EMPLOYER_PASSWORD`, opens `/job-seeker` directly, verifies the browser returns to `/employer`, confirms employer workspace/menu content remains visible, and asserts job-seeker workspace content never renders. Validation: `npx playwright test tests/e2e/v4-employer-route-denial.spec.ts` (1 skipped because employer E2E credentials are not configured in this environment), `npx vitest run tests/auth/route-guard.test.ts tests/auth/enforce-route-access.test.ts tests/auth/account-header.test.ts` (29 tests passed), `npx semgrep --config auto src/ --quiet`, and `npm audit`. The screenshot path is `tests/screenshots/v4-task10-employer-route-denial.png` when credentials are available.
 
 - [ ] Task 11: Run focused validation and update completion notes (P2)
   - Acceptance: The smallest relevant Vitest and Playwright targets run, results are recorded, and this task list is updated with completion notes.
