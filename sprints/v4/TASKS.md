@@ -47,9 +47,10 @@
   - Files: `src/components/account-header.tsx`, `src/components/account-profile-controls.tsx`, `src/app/globals.css`, `tests/e2e/v4-top-menu-responsive.spec.ts`
   - Completed: 2026-04-25 — Added stable top-menu test IDs for the header, brand link, primary nav, and individual nav links, then tightened mobile nav/profile sizing so header controls remain reachable without collisions. Added Playwright coverage for desktop and mobile public top-menu layouts with screenshots at `tests/screenshots/v4-task8-desktop-top-menu.png` and `tests/screenshots/v4-task8-mobile-top-menu.png`. Validation: `npx playwright test tests/e2e/v4-top-menu-responsive.spec.ts` (2 tests passed), `npx vitest run tests/auth/account-header.test.ts` (10 tests passed), `npx semgrep --config auto src/ --quiet`, and `npm audit`.
 
-- [ ] Task 9: Add Playwright coverage for employer login menu isolation (P1)
+- [x] Task 9: Add Playwright coverage for employer login menu isolation (P1)
   - Acceptance: An employer-authenticated browser flow verifies the top menu does not show `Job Seeker`, shows the employer profile state, and retains logout.
   - Files: `tests/e2e/v4-employer-menu-isolation.spec.ts`, `tests/screenshots/`
+  - Completed: 2026-04-25 — Added a dedicated employer-authenticated Playwright flow that logs in with `E2E_SUPABASE_EMPLOYER_EMAIL` and `E2E_SUPABASE_EMPLOYER_PASSWORD`, verifies the top menu shows `Home` and `Employer`, omits `Job Seeker` plus public auth links, shows the employer profile state, and keeps logout visible. Validation: `npx playwright test tests/e2e/v4-employer-menu-isolation.spec.ts` (1 skipped because employer E2E credentials are not configured in this environment), `npx vitest run tests/auth/account-header.test.ts` (10 tests passed), `npx semgrep --config auto src/ --quiet`, and `npm audit`. The screenshot path is `tests/screenshots/v4-task9-employer-menu-isolation.png` when credentials are available.
 
 - [ ] Task 10: Add Playwright coverage for employer direct-route denial (P1)
   - Acceptance: An employer-authenticated browser flow navigates directly to `/job-seeker` and verifies the app redirects to `/employer` without rendering job-seeker-only content.
