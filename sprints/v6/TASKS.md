@@ -15,9 +15,10 @@
   - Files: `tests/agents/job-posting/model-preflight.test.ts`, `src/lib/agents/job-posting/openai-client.ts`
   - Completed: 2026-04-25 — Added OpenAI `/models` preflight, unavailable-model handling, provider/network/malformed-response errors without key leakage, focused Vitest coverage, Semgrep scan, npm audit, and graph rebuild.
 
-- [ ] Task 4: Add prompt version and assembly layer (P0)
+- [x] Task 4: Add prompt version and assembly layer (P0)
   - Acceptance: Tests verify prompt assembly separates system policy, product instructions, tool/output rules, and untrusted employer prompt content.
   - Files: `tests/agents/job-posting/prompt-assembly.test.ts`, `src/lib/agents/job-posting/prompts.ts`
+  - Completed: 2026-04-25 — Added server-side prompt version metadata, checksum generation, separated system/developer/user prompt assembly, untrusted employer prompt wrapping, canonical system prompt loading, focused Vitest coverage, Semgrep scan, npm audit, and graph rebuild.
 
 - [ ] Task 5: Add live job posting inference service (P0)
   - Acceptance: Service calls the real OpenAI Responses API in production mode, parses structured JSON, validates required fields, and reports provider response id and model used.
