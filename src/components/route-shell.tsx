@@ -1,3 +1,4 @@
+import React from "react";
 import type { ReactNode } from "react";
 
 import { AccountHeader, getAccountHeaderState } from "@/components/account-header";
@@ -18,25 +19,13 @@ export async function RouteShell({
   const accountHeaderState = await getAccountHeaderState();
 
   return (
-    <main>
-      <div
-        style={{
-          display: "grid",
-          gap: "24px",
-          padding: "32px",
-          borderRadius: "24px",
-          background: "rgba(255, 255, 255, 0.86)",
-          border: "1px solid rgba(31, 41, 51, 0.12)",
-          boxShadow: "0 24px 60px rgba(31, 41, 51, 0.10)"
-        }}
-      >
+    <main className="app-page route-page">
+      <div className="product-shell route-shell">
         <AccountHeader state={accountHeaderState} />
-        <div style={{ display: "grid", gap: "12px" }}>
-          <p style={{ margin: 0, textTransform: "uppercase", letterSpacing: "0.12em", fontSize: "0.78rem" }}>
-            {eyebrow}
-          </p>
-          <h1 style={{ margin: 0, fontSize: "clamp(2rem, 6vw, 4rem)" }}>{title}</h1>
-          <p style={{ margin: 0, maxWidth: "60ch", lineHeight: 1.6 }}>{description}</p>
+        <div className="route-shell__intro">
+          <p className="route-shell__eyebrow">{eyebrow}</p>
+          <h1>{title}</h1>
+          <p>{description}</p>
         </div>
         {children}
       </div>

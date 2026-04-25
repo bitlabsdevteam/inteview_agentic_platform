@@ -37,9 +37,10 @@
   - Files: `src/components/account-header.tsx`, `src/components/account-profile-controls.tsx`, `src/app/globals.css`, `tests/auth/account-header.test.ts`
   - Completed: 2026-04-25 — Reworked `AccountHeader` into a branded top menu with an Interview Agent home link, role-scoped primary workspace navigation, compact account/logout placement, and focused CSS states. Added render-level coverage proving authenticated employer sessions expose the branded top menu, retain logout/profile controls, and omit public auth plus job-seeker links. Validation: `npx vitest run tests/auth/account-header.test.ts` (10 tests passed), `npx semgrep --config auto src/ --quiet`, and `npm audit`.
 
-- [ ] Task 7: Apply the refined AI agentic company visual language to shared shells (P1)
+- [x] Task 7: Apply the refined AI agentic company visual language to shared shells (P1)
   - Acceptance: Public, employer, and job seeker shells share consistent spacing, typography, color tokens, and surface styling without nested card-heavy layouts or visible debug/session text.
   - Files: `src/components/route-shell.tsx`, `src/components/employer-chat-shell.tsx`, `src/components/job-seeker-shell.tsx`, `src/app/page.tsx`, `src/app/globals.css`
+  - Completed: 2026-04-25 — Added shared `app-page` and `product-shell` structure across public, employer, job seeker, and generic route shells; moved `RouteShell` off inline styles; and replaced route/debug-facing labels with product-facing workspace language. Added render-level coverage that verifies shared shell classes and blocks internal UI terms. Validation: `npx vitest run tests/shells/visual-language.test.ts tests/auth/account-header.test.ts` (12 tests passed), `npx semgrep --config auto src/ --quiet`, and `npm audit`.
 
 - [ ] Task 8: Add responsive top-menu behavior (P1)
   - Acceptance: The top menu remains usable at mobile and desktop widths, labels do not overlap profile controls, and account actions remain reachable.

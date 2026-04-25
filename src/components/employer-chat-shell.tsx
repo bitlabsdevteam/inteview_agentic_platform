@@ -1,3 +1,5 @@
+import React from "react";
+
 import { AccountHeader, getAccountHeaderState } from "@/components/account-header";
 
 const workflowSteps = [
@@ -30,10 +32,10 @@ const threadMessages = [
       "I’m ready to turn your hiring brief into a publishable role. Start with the job title, level, and the business problem this hire needs to solve."
   },
   {
-    speaker: "Session Focus",
+    speaker: "Workspace Focus",
     tone: "system",
     body:
-      "This shell is prepared for future job-description workflows, structured extraction, evaluation, and audit traces."
+      "Use this workspace to prepare role details before drafting the final job description."
   },
   {
     speaker: "Suggested Prompt",
@@ -47,13 +49,13 @@ export async function EmployerChatShell() {
   const accountHeaderState = await getAccountHeaderState();
 
   return (
-    <main className="employer-page">
-      <div className="employer-shell">
+    <main className="app-page employer-page">
+      <div className="product-shell employer-shell">
         <AccountHeader state={accountHeaderState} />
 
         <section className="employer-hero">
           <div className="employer-hero__copy">
-            <p className="employer-eyebrow">Protected Employer Route</p>
+            <p className="employer-eyebrow">Employer Workspace</p>
             <h1>Employer agent workspace</h1>
             <p className="employer-summary">
               Land directly in a job-design workspace where the employer agent can gather hiring
@@ -62,10 +64,10 @@ export async function EmployerChatShell() {
           </div>
 
           <div className="employer-hero__meta">
-            <p className="employer-section-label">Session Posture</p>
+            <p className="employer-section-label">Workspace Status</p>
             <div className="employer-session-pulse">
               <strong>Ready for intake</strong>
-              <span>Role-aware protected shell with a prompt composer, planning board, and audit-minded context.</span>
+              <span>Capture role requirements with the prompt composer and planning board.</span>
             </div>
           </div>
         </section>
@@ -77,7 +79,7 @@ export async function EmployerChatShell() {
                 <p className="employer-section-label">Agent Thread</p>
                 <h2>Shape the next hiring brief</h2>
               </div>
-              <p className="employer-chat-panel__status">Workspace synced to employer routing</p>
+              <p className="employer-chat-panel__status">Employer workspace</p>
             </div>
 
             <div className="employer-chat-thread" data-testid="employer-chat-thread">

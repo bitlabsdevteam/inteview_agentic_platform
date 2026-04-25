@@ -1,3 +1,5 @@
+import React from "react";
+
 import { AccountHeader, getAccountHeaderState } from "@/components/account-header";
 
 const prepChecklist = [
@@ -26,26 +28,25 @@ export async function JobSeekerShell() {
   const accountHeaderState = await getAccountHeaderState();
 
   return (
-    <main className="job-seeker-page">
-      <div className="job-seeker-shell">
+    <main className="app-page job-seeker-page">
+      <div className="product-shell job-seeker-shell">
         <AccountHeader state={accountHeaderState} />
 
         <section className="job-seeker-hero">
           <div className="job-seeker-hero__copy">
-            <p className="job-seeker-eyebrow">Protected Job Seeker Route</p>
+            <p className="job-seeker-eyebrow">Job Seeker Workspace</p>
             <h1>Job seeker workspace</h1>
             <p className="job-seeker-summary">
-              This protected landing page confirms the correct role-aware redirect and gives
-              candidates a clear starting point for upcoming interview preparation workflows.
+              This workspace gives candidates a clear starting point for interview preparation,
+              planning, and guided practice.
             </p>
           </div>
 
           <article className="job-seeker-prep-card" data-testid="job-seeker-prep-card">
-            <p className="job-seeker-section-label">Role Sync</p>
+            <p className="job-seeker-section-label">Account</p>
             <strong>Signed in as job seeker</strong>
             <span>
-              Authentication, role persistence, and protected routing are all aligned to the
-              candidate experience.
+              Your workspace is ready for interview preparation and planning.
             </span>
           </article>
         </section>

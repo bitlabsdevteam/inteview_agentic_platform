@@ -44,6 +44,59 @@ main {
   padding: 48px 0 80px;
 }
 
+.app-page {
+  width: min(1120px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 48px 0 80px;
+}
+
+.product-shell {
+  display: grid;
+  gap: 24px;
+}
+
+.route-page {
+  width: min(960px, calc(100% - 32px));
+}
+
+.route-shell {
+  padding: 32px;
+  border: 1px solid var(--surface-border);
+  border-radius: 8px;
+  background:
+    linear-gradient(180deg, rgba(255, 252, 247, 0.96), rgba(244, 250, 247, 0.9)),
+    var(--surface-strong);
+  box-shadow: var(--shadow);
+}
+
+.route-shell__intro {
+  display: grid;
+  gap: 12px;
+}
+
+.route-shell__eyebrow {
+  margin: 0;
+  font-family: "Courier New", Courier, monospace;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #365b53;
+}
+
+.route-shell__intro h1 {
+  margin: 0;
+  font-size: clamp(2rem, 6vw, 4rem);
+  line-height: 1.05;
+}
+
+.route-shell__intro p {
+  max-width: 60ch;
+  margin: 0;
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+
 .account-header {
   width: 100%;
 }

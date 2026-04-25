@@ -1,3 +1,4 @@
+import React from "react";
 import Link from "next/link";
 
 import { AccountHeader, getAccountHeaderState } from "@/components/account-header";
@@ -10,7 +11,7 @@ export default async function HomePage() {
   const landingActions = getHomePageActions(accountHeaderState);
 
   return (
-    <main className="landing-page">
+    <main className="app-page landing-page product-shell product-shell--public">
       <section className="landing-hero">
         <div className="landing-hero__copy">
           <AccountHeader state={accountHeaderState} />
@@ -45,7 +46,7 @@ export default async function HomePage() {
           </div>
           <div className="landing-signal-card">
             <span>Shared foundation</span>
-            <strong>Supabase auth, role-aware routing, and future employer-first onboarding</strong>
+            <strong>Secure sign-in, role-matched workspaces, and future employer-first onboarding</strong>
           </div>
         </div>
       </section>
