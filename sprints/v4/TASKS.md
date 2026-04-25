@@ -17,9 +17,10 @@
   - Files: `tests/auth/account-header.test.ts`, `src/components/account-header.tsx`
   - Completed: 2026-04-25 — Added the employer-scoped navigation regression in `tests/auth/account-header.test.ts`. The focused test target is intentionally red until Task 4 implements role-scoped links: `npx vitest run tests/auth/account-header.test.ts` fails because the current employer nav still returns `Home`, `Employer`, and `Job Seeker`. Security checks passed with `npx semgrep --config auto src/ --quiet` and `npm audit`.
 
-- [ ] Task 3: Add failing unit coverage for employer denial from job-seeker routes (P0)
+- [x] Task 3: Add failing unit coverage for employer denial from job-seeker routes (P0)
   - Acceptance: A test proves an authenticated employer requesting `/job-seeker` resolves to `/employer` before the job-seeker page can render.
   - Files: `tests/auth/route-guard.test.ts`, `tests/auth/enforce-route-access.test.ts`, `src/lib/auth/route-guard.ts`, `src/lib/auth/enforce-route-access.ts`
+  - Completed: 2026-04-25 — Added explicit regression coverage for employer access to `/job-seeker` at the route resolver and server enforcement layers. The focused target passed immediately because the existing mismatch redirect implementation already routes employers back to `/employer`: `npx vitest run tests/auth/route-guard.test.ts tests/auth/enforce-route-access.test.ts` (15 tests passed). Security checks passed with `npx semgrep --config auto src/ --quiet` and `npm audit`.
 
 - [ ] Task 4: Implement role-scoped authenticated navigation links (P0)
   - Acceptance: `getAccountHeaderNavLinks` returns public links for anonymous users, employer-only links for employer users, and job-seeker-only links for job seeker users.
