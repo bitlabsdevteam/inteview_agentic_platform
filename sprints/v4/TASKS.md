@@ -27,9 +27,10 @@
   - Files: `src/components/account-header.tsx`, `tests/auth/account-header.test.ts`
   - Completed: 2026-04-25 — Implemented role-derived authenticated navigation so employer sessions receive `Home` and `Employer`, job seeker sessions receive `Home` and `Job Seeker`, anonymous users keep public auth and workspace links, and authenticated no-role users receive `Home` only while route guards send them to role completion. Added job-seeker scoped nav coverage and verified the pre-existing employer regression now passes. Validation: `npx vitest run tests/auth/account-header.test.ts` (9 tests passed), `npx semgrep --config auto src/ --quiet`, and `npm audit`.
 
-- [ ] Task 5: Implement protected-route mismatch redirects (P0)
+- [x] Task 5: Implement protected-route mismatch redirects (P0)
   - Acceptance: Employer sessions are redirected from `/job-seeker` to `/employer`, job seeker sessions are redirected from `/employer` to `/job-seeker`, anonymous users still redirect to `/login`, and no-role users still redirect to `/auth/complete-role`.
   - Files: `src/lib/auth/route-guard.ts`, `src/lib/auth/enforce-route-access.ts`, `tests/auth/route-guard.test.ts`, `tests/auth/enforce-route-access.test.ts`
+  - Completed: 2026-04-25 — Added explicit resolver and server enforcement coverage for job seeker sessions denied from `/employer` and authenticated no-role sessions redirected from protected routes to role completion. The existing generic protected-route mismatch implementation already satisfied the full redirect matrix, so no production changes were needed. Validation: `npx vitest run tests/auth/route-guard.test.ts tests/auth/enforce-route-access.test.ts` (19 tests passed), `npx semgrep --config auto src/ --quiet`, and `npm audit`.
 
 - [ ] Task 6: Redesign the account header as a professional top menu bar (P1)
   - Acceptance: The header includes a clear brand area, role-scoped primary navigation, accessible focus states, and a compact profile/logout area without public auth actions after login.

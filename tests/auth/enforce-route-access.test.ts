@@ -85,6 +85,40 @@ describe("enforceRouteAccess", () => {
     expect(redirect).toHaveBeenCalledWith("/employer");
   });
 
+  it("redirects job seeker sessions away from employer routes before rendering", async () => {
+    getUser.mockResolvedValue({
+      data: {
+        user: {
+          user_metadata: {
+            role: "job_seeker"
+          }
+        }
+      }
+    });
+
+    await import("@/lib/auth/enforce-route-access").then(async ({ enforceRouteAccess }) => {
+      await enforceRouteAccess("/employer");
+    });
+
+    expect(redirect).toHaveBeenCalledWith("/job-seeker");
+  });
+
+  it("redirects authenticated sessions without roles away from protected routes", async () => {
+    getUser.mockResolvedValue({
+      data: {
+        user: {
+          user_metadata: {}
+        }
+      }
+    });
+
+    await import("@/lib/auth/enforce-route-access").then(async ({ enforceRouteAccess }) => {
+      await enforceRouteAccess("/employer");
+    });
+
+    expect(redirect).toHaveBeenCalledWith("/auth/complete-role?intent=login");
+  });
+
   it("redirects authenticated users away from /login to their saved role workspace", async () => {
     getUser.mockResolvedValue({
       data: {

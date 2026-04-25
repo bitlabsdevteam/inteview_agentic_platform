@@ -63,11 +63,31 @@ describe("resolveRouteGuardRedirect", () => {
     ).toBe("/employer");
   });
 
+  it("redirects authenticated job seekers away from employer routes", () => {
+    expect(
+      resolveRouteGuardRedirect({
+        isAuthenticated: true,
+        pathname: "/employer",
+        role: "job_seeker"
+      })
+    ).toBe("/job-seeker");
+  });
+
   it("sends authenticated users without a saved role to role completion", () => {
     expect(
       resolveRouteGuardRedirect({
         isAuthenticated: true,
         pathname: "/register",
+        role: null
+      })
+    ).toBe("/auth/complete-role?intent=login");
+  });
+
+  it("sends authenticated no-role users away from protected workspaces to role completion", () => {
+    expect(
+      resolveRouteGuardRedirect({
+        isAuthenticated: true,
+        pathname: "/job-seeker",
         role: null
       })
     ).toBe("/auth/complete-role?intent=login");
