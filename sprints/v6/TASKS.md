@@ -30,9 +30,10 @@
   - Files: `supabase/migrations/20260425000001_job_posting_agent.sql`, `tests/agents/job-posting/persistence.test.ts`, `src/lib/agents/job-posting/persistence.ts`
   - Completed: 2026-04-25 — Added owner-scoped agent session, message, and execution trace migration with RLS; added persistence insert/list helpers, audit metadata builders, focused Vitest coverage, Semgrep scan, npm audit, and graph rebuild.
 
-- [ ] Task 7: Add prompt-first job creation server action (P0)
+- [x] Task 7: Add prompt-first job creation server action (P0)
   - Acceptance: Employer prompt creates an agent session, calls inference, persists trace metadata, and creates or updates an `employer_jobs` draft without requiring manual department, level, or location input.
   - Files: `tests/employer/job-agent-action.test.ts`, `src/app/employer/jobs/actions.ts`, `src/lib/agents/job-posting/create-draft.ts`
+  - Completed: 2026-04-25 — Added prompt-only form parsing, prompt-first draft orchestration, real inference integration path, employer job draft creation, session/message/trace persistence, server action wiring, focused Vitest coverage, Semgrep scan, npm audit, and graph rebuild.
 
 - [ ] Task 8: Replace create-job form with conversational composer (P1)
   - Acceptance: `/employer/jobs/new` shows a single hiring prompt composer, generated draft state, assumptions, and no mandatory department or level fields before generation.
