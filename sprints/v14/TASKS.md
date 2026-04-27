@@ -45,9 +45,10 @@
   - Files: `src/lib/agents/job-posting/interview-blueprint-persistence.ts`, `tests/agents/job-posting/interview-blueprint-persistence.test.ts`
   - Completed: 2026-04-27 — Implemented typed interview blueprint payload builders plus strict employer/job-scoped upsert, read, question create, and ordered question list helpers for the new blueprint tables. Verified with targeted Vitest, Semgrep clean, and `npm audit --audit-level=high` clean.
 
-- [ ] Task 10: Add failing tests for stage-aware agent/chat response contracts (P0)
+- [x] Task 10: Add failing tests for stage-aware agent/chat response contracts (P0)
   - Acceptance: API tests require `activeStage`, `stageSummary`, and `interviewBlueprintSummary` in job chat responses without breaking existing clients.
   - Files: `tests/app/api/employer/jobs/agent-chat-route.test.ts`
+  - Completed: 2026-04-27 — Added red-first API contract coverage requiring stage-aware chat response fields for active stage, pipeline summary, and interview blueprint summary while preserving the existing response shape. Verified failing state with targeted Vitest run because the route does not yet return those fields.
 
 - [ ] Task 11: Implement stage-aware orchestration and response metadata (P0)
   - Acceptance: Job chat orchestration surfaces stage-targeted recommendations and returns pipeline/interview blueprint summaries with safe defaults.

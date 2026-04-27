@@ -99,6 +99,42 @@ describe("POST /api/employer/jobs/[id]/agent-chat", () => {
         blocksReview: false,
         requiresEmployerFix: true
       },
+      activeStage: "interview_structure",
+      stageSummary: {
+        activeStageKey: "interview_structure",
+        stages: [
+          {
+            key: "job_posting",
+            label: "Build Job Posting",
+            state: "complete",
+            blockers: []
+          },
+          {
+            key: "interview_structure",
+            label: "Design Interview Structure",
+            state: "current",
+            blockers: []
+          },
+          {
+            key: "review",
+            label: "Review And Approve",
+            state: "upcoming",
+            blockers: []
+          }
+        ]
+      },
+      interviewBlueprintSummary: {
+        id: "blueprint-1",
+        status: "draft",
+        responseMode: "voice_agent",
+        toneProfile: "high-precision",
+        parsingStrategy: "hybrid",
+        benchmarkSummary:
+          "Advance candidates who show concrete ownership examples, clear tradeoff reasoning, and strong debugging communication.",
+        completenessGaps: [
+          "Add at least one interview question to stage: Technical Deep Dive."
+        ]
+      },
       messages: [
         {
           id: "m-1",
@@ -155,6 +191,30 @@ describe("POST /api/employer/jobs/[id]/agent-chat", () => {
       readinessFlags: {
         blocksReview: false,
         requiresEmployerFix: true
+      },
+      activeStage: "interview_structure",
+      stageSummary: {
+        activeStageKey: "interview_structure",
+        stages: [
+          {
+            key: "job_posting",
+            state: "complete"
+          },
+          {
+            key: "interview_structure",
+            state: "current"
+          },
+          {
+            key: "review",
+            state: "upcoming"
+          }
+        ]
+      },
+      interviewBlueprintSummary: {
+        id: "blueprint-1",
+        responseMode: "voice_agent",
+        toneProfile: "high-precision",
+        completenessGaps: ["Add at least one interview question to stage: Technical Deep Dive."]
       }
     });
     expect(Array.isArray(payload.messages)).toBe(true);
