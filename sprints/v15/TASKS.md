@@ -10,9 +10,10 @@
   - Files: `tests/components/employer-job-detail-readonly.test.ts`
   - Completed: 2026-04-27 - Added red-first route coverage requiring a single read-only workspace surface, no stage pipeline, no stage query navigation, and no editable artifact controls; verified expected failing Vitest state plus Semgrep clean and npm audit clean.
 
-- [ ] Task 3: Implement a read-only workspace presenter for employer job detail data (P0)
+- [x] Task 3: Implement a read-only workspace presenter for employer job detail data (P0)
   - Acceptance: A deterministic view-model helper assembles the full artifact sections needed by the read-only workspace from persisted job, role-profile, quality, and interview data.
   - Files: `src/lib/employer/job-readonly-workspace.ts`, `src/app/employer/jobs/[id]/page.tsx`
+  - Completed: 2026-04-27 - Implemented a deterministic read-only workspace presenter for role profile, generated job posting, interview structure, and review notes, then rewired the employer job detail route to render a single artifact workspace instead of stage panels or editable forms; verified with targeted Vitest route/presenter coverage, workflow regression tests, Semgrep clean, and npm audit clean.
 
 - [ ] Task 4: Add failing tests for chat-only right rail behavior (P0)
   - Acceptance: Tests require the right panel to contain only chat thread/composer content, hide memory and side-summary widgets, remove `Send To Agent`, and submit on `Enter` while preserving `Shift+Enter` newline behavior.
