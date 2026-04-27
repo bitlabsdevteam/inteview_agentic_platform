@@ -20,9 +20,10 @@
   - Files: `tests/components/employer-job-agent-chat.test.ts`
   - Completed: 2026-04-27 - Added red-first chat coverage that forbids side widgets and visible send-button UI in the right rail, and requires explicit `Enter` submit plus `Shift+Enter` newline handling in the chat composer source; verified expected failing Vitest state plus Semgrep clean and npm audit clean.
 
-- [ ] Task 5: Implement minimal chat rail and keyboard-submit composer (P0)
+- [x] Task 5: Implement minimal chat rail and keyboard-submit composer (P0)
   - Acceptance: The chat component removes non-chat side panels, removes the visible send button, and sends a message on `Enter` without submitting on `Shift+Enter`.
   - Files: `src/components/employer-job-agent-chat.tsx`, `src/app/globals.css`
+  - Completed: 2026-04-27 - Simplified the employer job chat rail down to thread plus composer only, removed the visible send button and side widgets, added `Enter` submit with `Shift+Enter` newline handling via `requestSubmit()`, and updated chat coverage to the v15 minimal-rail contract; verified with targeted Vitest, Semgrep clean, and npm audit clean.
 
 - [ ] Task 6: Add failing tests for route/page contracts after stage removal (P0)
   - Acceptance: Tests require the employer job route and chat flow to stop depending on `activeStage`, `stageSummary`, and stage-based panel rendering for the workspace UI.

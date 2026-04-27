@@ -17,21 +17,19 @@ vi.mock("next/navigation", () => ({
 }));
 
 describe("employer job agent chat ui", () => {
-  it("renders role profile summary and unboxed quality warning guidance", () => {
+  it("renders a minimal chat thread and composer shell for v15", () => {
     const html = renderToStaticMarkup(
       React.createElement(EmployerJobAgentChat, V15_AGENT_CHAT_PROPS_FIXTURE)
     );
 
-    expect(html).toContain("Role Profile Summary");
-    expect(html).toContain("Senior AI Product Engineer");
-    expect(html).toContain("Hiring manager not yet confirmed");
-    expect(html).toContain("Quality Warnings");
-    expect(html).toContain("Missing required section: Interview process.");
-    expect(html).toContain("Add explicit interview process section.");
-    expect(html).toContain("Review is currently blocked");
-    expect(html).toContain("employer-job-chat__quality-list");
-    expect(html).toContain("employer-job-chat__quality-entry");
-    expect(html).not.toContain("employer-job-chat__quality-item");
+    expect(html).toContain("JD Agent Chat");
+    expect(html).toContain("No critical fields missing.");
+    expect(html).toContain("No chat history yet.");
+    expect(html).toContain("Continue refining this JD");
+    expect(html).toContain("Press Enter to send. Use Shift+Enter for a new line.");
+    expect(html).not.toContain("Role Profile Summary");
+    expect(html).not.toContain("Quality Warnings");
+    expect(html).not.toContain("Session Memory");
   });
 
   it("captures the v15 keyboard-submit chat expectations in shared fixtures", () => {
