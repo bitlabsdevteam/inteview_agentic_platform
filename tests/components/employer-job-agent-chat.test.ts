@@ -2,6 +2,10 @@ import React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
 
+import {
+  V15_AGENT_CHAT_PROPS_FIXTURE,
+  V15_CHAT_KEYBOARD_EXPECTATIONS
+} from "./v15-workspace-fixtures";
 import { EmployerJobAgentChat } from "@/components/employer-job-agent-chat";
 
 vi.mock("next/navigation", () => ({
@@ -11,45 +15,9 @@ vi.mock("next/navigation", () => ({
 }));
 
 describe("employer job agent chat ui", () => {
-  it("renders role profile summary and quality warning guidance blocks", () => {
+  it("renders role profile summary and unboxed quality warning guidance", () => {
     const html = renderToStaticMarkup(
-      React.createElement(EmployerJobAgentChat, {
-        jobId: "job-1",
-        initialSession: {
-          id: "session-1",
-          status: "needs_follow_up",
-          assumptions: [],
-          missingCriticalFields: [],
-          followUpQuestions: [],
-          updatedAt: "2026-04-28T00:00:00.000Z"
-        },
-        initialMessages: [],
-        initialMemory: { summary: null, compacted: false },
-        initialRoleProfileSummary: {
-          title: "Senior AI Product Engineer",
-          department: "Engineering",
-          level: "Senior",
-          locationPolicy: "Remote US",
-          compensationRange: "$180k-$220k",
-          unresolvedConstraints: ["Hiring manager not yet confirmed"],
-          conflicts: []
-        },
-        initialQualityChecks: [
-          {
-            checkType: "completeness",
-            status: "warn",
-            issues: ["Missing required section: Interview process."],
-            suggestedRewrite: "Add explicit interview process section."
-          },
-          {
-            checkType: "discriminatory_phrasing",
-            status: "fail",
-            issues: ["Potentially biased phrase detected: 'rockstar engineer'."],
-            suggestedRewrite: "Use skill-based language."
-          }
-        ],
-        initialReadinessFlags: { blocksReview: true, requiresEmployerFix: true }
-      })
+      React.createElement(EmployerJobAgentChat, V15_AGENT_CHAT_PROPS_FIXTURE)
     );
 
     expect(html).toContain("Role Profile Summary");
@@ -59,5 +27,16 @@ describe("employer job agent chat ui", () => {
     expect(html).toContain("Missing required section: Interview process.");
     expect(html).toContain("Add explicit interview process section.");
     expect(html).toContain("Review is currently blocked");
+    expect(html).toContain("employer-job-chat__quality-list");
+    expect(html).toContain("employer-job-chat__quality-entry");
+    expect(html).not.toContain("employer-job-chat__quality-item");
+  });
+
+  it("captures the v15 keyboard-submit chat expectations in shared fixtures", () => {
+    expect(V15_CHAT_KEYBOARD_EXPECTATIONS).toEqual({
+      submitOnEnter: true,
+      newlineOnShiftEnter: true,
+      showsVisibleSendButton: false
+    });
   });
 });
