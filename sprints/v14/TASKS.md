@@ -65,9 +65,10 @@
   - Files: `src/app/employer/jobs/[id]/page.tsx`, `src/app/globals.css`
   - Completed: 2026-04-27 — Reworked the employer job detail page into a staged workspace with a top pipeline status bar, stage-state presentation for blocked review behavior, and stage-specific panels that swap between job-posting editing, interview-structure design summary, and review readiness while preserving the assistant rail. Verified with targeted Vitest, Semgrep clean, `npm audit --audit-level=high` clean, and graph rebuild.
 
-- [ ] Task 14: Add failing UI tests for interview structure design panel (P1)
+- [x] Task 14: Add failing UI tests for interview structure design panel (P1)
   - Acceptance: Tests cover question rows, response mode selector, tone selector, parsing strategy selector, benchmark summary, and readiness hints.
-  - Files: `tests/components/employer-interview-blueprint-panel.test.tsx`
+  - Files: `tests/components/employer-interview-blueprint-panel.test.ts`
+  - Completed: 2026-04-27 — Added red-first component contracts for a standalone interview blueprint design panel that must render ordered question rows, response-mode/tone/parsing selectors, benchmark input, and readiness hints for blocked Stage 2 states. Verified failing state with targeted Vitest run because `src/components/employer-interview-blueprint-panel.tsx` does not exist yet.
 
 - [ ] Task 15: Implement interview structure design panel and server action wiring (P1)
   - Acceptance: Employers can edit and save interview blueprint data and ordered questions from Stage 2 with validation errors surfaced in UI.
