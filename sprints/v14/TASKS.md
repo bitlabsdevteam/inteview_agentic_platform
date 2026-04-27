@@ -85,9 +85,10 @@
   - Files: `src/lib/employer/jobs.ts`, `src/app/employer/jobs/[id]/page.tsx`, `tests/employer/job-workflow.test.ts`
   - Completed: 2026-04-27 — Extended the shared review gate to treat interview blueprint completeness gaps as review blockers alongside Stage 1 quality failures, including combined-warning messaging when both categories are unresolved, and wired the staged job-detail page to pass Stage 2 completeness gaps into that gate before enabling review controls. Verified with targeted Vitest, Semgrep clean, `npm audit --audit-level=high` clean, and graph rebuild.
 
-- [ ] Task 18: Add focused E2E for staged job-posting pipeline flow (P1)
+- [x] Task 18: Add focused E2E for staged job-posting pipeline flow (P1)
   - Acceptance: Playwright verifies Stage 1 drafting, Stage 2 interview-design completion, and Stage 3 review gating in one employer flow.
   - Files: `tests/e2e/v14-job-posting-pipeline.spec.ts`
+  - Completed: 2026-04-27 — Added a focused guarded Playwright flow covering prompt-first job drafting, visible staged pipeline shell, Stage 2 interview structure completion, and Stage 3 review/publish gating transitions in stub inference mode. Targeted Playwright execution ran successfully but skipped locally because the required Supabase runtime environment and employer credentials were not present.
 
 - [ ] Task 19: Run targeted validation suite and refresh graph artifacts (P0)
   - Acceptance: Relevant Vitest, Playwright, build, and graph rebuild commands complete, or blockers are documented in task notes.
