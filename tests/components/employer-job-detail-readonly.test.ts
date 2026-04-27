@@ -1,4 +1,6 @@
 import React from "react";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -219,5 +221,17 @@ describe("v15 read-only workspace fixtures", () => {
     expect(markup).not.toContain('data-testid="employer-job-stage-panel-job_posting"');
     expect(markup).not.toContain('data-testid="employer-job-stage-panel-interview_structure"');
     expect(markup).not.toContain('data-testid="employer-job-stage-panel-review"');
+  });
+
+  it("removes leftover stage-routing hooks from the employer job detail route source", () => {
+    const pageSource = readFileSync(
+      join(process.cwd(), "src/app/employer/jobs/[id]/page.tsx"),
+      "utf8"
+    );
+
+    expect(pageSource).not.toContain("activeStage");
+    expect(pageSource).not.toContain("stageSummary");
+    expect(pageSource).not.toContain("searchParams?");
+    expect(pageSource).not.toContain("?stage=");
   });
 });

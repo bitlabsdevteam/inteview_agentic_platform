@@ -25,9 +25,10 @@
   - Files: `src/components/employer-job-agent-chat.tsx`, `src/app/globals.css`
   - Completed: 2026-04-27 - Simplified the employer job chat rail down to thread plus composer only, removed the visible send button and side widgets, added `Enter` submit with `Shift+Enter` newline handling via `requestSubmit()`, and updated chat coverage to the v15 minimal-rail contract; verified with targeted Vitest, Semgrep clean, and npm audit clean.
 
-- [ ] Task 6: Add failing tests for route/page contracts after stage removal (P0)
+- [x] Task 6: Add failing tests for route/page contracts after stage removal (P0)
   - Acceptance: Tests require the employer job route and chat flow to stop depending on `activeStage`, `stageSummary`, and stage-based panel rendering for the workspace UI.
   - Files: `tests/components/employer-job-detail-readonly.test.ts`, `tests/app/api/employer/jobs/agent-chat-route.test.ts`
+  - Completed: 2026-04-27 - Added red-first route and API contracts that reject leftover stage-routing hooks in the employer job detail page source and require the job chat response to omit `activeStage` and `stageSummary`; verified expected failing Vitest state plus Semgrep clean and npm audit clean.
 
 - [ ] Task 7: Implement single-workspace page layout and retire stage-based UI wiring (P0)
   - Acceptance: The employer job detail page renders the read-only artifact left panel and chat-only right panel, with stage bar and interview blueprint form removed from the page.
