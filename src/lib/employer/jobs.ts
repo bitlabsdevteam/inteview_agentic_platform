@@ -194,6 +194,7 @@ export function getEmployerJobPrimaryAction(status: EmployerJobStatus): Employer
 export function getEmployerJobReviewGate(input: {
   status: EmployerJobStatus;
   qualityCheckStatuses: EmployerJobQualityStatus[];
+  interviewBlueprintCompletenessGaps?: string[];
 }): EmployerJobReviewGate {
   if (input.status !== "draft") {
     return {
@@ -204,13 +205,36 @@ export function getEmployerJobReviewGate(input: {
     };
   }
 
-  const blocksReview = input.qualityCheckStatuses.includes("fail");
-  if (blocksReview) {
+  const qualityBlocksReview = input.qualityCheckStatuses.includes("fail");
+  const interviewStructureBlocked =
+    (input.interviewBlueprintCompletenessGaps ?? []).map((gap) => gap.trim()).filter(Boolean).length > 0;
+
+  if (qualityBlocksReview && interviewStructureBlocked) {
+    return {
+      canSubmitForReview: false,
+      blocksReview: true,
+      requiresEmployerFix: true,
+      warningMessage:
+        "Critical quality failures and interview structure blockers must be fixed before this job can move to review."
+    };
+  }
+
+  if (qualityBlocksReview) {
     return {
       canSubmitForReview: false,
       blocksReview: true,
       requiresEmployerFix: true,
       warningMessage: "Critical quality failures must be fixed before this job can move to review."
+    };
+  }
+
+  if (interviewStructureBlocked) {
+    return {
+      canSubmitForReview: false,
+      blocksReview: true,
+      requiresEmployerFix: true,
+      warningMessage:
+        "Interview structure is incomplete. Resolve blueprint readiness gaps before this job can move to review."
     };
   }
 

@@ -292,7 +292,8 @@ export default async function EmployerJobDetailPage({ params }: EmployerJobDetai
   });
   const reviewGate = getEmployerJobReviewGate({
     status: job.status,
-    qualityCheckStatuses: currentQualityChecks.map((check) => check.status)
+    qualityCheckStatuses: currentQualityChecks.map((check) => check.status),
+    interviewBlueprintCompletenessGaps: interviewBlueprintSummary.completenessGaps
   });
   const canSubmitForReview = reviewGate.canSubmitForReview;
   const canPublish = job.status === "needs_review";

@@ -80,9 +80,10 @@
   - Files: `tests/employer/job-workflow.test.ts`
   - Completed: 2026-04-27 — Added red-first review-gate contracts requiring draft review to stay blocked when interview blueprint completeness gaps remain unresolved, plus page-source coverage requiring the job detail route to pass interview-structure blockers into the review gate. Verified failing state with targeted Vitest run because `getEmployerJobReviewGate` still considers only quality checks and the page does not yet provide interview blueprint completeness gaps to the gate.
 
-- [ ] Task 17: Implement combined review gate across job posting and interview design (P1)
+- [x] Task 17: Implement combined review gate across job posting and interview design (P1)
   - Acceptance: Review controls aggregate Stage 1 quality blockers and Stage 2 completeness blockers before enabling `Mark Ready For Review`.
   - Files: `src/lib/employer/jobs.ts`, `src/app/employer/jobs/[id]/page.tsx`, `tests/employer/job-workflow.test.ts`
+  - Completed: 2026-04-27 — Extended the shared review gate to treat interview blueprint completeness gaps as review blockers alongside Stage 1 quality failures, including combined-warning messaging when both categories are unresolved, and wired the staged job-detail page to pass Stage 2 completeness gaps into that gate before enabling review controls. Verified with targeted Vitest, Semgrep clean, `npm audit --audit-level=high` clean, and graph rebuild.
 
 - [ ] Task 18: Add focused E2E for staged job-posting pipeline flow (P1)
   - Acceptance: Playwright verifies Stage 1 drafting, Stage 2 interview-design completion, and Stage 3 review gating in one employer flow.
