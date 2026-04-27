@@ -90,6 +90,7 @@
   - Files: `tests/e2e/v14-job-posting-pipeline.spec.ts`
   - Completed: 2026-04-27 — Added a focused guarded Playwright flow covering prompt-first job drafting, visible staged pipeline shell, Stage 2 interview structure completion, and Stage 3 review/publish gating transitions in stub inference mode. Targeted Playwright execution ran successfully but skipped locally because the required Supabase runtime environment and employer credentials were not present.
 
-- [ ] Task 19: Run targeted validation suite and refresh graph artifacts (P0)
+- [x] Task 19: Run targeted validation suite and refresh graph artifacts (P0)
   - Acceptance: Relevant Vitest, Playwright, build, and graph rebuild commands complete, or blockers are documented in task notes.
   - Commands: `npx vitest run tests/agents/job-posting tests/components tests/app/api/employer/jobs tests/employer/job-workflow.test.ts`, `npx playwright test tests/e2e/v14-job-posting-pipeline.spec.ts`, `npm run build`, `python3 -c "from graphify.watch import _rebuild_code; from pathlib import Path; _rebuild_code(Path('.'))"`
+  - Completed: 2026-04-27 — Ran the targeted Vitest slice successfully (23 files, 106 tests), reran focused Playwright validation for the staged pipeline flow with `E2E_AGENT_STUB_MODE=true` and confirmed the spec executes but skips locally because the guarded Supabase runtime environment and employer credentials are not present, completed a clean production build after fixing a Stage 2 panel type import in the job detail page, reran Semgrep and `npm audit --audit-level=high` clean on the final source state, and refreshed graph artifacts with the required rebuild command.

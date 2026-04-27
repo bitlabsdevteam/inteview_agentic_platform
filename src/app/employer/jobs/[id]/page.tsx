@@ -18,8 +18,11 @@ import {
 } from "@/lib/agents/job-posting/memory";
 import {
   deriveInterviewBlueprintCompletenessGaps,
+  type InterviewBlueprintParsingStrategy,
   type InterviewBlueprintQuestion,
-  type InterviewBlueprintStage
+  type InterviewBlueprintResponseMode,
+  type InterviewBlueprintStage,
+  type InterviewBlueprintToneProfile,
 } from "@/lib/agents/job-posting/interview-blueprint";
 import {
   getEmployerJobInterviewBlueprintByJob,
@@ -55,9 +58,9 @@ type InterviewBlueprintSummary = {
   id: string | null;
   title: string;
   objective: string;
-  responseMode: string | null;
-  toneProfile: string | null;
-  parsingStrategy: string | null;
+  responseMode: InterviewBlueprintResponseMode | null;
+  toneProfile: InterviewBlueprintToneProfile | null;
+  parsingStrategy: InterviewBlueprintParsingStrategy | null;
   benchmarkSummary: string;
   questionCount: number;
   completenessGaps: string[];
@@ -467,9 +470,9 @@ export default async function EmployerJobDetailPage({ params }: EmployerJobDetai
                 blueprint={{
                   title: interviewBlueprintSummary.title,
                   objective: interviewBlueprintSummary.objective,
-                  responseMode: interviewBlueprintSummary.responseMode as InterviewBlueprintSummary["responseMode"],
-                  toneProfile: interviewBlueprintSummary.toneProfile as InterviewBlueprintSummary["toneProfile"],
-                  parsingStrategy: interviewBlueprintSummary.parsingStrategy as InterviewBlueprintSummary["parsingStrategy"],
+                  responseMode: interviewBlueprintSummary.responseMode,
+                  toneProfile: interviewBlueprintSummary.toneProfile,
+                  parsingStrategy: interviewBlueprintSummary.parsingStrategy,
                   benchmarkSummary: interviewBlueprintSummary.benchmarkSummary,
                   approvalNotes: interviewBlueprintRecord?.approval_notes ?? "",
                   stages: interviewBlueprintSummary.stages
