@@ -20,9 +20,10 @@
   - Files: `tests/agents/job-posting/interview-blueprint.test.ts`
   - Completed: 2026-04-27 — Added red-first contract coverage for interview blueprint validation, whitespace normalization, deterministic enum enforcement, ordered stages/questions, and completeness-gap derivation. Verified failing state with targeted Vitest run due to missing `interview-blueprint` module.
 
-- [ ] Task 5: Implement interview blueprint schema and validation module (P0)
+- [x] Task 5: Implement interview blueprint schema and validation module (P0)
   - Acceptance: `interview-blueprint.ts` normalizes interview structure inputs, validates allowed enum values, and emits completeness gaps.
   - Files: `src/lib/agents/job-posting/interview-blueprint.ts`, `tests/agents/job-posting/interview-blueprint.test.ts`
+  - Completed: 2026-04-27 — Implemented typed interview blueprint enums, deterministic validation for stage/question contracts, whitespace normalization, and completeness-gap derivation for missing response mode, parsing strategy, benchmark summary, and empty stage questions. Verified with targeted Vitest, Semgrep clean, and `npm audit --audit-level=high` clean.
 
 - [ ] Task 6: Add failing migration tests for interview blueprint persistence (P0)
   - Acceptance: Tests require employer/job-scoped blueprint and question tables, indexes, updated-at triggers, and owner RLS.
