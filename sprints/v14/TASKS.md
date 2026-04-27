@@ -40,9 +40,10 @@
   - Files: `tests/agents/job-posting/interview-blueprint-persistence.test.ts`
   - Completed: 2026-04-27 — Added red-first persistence coverage for interview blueprint upsert payloads, question insert payloads, strict employer/job reads, and ordered question listing by blueprint scope. Verified failing state with targeted Vitest run due to missing `interview-blueprint-persistence` module.
 
-- [ ] Task 9: Implement interview blueprint persistence helpers (P0)
+- [x] Task 9: Implement interview blueprint persistence helpers (P0)
   - Acceptance: Helper functions read and write blueprint and question records with typed job/employer scoping.
   - Files: `src/lib/agents/job-posting/interview-blueprint-persistence.ts`, `tests/agents/job-posting/interview-blueprint-persistence.test.ts`
+  - Completed: 2026-04-27 — Implemented typed interview blueprint payload builders plus strict employer/job-scoped upsert, read, question create, and ordered question list helpers for the new blueprint tables. Verified with targeted Vitest, Semgrep clean, and `npm audit --audit-level=high` clean.
 
 - [ ] Task 10: Add failing tests for stage-aware agent/chat response contracts (P0)
   - Acceptance: API tests require `activeStage`, `stageSummary`, and `interviewBlueprintSummary` in job chat responses without breaking existing clients.
