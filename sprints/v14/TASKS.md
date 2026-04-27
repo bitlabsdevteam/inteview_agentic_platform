@@ -30,9 +30,10 @@
   - Files: `tests/supabase/employer-job-interview-blueprints-migration.test.ts`
   - Completed: 2026-04-27 — Added red-first migration contract coverage for interview blueprint and question tables, owner-scoped RLS policies, scoped indexes, and updated-at triggers. Verified failing state with targeted Vitest run due to missing `20260430000000_employer_job_interview_blueprints.sql` migration.
 
-- [ ] Task 7: Implement interview blueprint Supabase migration (P0)
+- [x] Task 7: Implement interview blueprint Supabase migration (P0)
   - Acceptance: Migration creates `employer_job_interview_blueprints` and `employer_job_interview_questions` with scoped constraints and RLS.
   - Files: `supabase/migrations/20260430000000_employer_job_interview_blueprints.sql`, `tests/supabase/employer-job-interview-blueprints-migration.test.ts`
+  - Completed: 2026-04-27 — Implemented interview blueprint and question table migration with typed workflow checks, job-scoped uniqueness, owner-enforced RLS policies, scoped indexes, and updated-at triggers for both tables. Verified with targeted Vitest, Semgrep clean, and `npm audit --audit-level=high` clean.
 
 - [ ] Task 8: Add failing tests for interview blueprint persistence helpers (P0)
   - Acceptance: Tests cover create, update, list, and job-scoped question ordering with strict employer ownership.
