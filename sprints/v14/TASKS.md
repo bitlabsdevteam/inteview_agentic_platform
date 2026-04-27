@@ -10,9 +10,10 @@
   - Files: `tests/agents/job-posting/pipeline-state.test.ts`
   - Completed: 2026-04-27 — Added red-first contract coverage for pipeline stage ordering, current/complete/blocked/upcoming states, and Stage 1 to Stage 2 progression into review readiness. Verified failing state with targeted Vitest run due to missing `job-pipeline` module.
 
-- [ ] Task 3: Implement deterministic pipeline stage-state helper (P0)
+- [x] Task 3: Implement deterministic pipeline stage-state helper (P0)
   - Acceptance: `job-pipeline.ts` derives stage order, labels, completion, and blocker summaries from job + quality + interview blueprint state.
   - Files: `src/lib/agents/job-posting/job-pipeline.ts`, `tests/agents/job-posting/pipeline-state.test.ts`
+  - Completed: 2026-04-27 — Implemented deterministic pipeline stage derivation for draft, review, and post-review job states with explicit Stage 1 blockers, Stage 2 completeness handling, and stable stage labels for the upcoming UI shell. Verified with targeted Vitest, Semgrep clean, and `npm audit --audit-level=high` clean.
 
 - [ ] Task 4: Add failing tests for interview blueprint schema and validation (P0)
   - Acceptance: Tests enforce required fields for response mode, tone profile, parsing strategy, benchmark summary, and ordered questions.
