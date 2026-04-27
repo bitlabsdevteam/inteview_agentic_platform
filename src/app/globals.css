@@ -1454,6 +1454,89 @@ main {
   min-height: 280px;
 }
 
+.employer-job-detail-pipeline {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.employer-job-detail-pipeline__stage {
+  display: grid;
+  gap: 10px;
+  padding: 20px;
+  border: 1px solid rgba(94, 47, 0, 0.12);
+  border-radius: 22px;
+  background: rgba(255, 252, 247, 0.92);
+  box-shadow: var(--shadow);
+}
+
+.employer-job-detail-pipeline__stage h2,
+.employer-job-stage-panel__card h3,
+.employer-job-stage-panel__stage h3 {
+  margin: 0;
+  line-height: 1.2;
+}
+
+.employer-job-detail-pipeline__state,
+.employer-job-detail-pipeline__hint,
+.employer-job-stage-panel__card p,
+.employer-job-stage-panel__stage p {
+  margin: 0;
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+
+.employer-job-detail-pipeline__stage--current {
+  border-color: rgba(69, 99, 83, 0.32);
+  background:
+    radial-gradient(circle at top right, rgba(69, 99, 83, 0.12), transparent 36%),
+    rgba(247, 252, 249, 0.96);
+}
+
+.employer-job-detail-pipeline__stage--complete {
+  border-color: rgba(90, 125, 92, 0.26);
+  background: rgba(245, 251, 244, 0.94);
+}
+
+.employer-job-detail-pipeline__stage--blocked {
+  border-color: rgba(162, 53, 47, 0.34);
+  background: rgba(255, 239, 236, 0.94);
+}
+
+.employer-job-detail-pipeline__blockers {
+  margin: 0;
+}
+
+.employer-job-stage-panel {
+  align-content: start;
+}
+
+.employer-job-stage-panel__summary-grid {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.employer-job-stage-panel__card,
+.employer-job-stage-panel__stage {
+  display: grid;
+  gap: 10px;
+  padding: 18px;
+  border: 1px solid rgba(94, 47, 0, 0.12);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.72);
+}
+
+.employer-job-stage-panel__card--blocked {
+  border-color: rgba(162, 53, 47, 0.3);
+  background: rgba(255, 239, 236, 0.92);
+}
+
+.employer-job-stage-panel__stages {
+  display: grid;
+  gap: 12px;
+}
+
 .employer-job-detail {
   display: grid;
   gap: 20px;
@@ -1579,10 +1662,12 @@ main {
   .employer-hero,
   .employer-board,
   .employer-chat-panel__header,
+  .employer-job-detail-pipeline,
   .employer-jobs-hero,
   .employer-job-row,
   .employer-job-detail,
   .employer-job-agent,
+  .employer-job-stage-panel__summary-grid,
   .employer-job-form__grid {
     grid-template-columns: 1fr;
   }

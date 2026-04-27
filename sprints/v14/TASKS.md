@@ -60,9 +60,10 @@
   - Files: `tests/components/employer-job-detail-pipeline.test.ts`
   - Completed: 2026-04-27 — Added red-first page-shell coverage that renders the employer job detail route with mocked job, role-profile, quality, and interview-blueprint state, then requires a visible pipeline status bar, active-stage panel switching, and blocked review-stage shell behavior. Verified failing state with targeted Vitest run because the page still renders the legacy flat form layout without the pipeline shell.
 
-- [ ] Task 13: Implement top-level status bar and stage-aware job detail layout (P1)
+- [x] Task 13: Implement top-level status bar and stage-aware job detail layout (P1)
   - Acceptance: Employer job detail page renders the three-stage pipeline header and shows stage-specific content instead of one flat workspace.
   - Files: `src/app/employer/jobs/[id]/page.tsx`, `src/app/globals.css`
+  - Completed: 2026-04-27 — Reworked the employer job detail page into a staged workspace with a top pipeline status bar, stage-state presentation for blocked review behavior, and stage-specific panels that swap between job-posting editing, interview-structure design summary, and review readiness while preserving the assistant rail. Verified with targeted Vitest, Semgrep clean, `npm audit --audit-level=high` clean, and graph rebuild.
 
 - [ ] Task 14: Add failing UI tests for interview structure design panel (P1)
   - Acceptance: Tests cover question rows, response mode selector, tone selector, parsing strategy selector, benchmark summary, and readiness hints.
