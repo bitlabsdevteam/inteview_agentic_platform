@@ -25,9 +25,10 @@
   - Files: `src/lib/agents/job-posting/interview-blueprint.ts`, `tests/agents/job-posting/interview-blueprint.test.ts`
   - Completed: 2026-04-27 — Implemented typed interview blueprint enums, deterministic validation for stage/question contracts, whitespace normalization, and completeness-gap derivation for missing response mode, parsing strategy, benchmark summary, and empty stage questions. Verified with targeted Vitest, Semgrep clean, and `npm audit --audit-level=high` clean.
 
-- [ ] Task 6: Add failing migration tests for interview blueprint persistence (P0)
+- [x] Task 6: Add failing migration tests for interview blueprint persistence (P0)
   - Acceptance: Tests require employer/job-scoped blueprint and question tables, indexes, updated-at triggers, and owner RLS.
   - Files: `tests/supabase/employer-job-interview-blueprints-migration.test.ts`
+  - Completed: 2026-04-27 — Added red-first migration contract coverage for interview blueprint and question tables, owner-scoped RLS policies, scoped indexes, and updated-at triggers. Verified failing state with targeted Vitest run due to missing `20260430000000_employer_job_interview_blueprints.sql` migration.
 
 - [ ] Task 7: Implement interview blueprint Supabase migration (P0)
   - Acceptance: Migration creates `employer_job_interview_blueprints` and `employer_job_interview_questions` with scoped constraints and RLS.
