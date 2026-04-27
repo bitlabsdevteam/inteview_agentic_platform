@@ -75,9 +75,10 @@
   - Files: `src/components/employer-interview-blueprint-panel.tsx`, `src/app/employer/jobs/actions.ts`, `src/app/employer/jobs/[id]/page.tsx`, `src/app/globals.css`
   - Completed: 2026-04-27 — Implemented a standalone interview blueprint panel with editable plan fields, ordered question rows, readiness hints, and Stage 2 form controls; added a save action that validates, normalizes, replaces persisted interview questions, and redirects back to the job detail route; and wired the live panel into the staged job-detail page. Verified with targeted Vitest, Semgrep clean, `npm audit --audit-level=high` clean, and graph rebuild.
 
-- [ ] Task 16: Add failing tests for combined review gate behavior (P1)
+- [x] Task 16: Add failing tests for combined review gate behavior (P1)
   - Acceptance: Tests require Stage 3 review to stay blocked when critical JD failures remain or interview blueprint completeness gaps are unresolved.
   - Files: `tests/employer/job-workflow.test.ts`
+  - Completed: 2026-04-27 — Added red-first review-gate contracts requiring draft review to stay blocked when interview blueprint completeness gaps remain unresolved, plus page-source coverage requiring the job detail route to pass interview-structure blockers into the review gate. Verified failing state with targeted Vitest run because `getEmployerJobReviewGate` still considers only quality checks and the page does not yet provide interview blueprint completeness gaps to the gate.
 
 - [ ] Task 17: Implement combined review gate across job posting and interview design (P1)
   - Acceptance: Review controls aggregate Stage 1 quality blockers and Stage 2 completeness blockers before enabling `Mark Ready For Review`.

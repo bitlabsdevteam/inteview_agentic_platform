@@ -115,6 +115,40 @@ describe("employer job workflow", () => {
     });
   });
 
+  it("keeps review blocked when interview structure completeness gaps remain unresolved", () => {
+    expect(
+      getEmployerJobReviewGate({
+        status: "draft",
+        qualityCheckStatuses: ["pass"],
+        interviewBlueprintCompletenessGaps: [
+          "Add at least one benchmark summary for evaluator guidance."
+        ]
+      } as never)
+    ).toEqual({
+      canSubmitForReview: false,
+      blocksReview: true,
+      requiresEmployerFix: true,
+      warningMessage:
+        "Interview structure is incomplete. Resolve blueprint readiness gaps before this job can move to review."
+    });
+
+    expect(
+      getEmployerJobReviewGate({
+        status: "draft",
+        qualityCheckStatuses: ["fail"],
+        interviewBlueprintCompletenessGaps: [
+          "Add at least one interview question to define the interview plan."
+        ]
+      } as never)
+    ).toEqual({
+      canSubmitForReview: false,
+      blocksReview: true,
+      requiresEmployerFix: true,
+      warningMessage:
+        "Critical quality failures and interview structure blockers must be fixed before this job can move to review."
+    });
+  });
+
   it("does not render persistent reasoning or thinking boxes in employer job detail rail", () => {
     const pageSource = readFileSync(
       join(process.cwd(), "src/app/employer/jobs/[id]/page.tsx"),
@@ -141,5 +175,6 @@ describe("employer job workflow", () => {
     expect(detailPageSource).toContain("getEmployerJobReviewGate");
     expect(detailPageSource).toContain("reviewGate.warningMessage");
     expect(detailPageSource).toContain("disabled={!canSubmitForReview}");
+    expect(detailPageSource).toContain("interviewBlueprintCompletenessGaps");
   });
 });
