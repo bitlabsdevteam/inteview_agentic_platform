@@ -15,9 +15,10 @@
   - Files: `src/lib/agents/job-posting/job-pipeline.ts`, `tests/agents/job-posting/pipeline-state.test.ts`
   - Completed: 2026-04-27 — Implemented deterministic pipeline stage derivation for draft, review, and post-review job states with explicit Stage 1 blockers, Stage 2 completeness handling, and stable stage labels for the upcoming UI shell. Verified with targeted Vitest, Semgrep clean, and `npm audit --audit-level=high` clean.
 
-- [ ] Task 4: Add failing tests for interview blueprint schema and validation (P0)
+- [x] Task 4: Add failing tests for interview blueprint schema and validation (P0)
   - Acceptance: Tests enforce required fields for response mode, tone profile, parsing strategy, benchmark summary, and ordered questions.
   - Files: `tests/agents/job-posting/interview-blueprint.test.ts`
+  - Completed: 2026-04-27 — Added red-first contract coverage for interview blueprint validation, whitespace normalization, deterministic enum enforcement, ordered stages/questions, and completeness-gap derivation. Verified failing state with targeted Vitest run due to missing `interview-blueprint` module.
 
 - [ ] Task 5: Implement interview blueprint schema and validation module (P0)
   - Acceptance: `interview-blueprint.ts` normalizes interview structure inputs, validates allowed enum values, and emits completeness gaps.
