@@ -46,6 +46,7 @@ type InterviewBlueprintPersistenceClient = {
   from: (table: "employer_job_interview_blueprints" | "employer_job_interview_questions") => {
     select: (columns: string) => unknown;
     insert: (values: Record<string, unknown>) => unknown;
+    delete?: () => unknown;
     upsert?: (values: Record<string, unknown>) => unknown;
   };
 };
@@ -199,5 +200,33 @@ export async function listEmployerJobInterviewQuestionsByBlueprint(
       .order("stage_order", { ascending: true })
       .order("question_order", { ascending: true }),
     "list employer job interview questions by blueprint"
+  );
+}
+
+export async function deleteEmployerJobInterviewQuestionsByBlueprint(
+  client: InterviewBlueprintPersistenceClient,
+  employerUserId: string,
+  employerJobId: string,
+  interviewBlueprintId: string
+) {
+  const query = (client.from("employer_job_interview_questions") as unknown as {
+    delete: () => {
+      eq: (column: string, value: string) => {
+        eq: (column: string, value: string) => {
+          eq: (column: string, value: string) => {
+            select: (columns: string) => Promise<QueryResult<Array<{ id: string }>>>;
+          };
+        };
+      };
+    };
+  }).delete();
+
+  return assertQueryResult(
+    await query
+      .eq("employer_user_id", employerUserId)
+      .eq("employer_job_id", employerJobId)
+      .eq("interview_blueprint_id", interviewBlueprintId)
+      .select("id"),
+    "delete employer job interview questions by blueprint"
   );
 }

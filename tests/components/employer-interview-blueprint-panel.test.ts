@@ -17,6 +17,8 @@ const blueprint = {
   }))
 };
 
+globalThis.React = React;
+
 describe("employer interview blueprint panel", () => {
   it("renders ordered question rows plus response mode, tone, parsing strategy, and benchmark controls", () => {
     const markup = renderToStaticMarkup(

@@ -28,6 +28,19 @@ import {
 import { createStaticEmployerAssistantPromptVersion } from "@/lib/agents/employer-assistant/prompts";
 import { runEmployerAssistantOrchestration } from "@/lib/agents/employer-assistant/orchestrator";
 import {
+  deleteEmployerJobInterviewQuestionsByBlueprint,
+  getEmployerJobInterviewBlueprintByJob,
+  upsertEmployerJobInterviewBlueprint,
+  createEmployerJobInterviewQuestion
+} from "@/lib/agents/job-posting/interview-blueprint-persistence";
+import {
+  normalizeInterviewBlueprint,
+  validateInterviewBlueprint,
+  type InterviewBlueprint,
+  type InterviewBlueprintQuestion,
+  type InterviewBlueprintStage
+} from "@/lib/agents/job-posting/interview-blueprint";
+import {
   getFollowUpAnswerFromFormData,
   getFollowUpSessionIdFromFormData,
   reviseEmployerJobDraftFromFollowUp
@@ -124,6 +137,119 @@ function parseMultilineText(value: string | undefined) {
 
   const trimmed = value.trim();
   return trimmed ? [trimmed] : [];
+}
+
+function readOptionalFieldValue(formData: FormData, key: string) {
+  const value = formData.get(key);
+  return typeof value === "string" ? value.trim() : "";
+}
+
+function readPositiveIntegerField(formData: FormData, key: string, label: string) {
+  const raw = readRequiredField(formData, key, label);
+  const parsed = Number(raw);
+
+  if (!Number.isInteger(parsed) || parsed <= 0) {
+    throw new Error(`${label} must be a positive integer.`);
+  }
+
+  return parsed;
+}
+
+function readNonNegativeIntegerField(formData: FormData, key: string, label: string) {
+  const raw = readRequiredField(formData, key, label);
+  const parsed = Number(raw);
+
+  if (!Number.isInteger(parsed) || parsed < 0) {
+    throw new Error(`${label} must be a non-negative integer.`);
+  }
+
+  return parsed;
+}
+
+function readInterviewBlueprintFromFormData(formData: FormData): InterviewBlueprint {
+  const stageCount = readNonNegativeIntegerField(formData, "stageCount", "Stage count");
+  const stages: InterviewBlueprintStage[] = [];
+
+  for (let stageIndex = 0; stageIndex < stageCount; stageIndex += 1) {
+    const stageOrder = readPositiveIntegerField(
+      formData,
+      `stageOrder_${stageIndex}`,
+      `Stage ${stageIndex + 1} order`
+    );
+    const stageLabel = readRequiredField(
+      formData,
+      `stageLabel_${stageIndex}`,
+      `Stage ${stageIndex + 1} label`
+    );
+    const questionCount = readNonNegativeIntegerField(
+      formData,
+      `questionCount_${stageIndex}`,
+      `Stage ${stageIndex + 1} question count`
+    );
+    const questions: InterviewBlueprintQuestion[] = [];
+
+    for (let questionIndex = 0; questionIndex < questionCount; questionIndex += 1) {
+      questions.push({
+        questionOrder: readPositiveIntegerField(
+          formData,
+          `questionOrder_${stageIndex}_${questionIndex}`,
+          `Question ${questionIndex + 1} order`
+        ),
+        questionText: readRequiredField(
+          formData,
+          `questionText_${stageIndex}_${questionIndex}`,
+          `Question ${questionIndex + 1} text`
+        ),
+        intent: readRequiredField(
+          formData,
+          `intent_${stageIndex}_${questionIndex}`,
+          `Question ${questionIndex + 1} intent`
+        ),
+        evaluationFocus: readRequiredField(
+          formData,
+          `evaluationFocus_${stageIndex}_${questionIndex}`,
+          `Question ${questionIndex + 1} evaluation focus`
+        ),
+        strongSignal: readRequiredField(
+          formData,
+          `strongSignal_${stageIndex}_${questionIndex}`,
+          `Question ${questionIndex + 1} strong signal`
+        ),
+        failureSignal: readRequiredField(
+          formData,
+          `failureSignal_${stageIndex}_${questionIndex}`,
+          `Question ${questionIndex + 1} failure signal`
+        ),
+        followUpPrompt: readRequiredField(
+          formData,
+          `followUpPrompt_${stageIndex}_${questionIndex}`,
+          `Question ${questionIndex + 1} follow-up prompt`
+        )
+      });
+    }
+
+    stages.push({
+      stageLabel,
+      stageOrder,
+      questions
+    });
+  }
+
+  return {
+    status: "draft",
+    title: readRequiredField(formData, "title", "Interview plan title"),
+    objective: readRequiredField(formData, "objective", "Interview plan objective"),
+    responseMode: readRequiredField(formData, "responseMode", "Response mode") as InterviewBlueprint["responseMode"],
+    toneProfile: readRequiredField(formData, "toneProfile", "Tone profile") as InterviewBlueprint["toneProfile"],
+    parsingStrategy: readRequiredField(
+      formData,
+      "parsingStrategy",
+      "Parsing strategy"
+    ) as InterviewBlueprint["parsingStrategy"],
+    benchmarkSummary: readRequiredField(formData, "benchmarkSummary", "Benchmark summary"),
+    approvalNotes: readOptionalFieldValue(formData, "approvalNotes"),
+    stages
+  };
 }
 
 function parseMissingSignals(value: unknown) {
@@ -330,6 +456,55 @@ export async function saveEmployerJobDraftAction(formData: FormData) {
     jobId.trim(),
     requireValidJobInput(formData)
   );
+
+  redirect(`/employer/jobs/${job.id}`);
+}
+
+export async function saveEmployerInterviewBlueprintAction(formData: FormData) {
+  const { supabase, userId } = await getEmployerContext();
+  const jobId = readRequiredField(formData, "jobId", "Job id");
+  const job = await getEmployerJob(supabase, userId, jobId);
+
+  if (!job) {
+    notFound();
+  }
+
+  const blueprint = readInterviewBlueprintFromFormData(formData);
+  const validation = validateInterviewBlueprint(blueprint);
+
+  if (!validation.ok) {
+    throw new Error(validation.errors.join("; "));
+  }
+
+  const normalizedBlueprint = normalizeInterviewBlueprint(validation.data);
+  const existingBlueprint = await getEmployerJobInterviewBlueprintByJob(supabase, userId, job.id);
+  const blueprintRecord = await upsertEmployerJobInterviewBlueprint(supabase, {
+    employerUserId: userId,
+    employerJobId: job.id,
+    blueprint: normalizedBlueprint
+  });
+
+  if (existingBlueprint) {
+    await deleteEmployerJobInterviewQuestionsByBlueprint(
+      supabase,
+      userId,
+      job.id,
+      existingBlueprint.id
+    );
+  }
+
+  for (const stage of normalizedBlueprint.stages) {
+    for (const question of stage.questions) {
+      await createEmployerJobInterviewQuestion(supabase, {
+        employerUserId: userId,
+        employerJobId: job.id,
+        interviewBlueprintId: blueprintRecord.id,
+        stageLabel: stage.stageLabel,
+        stageOrder: stage.stageOrder,
+        question
+      });
+    }
+  }
 
   redirect(`/employer/jobs/${job.id}`);
 }

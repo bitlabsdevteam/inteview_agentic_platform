@@ -1537,6 +1537,19 @@ main {
   gap: 12px;
 }
 
+.employer-interview-blueprint-panel,
+.employer-interview-blueprint-panel__question-row {
+  display: grid;
+  gap: 14px;
+}
+
+.employer-interview-blueprint-panel__question-row {
+  padding: 16px;
+  border: 1px solid rgba(94, 47, 0, 0.12);
+  border-radius: 16px;
+  background: rgba(255, 249, 240, 0.62);
+}
+
 .employer-job-detail {
   display: grid;
   gap: 20px;

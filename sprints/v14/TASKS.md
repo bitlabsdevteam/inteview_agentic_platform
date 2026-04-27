@@ -70,9 +70,10 @@
   - Files: `tests/components/employer-interview-blueprint-panel.test.ts`
   - Completed: 2026-04-27 — Added red-first component contracts for a standalone interview blueprint design panel that must render ordered question rows, response-mode/tone/parsing selectors, benchmark input, and readiness hints for blocked Stage 2 states. Verified failing state with targeted Vitest run because `src/components/employer-interview-blueprint-panel.tsx` does not exist yet.
 
-- [ ] Task 15: Implement interview structure design panel and server action wiring (P1)
+- [x] Task 15: Implement interview structure design panel and server action wiring (P1)
   - Acceptance: Employers can edit and save interview blueprint data and ordered questions from Stage 2 with validation errors surfaced in UI.
   - Files: `src/components/employer-interview-blueprint-panel.tsx`, `src/app/employer/jobs/actions.ts`, `src/app/employer/jobs/[id]/page.tsx`, `src/app/globals.css`
+  - Completed: 2026-04-27 — Implemented a standalone interview blueprint panel with editable plan fields, ordered question rows, readiness hints, and Stage 2 form controls; added a save action that validates, normalizes, replaces persisted interview questions, and redirects back to the job detail route; and wired the live panel into the staged job-detail page. Verified with targeted Vitest, Semgrep clean, `npm audit --audit-level=high` clean, and graph rebuild.
 
 - [ ] Task 16: Add failing tests for combined review gate behavior (P1)
   - Acceptance: Tests require Stage 3 review to stay blocked when critical JD failures remain or interview blueprint completeness gaps are unresolved.

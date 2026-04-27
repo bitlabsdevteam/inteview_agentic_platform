@@ -2,11 +2,13 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 
 import { AccountHeader, getAccountHeaderState } from "@/components/account-header";
+import { EmployerInterviewBlueprintPanel } from "@/components/employer-interview-blueprint-panel";
 import { EmployerJobAgentChat } from "@/components/employer-job-agent-chat";
 import {
   archiveEmployerJobAction,
   publishEmployerJobAction,
   removeEmployerJobAction,
+  saveEmployerInterviewBlueprintAction,
   saveEmployerJobDraftAction,
   submitEmployerJobForReviewAction
 } from "@/app/employer/jobs/actions";
@@ -456,81 +458,29 @@ export default async function EmployerJobDetailPage({ params }: EmployerJobDetai
               </div>
             </form>
           ) : pipelineDisplay.selectedStageKey === "interview_structure" ? (
-            <section
-              className="employer-jobs-panel employer-job-stage-panel"
+            <div
               data-testid="employer-job-stage-panel-interview_structure"
             >
-              <div className="employer-chat-panel__header">
-                <div>
-                  <p className="employer-section-label">Stage 2</p>
-                  <h2>Interview Structure Design</h2>
-                </div>
-                <span className="employer-chat-panel__status">
-                  {interviewBlueprintSummary.questionCount} questions
-                </span>
-              </div>
-              <p className="employer-summary">
-                Translate the approved role into an interview plan with clear questions, response
-                mode, tone, and evaluation rules before moving to review.
-              </p>
-              <div className="employer-job-stage-panel__summary-grid">
-                <article className="employer-job-stage-panel__card">
-                  <p className="employer-section-label">Plan</p>
-                  <h3>{interviewBlueprintSummary.title}</h3>
-                  <p>{interviewBlueprintSummary.objective}</p>
-                </article>
-                <article className="employer-job-stage-panel__card">
-                  <p className="employer-section-label">Configuration</p>
-                  <ul className="employer-guardrail-list">
-                    <li>Mode: {interviewBlueprintSummary.responseMode ?? "Not selected"}</li>
-                    <li>Tone: {interviewBlueprintSummary.toneProfile ?? "Not selected"}</li>
-                    <li>
-                      Parsing strategy: {interviewBlueprintSummary.parsingStrategy ?? "Not selected"}
-                    </li>
-                  </ul>
-                </article>
-              </div>
-              <article className="employer-job-stage-panel__card">
-                <p className="employer-section-label">Benchmark</p>
-                <p>
-                  {interviewBlueprintSummary.benchmarkSummary ||
-                    "Add benchmark guidance so evaluation stays consistent."}
-                </p>
-              </article>
-              <article className="employer-job-stage-panel__card">
-                <p className="employer-section-label">Interview Stages</p>
-                {interviewBlueprintSummary.stages.length > 0 ? (
-                  <div className="employer-job-stage-panel__stages">
-                    {interviewBlueprintSummary.stages.map((stage) => (
-                      <section className="employer-job-stage-panel__stage" key={stage.stageLabel}>
-                        <h3>{stage.stageLabel}</h3>
-                        <ul className="employer-guardrail-list">
-                          {stage.questions.map((question) => (
-                            <li key={`${stage.stageLabel}-${question.questionOrder}`}>
-                              {question.questionText}
-                            </li>
-                          ))}
-                        </ul>
-                      </section>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="employer-message__body">
-                    Add the first question set to unlock review readiness.
-                  </p>
-                )}
-              </article>
-              {interviewBlueprintSummary.completenessGaps.length > 0 ? (
-                <article className="employer-job-stage-panel__card employer-job-stage-panel__card--blocked">
-                  <p className="employer-section-label">Open Gaps</p>
-                  <ul className="employer-guardrail-list">
-                    {interviewBlueprintSummary.completenessGaps.map((gap) => (
-                      <li key={gap}>{gap}</li>
-                    ))}
-                  </ul>
-                </article>
-              ) : null}
-            </section>
+              <EmployerInterviewBlueprintPanel
+                action={saveEmployerInterviewBlueprintAction}
+                blueprint={{
+                  title: interviewBlueprintSummary.title,
+                  objective: interviewBlueprintSummary.objective,
+                  responseMode: interviewBlueprintSummary.responseMode as InterviewBlueprintSummary["responseMode"],
+                  toneProfile: interviewBlueprintSummary.toneProfile as InterviewBlueprintSummary["toneProfile"],
+                  parsingStrategy: interviewBlueprintSummary.parsingStrategy as InterviewBlueprintSummary["parsingStrategy"],
+                  benchmarkSummary: interviewBlueprintSummary.benchmarkSummary,
+                  approvalNotes: interviewBlueprintRecord?.approval_notes ?? "",
+                  stages: interviewBlueprintSummary.stages
+                }}
+                completenessGaps={interviewBlueprintSummary.completenessGaps}
+                jobId={job.id}
+                stageState={
+                  pipelineDisplay.stages.find((stage) => stage.key === "interview_structure")?.state ??
+                  "current"
+                }
+              />
+            </div>
           ) : (
             <section
               className="employer-jobs-panel employer-job-stage-panel"
