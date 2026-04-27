@@ -5,9 +5,10 @@
   - Files: `tests/agents/job-posting/pipeline-fixtures.ts`, `tests/components/employer-job-detail-pipeline.test.ts`
   - Completed: 2026-04-27 — Added reusable v14 pipeline fixtures covering the three stage definitions, shared state vocabulary, and baseline interview blueprint defaults, plus setup coverage verifying those contracts. Verified with targeted Vitest, Semgrep clean, and `npm audit --audit-level=high` clean.
 
-- [ ] Task 2: Add failing tests for pipeline stage-state contracts (P0)
+- [x] Task 2: Add failing tests for pipeline stage-state contracts (P0)
   - Acceptance: Tests cover `current`, `complete`, `blocked`, and `upcoming` states plus Stage 1 to Stage 2 progression rules.
   - Files: `tests/agents/job-posting/pipeline-state.test.ts`
+  - Completed: 2026-04-27 — Added red-first contract coverage for pipeline stage ordering, current/complete/blocked/upcoming states, and Stage 1 to Stage 2 progression into review readiness. Verified failing state with targeted Vitest run due to missing `job-pipeline` module.
 
 - [ ] Task 3: Implement deterministic pipeline stage-state helper (P0)
   - Acceptance: `job-pipeline.ts` derives stage order, labels, completion, and blocker summaries from job + quality + interview blueprint state.
