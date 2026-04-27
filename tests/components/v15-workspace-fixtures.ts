@@ -17,7 +17,7 @@ export type V15ReadonlyArtifactSectionFixture = {
 export type V15ChatKeyboardExpectationFixture = {
   submitOnEnter: true;
   newlineOnShiftEnter: true;
-  showsVisibleSendButton: false;
+  showsVisibleSendButton: true;
 };
 
 export const V15_WORKSPACE_LAYOUT_FIXTURES: V15WorkspacePanelFixture[] = [
@@ -59,10 +59,11 @@ export const V15_READONLY_ARTIFACT_SECTION_FIXTURES: V15ReadonlyArtifactSectionF
 export const V15_CHAT_KEYBOARD_EXPECTATIONS: V15ChatKeyboardExpectationFixture = {
   submitOnEnter: true,
   newlineOnShiftEnter: true,
-  showsVisibleSendButton: false
+  showsVisibleSendButton: true
 };
 
 export const V15_AGENT_CHAT_PROPS_FIXTURE = {
+  assistantName: "Scout",
   jobId: "job-1",
   initialSession: {
     id: "session-1",

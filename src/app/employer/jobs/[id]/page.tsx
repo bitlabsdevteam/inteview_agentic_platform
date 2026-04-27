@@ -2,9 +2,7 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 
 import {
-  archiveEmployerJobAction,
   publishEmployerJobAction,
-  removeEmployerJobAction,
   submitEmployerJobForReviewAction
 } from "@/app/employer/jobs/actions";
 import {
@@ -36,7 +34,6 @@ type EmployerJobDetailPageProps = {
   params: Promise<{
     id: string;
   }>;
-  searchParams?: Promise<Record<string, string | string[] | undefined>>;
 };
 
 type InterviewBlueprintSummary = {
@@ -198,7 +195,6 @@ export default async function EmployerJobDetailPage({
   });
   const canSubmitForReview = reviewGate.canSubmitForReview;
   const canPublish = job.status === "needs_review";
-  const canArchive = job.status !== "archived";
   const workspace = buildEmployerJobReadonlyWorkspace({
     job,
     assistantState,
@@ -223,128 +219,110 @@ export default async function EmployerJobDetailPage({
       </section>
 
       <section className="employer-job-detail">
-        <div className="employer-job-detail__main">
-          <section
-            className="employer-jobs-panel employer-job-readonly-workspace"
-            data-testid="employer-job-readonly-workspace"
+        <div className="employer-job-detail__layout" data-testid="employer-job-detail-layout">
+          <div
+            className="employer-job-detail__main"
+            data-testid="employer-job-detail-primary-column"
           >
-            <div className="employer-chat-panel__header">
-              <div>
-                <p className="employer-section-label">Created Artifact</p>
-                <h2>Read-Only Generated Artifact</h2>
-              </div>
-              <span className="employer-chat-panel__status">
-                {assistantState.readinessFlags.blocksReview ? "Needs Revision" : "Review Ready"}
-              </span>
-            </div>
-            <div className="employer-job-readonly-workspace__sections">
-              {workspace.sections.map((section) => (
-                <article
-                  className="employer-job-stage-panel__card"
-                  data-section-key={section.key}
-                  key={section.key}
-                >
-                  <p className="employer-section-label">{section.label}</p>
-                  <p className="employer-summary">{section.body}</p>
-                  {section.items.length > 0 ? (
-                    <dl className="employer-job-chat__kv">
-                      {section.items.map((item) => (
-                        <div key={`${section.key}-${item.label}`}>
-                          <dt>{item.label}</dt>
-                          <dd>{item.value}</dd>
-                        </div>
-                      ))}
-                    </dl>
-                  ) : null}
-                  {section.bullets.length > 0 ? (
-                    <ul className="employer-guardrail-list">
-                      {section.bullets.map((bullet) => (
-                        <li key={`${section.key}-${bullet}`}>{bullet}</li>
-                      ))}
-                    </ul>
-                  ) : null}
-                </article>
-              ))}
-            </div>
-          </section>
-
-          <section className="employer-job-detail__supporting">
-            <article className="employer-job-stage-panel__card">
+            <section
+              className="employer-jobs-panel employer-job-readonly-workspace"
+              data-testid="employer-job-readonly-workspace"
+            >
               <div className="employer-chat-panel__header">
                 <div>
-                  <p className="employer-section-label">Employer Controls</p>
-                  <h2>Review And Publish</h2>
+                  <p className="employer-section-label">Created Artifact</p>
+                  <h2>Read-Only Generated Artifact</h2>
                 </div>
                 <span className="employer-chat-panel__status">
-                  {canSubmitForReview ? "Ready" : "Blocked"}
+                  {assistantState.readinessFlags.blocksReview ? "Needs Revision" : "Review Ready"}
                 </span>
               </div>
-              <p className="employer-summary">
-                High-impact actions stay approval-gated even though revisions now happen through the
-                assistant.
-              </p>
-              <p className="employer-section-label">Review Checklist</p>
-              <ul className="employer-guardrail-list">
-                <li>Required fields are complete.</li>
-                <li>Compensation and location are visible.</li>
-                <li>Interview loop is defined.</li>
-                <li>Human approval happens before publishing.</li>
-              </ul>
-              {reviewGate.warningMessage ? (
-                <p className="employer-message__body" data-testid="employer-job-review-warning">
-                  {reviewGate.warningMessage}
+              <div className="employer-job-readonly-workspace__sections">
+                {workspace.sections.map((section) => (
+                  <article
+                    className="employer-job-stage-panel__card"
+                    data-section-key={section.key}
+                    key={section.key}
+                  >
+                    <p className="employer-section-label">{section.label}</p>
+                    <p className="employer-summary">{section.body}</p>
+                    {section.items.length > 0 ? (
+                      <dl className="employer-job-chat__kv">
+                        {section.items.map((item) => (
+                          <div key={`${section.key}-${item.label}`}>
+                            <dt>{item.label}</dt>
+                            <dd>{item.value}</dd>
+                          </div>
+                        ))}
+                      </dl>
+                    ) : null}
+                    {section.bullets.length > 0 ? (
+                      <ul className="employer-guardrail-list">
+                        {section.bullets.map((bullet) => (
+                          <li key={`${section.key}-${bullet}`}>{bullet}</li>
+                        ))}
+                      </ul>
+                    ) : null}
+                  </article>
+                ))}
+              </div>
+            </section>
+
+            <section className="employer-job-detail__supporting">
+              <article className="employer-job-stage-panel__card">
+                <div className="employer-chat-panel__header">
+                  <div>
+                    <p className="employer-section-label">Employer Controls</p>
+                    <h2>Review And Publish</h2>
+                  </div>
+                  <span className="employer-chat-panel__status">
+                    {canSubmitForReview ? "Ready" : "Blocked"}
+                  </span>
+                </div>
+                <p className="employer-summary">
+                  High-impact actions stay approval-gated even though revisions now happen through
+                  the assistant.
                 </p>
-              ) : null}
-              <div className="employer-composer__actions">
-                <form action={submitEmployerJobForReviewAction}>
-                  <input name="jobId" type="hidden" value={job.id} />
-                  <button
-                    className="employer-composer__button"
-                    data-testid="employer-job-review-button"
-                    disabled={!canSubmitForReview}
-                    type="submit"
-                  >
-                    Mark Ready For Review
-                  </button>
-                </form>
-                <form action={publishEmployerJobAction}>
-                  <input name="jobId" type="hidden" value={job.id} />
-                  <button
-                    className="employer-composer__button"
-                    data-testid="employer-job-publish-button"
-                    disabled={!canPublish}
-                    type="submit"
-                  >
-                    Publish Job
-                  </button>
-                </form>
-              </div>
-            </article>
-            <article className="employer-job-stage-panel__card">
-              <p className="employer-section-label">Archive And Remove</p>
-              <div className="employer-composer__actions">
-                <form action={archiveEmployerJobAction}>
-                  <input name="jobId" type="hidden" value={job.id} />
-                  <button
-                    className="employer-composer__button employer-composer__button--secondary"
-                    disabled={!canArchive}
-                    type="submit"
-                  >
-                    Archive Job
-                  </button>
-                </form>
-                <form action={removeEmployerJobAction}>
-                  <input name="jobId" type="hidden" value={job.id} />
-                  <button
-                    className="employer-composer__button employer-composer__button--secondary"
-                    type="submit"
-                  >
-                    Remove Job
-                  </button>
-                </form>
-              </div>
-            </article>
-          </section>
+                <p className="employer-section-label">Review Checklist</p>
+                <ul className="employer-guardrail-list">
+                  <li>Required fields are complete.</li>
+                  <li>Compensation and location are visible.</li>
+                  <li>Interview loop is defined.</li>
+                  <li>Human approval happens before publishing.</li>
+                </ul>
+                {reviewGate.warningMessage ? (
+                  <p className="employer-message__body" data-testid="employer-job-review-warning">
+                    {reviewGate.warningMessage}
+                  </p>
+                ) : null}
+                <div className="employer-composer__actions">
+                  <form action={submitEmployerJobForReviewAction}>
+                    <input name="jobId" type="hidden" value={job.id} />
+                    <button
+                      className="employer-composer__button"
+                      data-testid="employer-job-review-button"
+                      disabled={!canSubmitForReview}
+                      type="submit"
+                    >
+                      Mark Ready For Review
+                    </button>
+                  </form>
+                  <form action={publishEmployerJobAction}>
+                    <input name="jobId" type="hidden" value={job.id} />
+                    <button
+                      className="employer-composer__button"
+                      data-testid="employer-job-publish-button"
+                      disabled={!canPublish}
+                      type="submit"
+                    >
+                      Publish Job
+                    </button>
+                  </form>
+                </div>
+              </article>
+            </section>
+          </div>
+
         </div>
       </section>
     </>

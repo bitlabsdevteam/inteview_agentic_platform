@@ -6,6 +6,7 @@ import {
   buildEmployerJobInterviewQuestionInsert,
   createEmployerJobInterviewQuestion,
   getEmployerJobInterviewBlueprintByJob,
+  isMissingInterviewBlueprintTableError,
   listEmployerJobInterviewQuestionsByBlueprint,
   upsertEmployerJobInterviewBlueprint
 } from "@/lib/agents/job-posting/interview-blueprint-persistence";
@@ -186,6 +187,38 @@ describe("interview blueprint persistence", () => {
     ]);
   });
 
+  it("returns null when the blueprint table is not yet migrated", async () => {
+    const client = {
+      from() {
+        return {
+          select() {
+            return {
+              eq() {
+                return {
+                  eq() {
+                    return {
+                      maybeSingle: async () => ({
+                        data: null,
+                        error: {
+                          message:
+                            "Could not find the table 'public.employer_job_interview_blueprints' in the schema cache"
+                        }
+                      })
+                    };
+                  }
+                };
+              }
+            };
+          }
+        };
+      }
+    };
+
+    await expect(
+      getEmployerJobInterviewBlueprintByJob(client, "employer-user-1", "job-1")
+    ).resolves.toBeNull();
+  });
+
   it("creates and lists interview questions in strict employer/job/blueprint scope with stable ordering", async () => {
     const insertCalls: Array<Record<string, unknown>> = [];
     const insertClient = {
@@ -304,5 +337,66 @@ describe("interview blueprint persistence", () => {
       { order: ["stage_order", { ascending: true }] },
       { order: ["question_order", { ascending: true }] }
     ]);
+  });
+
+  it("returns an empty list when the question table is not yet migrated", async () => {
+    const client = {
+      from() {
+        return {
+          select() {
+            return {
+              eq() {
+                return {
+                  eq() {
+                    return {
+                      eq() {
+                        return {
+                          order() {
+                            return {
+                              order: async () => ({
+                                data: [],
+                                error: {
+                                  message:
+                                    "Could not find the table 'public.employer_job_interview_questions' in the schema cache"
+                                }
+                              })
+                            };
+                          }
+                        };
+                      }
+                    };
+                  }
+                };
+              }
+            };
+          }
+        };
+      }
+    };
+
+    await expect(
+      listEmployerJobInterviewQuestionsByBlueprint(
+        client,
+        "employer-user-1",
+        "job-1",
+        "blueprint-1"
+      )
+    ).resolves.toEqual([]);
+  });
+
+  it("detects missing interview blueprint table errors", () => {
+    expect(
+      isMissingInterviewBlueprintTableError(
+        new Error(
+          "Could not find the table 'public.employer_job_interview_blueprints' in the schema cache"
+        )
+      )
+    ).toBe(true);
+    expect(
+      isMissingInterviewBlueprintTableError(
+        new Error('relation "public.employer_job_interview_questions" does not exist')
+      )
+    ).toBe(true);
+    expect(isMissingInterviewBlueprintTableError(new Error("permission denied"))).toBe(false);
   });
 });

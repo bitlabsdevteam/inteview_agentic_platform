@@ -74,6 +74,35 @@ function assertQueryResult<T>(result: QueryResult<T>, operation: string) {
   return result.data;
 }
 
+function isMissingTableMessage(message: string | undefined, table: string) {
+  const normalizedMessage = message?.toLowerCase() ?? "";
+
+  if (!normalizedMessage) {
+    return false;
+  }
+
+  const normalizedTable = table.toLowerCase();
+  return (
+    normalizedMessage.includes(`could not find the table 'public.${normalizedTable}'`) ||
+    normalizedMessage.includes(`relation "public.${normalizedTable}" does not exist`) ||
+    normalizedMessage.includes(`relation "${normalizedTable}" does not exist`)
+  );
+}
+
+export function isMissingInterviewBlueprintTableError(error: unknown) {
+  const message =
+    error instanceof Error
+      ? error.message
+      : typeof error === "object" && error && "message" in error && typeof error.message === "string"
+        ? error.message
+        : undefined;
+
+  return (
+    isMissingTableMessage(message, "employer_job_interview_blueprints") ||
+    isMissingTableMessage(message, "employer_job_interview_questions")
+  );
+}
+
 export function buildEmployerJobInterviewBlueprintUpsert(
   input: EmployerJobInterviewBlueprintUpsertInput
 ) {
@@ -141,13 +170,16 @@ export async function getEmployerJobInterviewBlueprintByJob(
     };
   };
 
-  return assertQueryResult(
-    await query
-      .eq("employer_user_id", employerUserId)
-      .eq("employer_job_id", employerJobId)
-      .maybeSingle(),
-    "load employer job interview blueprint by job"
-  );
+  const result = await query
+    .eq("employer_user_id", employerUserId)
+    .eq("employer_job_id", employerJobId)
+    .maybeSingle();
+
+  if (isMissingTableMessage(result.error?.message, "employer_job_interview_blueprints")) {
+    return null;
+  }
+
+  return assertQueryResult(result, "load employer job interview blueprint by job");
 }
 
 export async function createEmployerJobInterviewQuestion(
@@ -192,15 +224,18 @@ export async function listEmployerJobInterviewQuestionsByBlueprint(
     };
   };
 
-  return assertQueryResult(
-    await query
-      .eq("employer_user_id", employerUserId)
-      .eq("employer_job_id", employerJobId)
-      .eq("interview_blueprint_id", interviewBlueprintId)
-      .order("stage_order", { ascending: true })
-      .order("question_order", { ascending: true }),
-    "list employer job interview questions by blueprint"
-  );
+  const result = await query
+    .eq("employer_user_id", employerUserId)
+    .eq("employer_job_id", employerJobId)
+    .eq("interview_blueprint_id", interviewBlueprintId)
+    .order("stage_order", { ascending: true })
+    .order("question_order", { ascending: true });
+
+  if (isMissingTableMessage(result.error?.message, "employer_job_interview_questions")) {
+    return [];
+  }
+
+  return assertQueryResult(result, "list employer job interview questions by blueprint");
 }
 
 export async function deleteEmployerJobInterviewQuestionsByBlueprint(

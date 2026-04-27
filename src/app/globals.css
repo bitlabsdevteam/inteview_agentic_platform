@@ -1470,6 +1470,17 @@ main {
   box-shadow: var(--shadow);
 }
 
+.employer-job-detail-pipeline__stage-content {
+  display: grid;
+  gap: 10px;
+  min-height: 100%;
+}
+
+.employer-job-detail-pipeline__stage-content--link {
+  color: inherit;
+  text-decoration: none;
+}
+
 .employer-job-detail-pipeline__stage h2,
 .employer-job-stage-panel__card h3,
 .employer-job-stage-panel__stage h3 {
@@ -1552,34 +1563,249 @@ main {
 
 .employer-job-detail {
   display: grid;
-  gap: 20px;
-  grid-template-columns: minmax(0, 1.4fr) minmax(300px, 0.8fr);
-  align-items: start;
   padding: 0;
   background: transparent;
   border: 0;
   box-shadow: none;
 }
 
+.employer-job-detail__layout {
+  display: grid;
+  gap: 20px;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: start;
+}
+
+.employer-job-wizard-layout {
+  display: grid;
+  gap: 20px;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+}
+
+.employer-job-wizard-layout__main,
+.employer-job-detail__main {
+  display: grid;
+  gap: 20px;
+  min-width: 0;
+}
+
+.employer-job-detail__supporting {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.employer-job-assistant-window {
+  position: sticky;
+  top: 24px;
+  width: min(460px, calc(100vw - 40px));
+  display: grid;
+  gap: 16px;
+  padding: 20px;
+  border: 1px solid rgba(94, 47, 0, 0.12);
+  border-radius: 28px;
+  background:
+    radial-gradient(circle at top right, rgba(69, 99, 83, 0.12), transparent 34%),
+    linear-gradient(180deg, rgba(255, 251, 245, 0.98), rgba(246, 236, 218, 0.95));
+  box-shadow: var(--shadow);
+  max-height: calc(100vh - 36px);
+  overflow: hidden;
+}
+
+.employer-job-assistant-window--collapsed {
+  width: 156px;
+}
+
+.employer-job-assistant-window__header {
+  display: grid;
+  gap: 12px;
+}
+
+.employer-job-assistant-window__header-copy {
+  display: grid;
+  gap: 8px;
+}
+
+.employer-job-assistant-window__header h2,
+.employer-job-assistant-window__intro p,
+.employer-job-assistant-window__empty-state p,
+.employer-job-assistant-window__collapsed-copy p {
+  margin: 0;
+}
+
+.employer-job-assistant-window__header h2 {
+  font-size: clamp(1.8rem, 2.8vw, 2.35rem);
+  line-height: 1;
+  letter-spacing: -0.04em;
+}
+
+.employer-job-assistant-window__header-description {
+  margin: 0;
+  line-height: 1.55;
+  color: var(--text-muted);
+}
+
+.employer-job-assistant-window__header-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.employer-job-assistant-window__body {
+  display: grid;
+  gap: 18px;
+  overflow: auto;
+  padding-right: 4px;
+}
+
+.employer-job-assistant-window__stack,
+.employer-job-assistant-window__intro,
+.employer-job-assistant-window__composer-grid,
+.employer-job-assistant-window__empty-state,
+.employer-job-assistant-window__collapsed-copy {
+  display: grid;
+  gap: 12px;
+}
+
+.employer-job-assistant-window__intro,
+.employer-job-assistant-window__empty-state,
+.employer-job-assistant-window__collapsed-copy {
+  padding: 16px;
+  border: 1px solid rgba(94, 47, 0, 0.1);
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.78);
+}
+
+.employer-job-assistant-window__collapsed-copy p {
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+.employer-job-assistant-window__rename-form {
+  display: grid;
+  gap: 10px;
+  padding: 14px;
+  border: 1px solid rgba(94, 47, 0, 0.1);
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.8);
+}
+
+.employer-job-assistant-window__rename-controls {
+  display: grid;
+  gap: 10px;
+}
+
+.employer-job-assistant-window__rename-input {
+  width: 100%;
+  min-height: 48px;
+  padding: 12px 16px;
+  border: 1px solid rgba(94, 47, 0, 0.16);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.96);
+  color: var(--text-primary);
+  font: inherit;
+}
+
+.employer-job-assistant-window__rename-input:focus-visible {
+  outline: 2px solid rgba(138, 75, 8, 0.4);
+  outline-offset: 3px;
+}
+
+.employer-job-assistant-window__mobile-trigger {
+  display: none;
+}
+
+.employer-job-assistant-window__mobile-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  display: grid;
+  align-items: end;
+  padding: 12px;
+  background: rgba(43, 32, 23, 0.24);
+}
+
+.employer-job-assistant-window--mobile {
+  position: relative;
+  top: auto;
+  width: 100%;
+  max-height: min(85vh, 720px);
+  border-radius: 24px 24px 16px 16px;
+}
+
 .employer-job-chat,
+.employer-job-chat__header,
+.employer-job-chat__identity,
+.employer-job-chat__identity-copy,
 .employer-job-chat__thread,
-.employer-job-chat__memory,
 .employer-job-chat__composer {
   display: grid;
   gap: 12px;
 }
 
 .employer-job-chat {
-  border: 1px solid rgba(94, 47, 0, 0.12);
-  border-radius: 22px;
-  background: rgba(255, 255, 255, 0.76);
-  padding: 16px;
+  gap: 14px;
+}
+
+.employer-job-chat__header {
+  padding: 18px;
+  border: 1px solid rgba(94, 47, 0, 0.1);
+  border-radius: 24px;
+  background:
+    radial-gradient(circle at top left, rgba(69, 99, 83, 0.12), transparent 30%),
+    rgba(255, 255, 255, 0.82);
+}
+
+.employer-job-chat__identity {
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+}
+
+.employer-job-chat__identity-copy h3,
+.employer-job-chat__bubble,
+.employer-job-chat__empty-copy,
+.employer-job-chat__system-badge {
+  margin: 0;
+}
+
+.employer-job-chat__identity-copy h3 {
+  font-size: 1.2rem;
+  line-height: 1.15;
+}
+
+.employer-job-chat__avatar {
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #8a4b08, #b78039);
+  color: #fff8ef;
+  font-size: 0.92rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+
+.employer-job-chat__avatar--large {
+  width: 60px;
+  height: 60px;
+  margin: 0 auto;
+  border-radius: 20px;
+  font-size: 1rem;
 }
 
 .employer-job-chat__thread {
-  max-height: 320px;
+  max-height: 420px;
   overflow: auto;
-  padding-right: 2px;
+  padding: 18px;
+  border: 1px solid rgba(94, 47, 0, 0.08);
+  border-radius: 26px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(249, 241, 228, 0.9)),
+    rgba(255, 252, 247, 0.98);
 }
 
 .employer-job-chat__status,
@@ -1597,78 +1823,104 @@ main {
 }
 
 .employer-job-chat__composer {
-  padding: 0;
-  border: 0;
-  background: transparent;
+  gap: 10px;
+  padding: 18px;
+  border: 1px solid rgba(94, 47, 0, 0.1);
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.82);
 }
 
-.employer-job-chat__composer .employer-composer__input {
-  min-height: 120px;
-}
-
-.employer-job-chat__memory {
-  padding: 14px;
-  border: 1px solid rgba(94, 47, 0, 0.12);
-  border-radius: 16px;
-  background: rgba(255, 249, 240, 0.58);
-}
-
-.employer-job-chat__readiness {
+.employer-job-chat__message {
   display: grid;
   gap: 8px;
 }
 
-.employer-job-chat__role-profile,
-.employer-job-chat__quality {
-  display: grid;
-  gap: 8px;
+.employer-job-chat__message--agent,
+.employer-job-chat__message--employer {
+  justify-items: start;
 }
 
-.employer-job-chat__kv {
-  display: grid;
-  gap: 6px;
-  margin: 0;
+.employer-job-chat__message--employer {
+  justify-items: end;
 }
 
-.employer-job-chat__kv div {
-  display: grid;
-  grid-template-columns: 112px minmax(0, 1fr);
-  gap: 8px;
+.employer-job-chat__message--system {
+  justify-items: center;
 }
 
-.employer-job-chat__kv dt {
-  font-size: 0.8rem;
-  font-weight: 700;
-  color: #684424;
-  letter-spacing: 0.01em;
+.employer-job-chat__bubble-meta {
+  display: flex;
+  width: 100%;
 }
 
-.employer-job-chat__kv dd {
-  margin: 0;
+.employer-job-chat__message--employer .employer-job-chat__bubble-meta {
+  justify-content: flex-end;
+}
+
+.employer-job-chat__bubble {
+  max-width: min(92%, 280px);
+  padding: 14px 16px;
+  border-radius: 20px;
+  line-height: 1.6;
   color: var(--text-primary);
+  white-space: pre-wrap;
 }
 
-.employer-job-chat__quality-item {
+.employer-job-chat__message--agent .employer-job-chat__bubble {
+  background: rgba(255, 245, 232, 0.98);
+  border-top-left-radius: 8px;
+}
+
+.employer-job-chat__message--employer .employer-job-chat__bubble {
+  background: rgba(69, 99, 83, 0.14);
+  border-top-right-radius: 8px;
+}
+
+.employer-job-chat__system-badge {
+  max-width: 85%;
+  padding: 10px 14px;
+  border-radius: 999px;
+  background: rgba(241, 248, 245, 0.98);
+  color: var(--text-muted);
+  text-align: center;
+}
+
+.employer-job-chat__empty-state {
   display: grid;
-  gap: 6px;
-  padding: 10px;
-  border-radius: 12px;
-  border: 1px solid rgba(94, 47, 0, 0.14);
-  background: rgba(255, 255, 255, 0.74);
+  gap: 12px;
+  place-items: center;
+  min-height: 240px;
+  text-align: center;
 }
 
-.employer-job-chat__quality-item--warn {
-  border-color: rgba(148, 92, 20, 0.35);
-  background: rgba(255, 246, 230, 0.9);
+.employer-job-chat__empty-copy {
+  max-width: 26ch;
+  line-height: 1.65;
+  color: var(--text-muted);
 }
 
-.employer-job-chat__quality-item--fail {
-  border-color: rgba(162, 53, 47, 0.35);
-  background: rgba(255, 235, 233, 0.92);
+.employer-job-chat__composer-shell {
+  display: grid;
+  gap: 12px;
 }
 
-.employer-job-chat__readiness-flag {
-  font-weight: 700;
+.employer-job-chat__input {
+  min-height: 132px;
+}
+
+.employer-job-chat__send {
+  justify-self: end;
+  min-width: 112px;
+}
+
+.employer-job-chat__send:disabled {
+  opacity: 0.55;
+}
+
+.employer-job-chat__composer-hint {
+  margin: 0;
+  color: var(--text-muted);
+  line-height: 1.5;
 }
 
 @media (max-width: 980px) {
@@ -1678,11 +1930,30 @@ main {
   .employer-job-detail-pipeline,
   .employer-jobs-hero,
   .employer-job-row,
-  .employer-job-detail,
+  .employer-job-wizard-layout,
+  .employer-job-detail__layout,
   .employer-job-agent,
   .employer-job-stage-panel__summary-grid,
+  .employer-job-detail__supporting,
   .employer-job-form__grid {
     grid-template-columns: 1fr;
+  }
+
+  .employer-job-assistant-window {
+    display: none;
+  }
+
+  .employer-job-assistant-window--mobile {
+    display: grid;
+  }
+
+  .employer-job-assistant-window__mobile-trigger {
+    display: inline-flex;
+    position: fixed;
+    right: 16px;
+    bottom: 16px;
+    z-index: 41;
+    width: auto;
   }
 
   .employer-hero h1 {

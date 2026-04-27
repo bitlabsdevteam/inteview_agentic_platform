@@ -1,3 +1,5 @@
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const createSupabaseServerClientMock = vi.fn();
@@ -215,5 +217,17 @@ describe("POST /api/employer/jobs/[id]/agent-chat", () => {
     );
 
     expect(response.status).toBe(403);
+  });
+
+  it("removes stage-based fallback wiring from the chat route source", () => {
+    const source = readFileSync(
+      join(process.cwd(), "src/app/api/employer/jobs/[id]/agent-chat/route.ts"),
+      "utf8"
+    );
+
+    expect(source).not.toContain("buildJobPostingPipelineStages");
+    expect(source).not.toContain("fallbackStageSummary");
+    expect(source).not.toContain("activeStage");
+    expect(source).not.toContain("stageSummary");
   });
 });

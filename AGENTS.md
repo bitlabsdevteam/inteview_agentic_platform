@@ -21,7 +21,7 @@ The platform should be designed and documented around this core stack:
 - `.next/` and `graphify-out/`: generated output; do not treat these as primary source directories.
 
 ## Reference Workflow
-Contributors must refer to the wiki entrypoint at [`/Users/davidbong/Documents/my_second_brain_vault/index.md`](/Users/davidbong/Documents/my_second_brain_vault/index.md) when building AI agents or personal assistants. Use it as the primary internal reference for building agent experiences comparable in quality and orchestration to OpenClaw, Claude Code, and Codex.
+Contributors must refer to the wiki entrypoint at [`/Users/davidbong/Documents/my_second_brain_vault/index.md`](/Users/davidbong/Documents/my_second_brain_vault/index.md) when building any AI agentic solution, AI agents, or personal assistants. Use it as the primary internal reference for building agent experiences comparable in quality and orchestration to OpenClaw, Claude Code, and Codex.
 
 Contributors must also follow the step-by-step architecture in [`Architecture_Design.md`](/Users/davidbong/Documents/ModernSoftwareDeveloperProject/Interview_agent/Architecture_Design.md) when building any hiring or recruiting feature. All implementation should map directly to the defined steps before development starts.
 

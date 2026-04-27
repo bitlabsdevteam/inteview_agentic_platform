@@ -30,6 +30,7 @@ import { runEmployerAssistantOrchestration } from "@/lib/agents/employer-assista
 import {
   deleteEmployerJobInterviewQuestionsByBlueprint,
   getEmployerJobInterviewBlueprintByJob,
+  isMissingInterviewBlueprintTableError,
   upsertEmployerJobInterviewBlueprint,
   createEmployerJobInterviewQuestion
 } from "@/lib/agents/job-posting/interview-blueprint-persistence";
@@ -477,33 +478,43 @@ export async function saveEmployerInterviewBlueprintAction(formData: FormData) {
   }
 
   const normalizedBlueprint = normalizeInterviewBlueprint(validation.data);
-  const existingBlueprint = await getEmployerJobInterviewBlueprintByJob(supabase, userId, job.id);
-  const blueprintRecord = await upsertEmployerJobInterviewBlueprint(supabase, {
-    employerUserId: userId,
-    employerJobId: job.id,
-    blueprint: normalizedBlueprint
-  });
+  try {
+    const existingBlueprint = await getEmployerJobInterviewBlueprintByJob(supabase, userId, job.id);
+    const blueprintRecord = await upsertEmployerJobInterviewBlueprint(supabase, {
+      employerUserId: userId,
+      employerJobId: job.id,
+      blueprint: normalizedBlueprint
+    });
 
-  if (existingBlueprint) {
-    await deleteEmployerJobInterviewQuestionsByBlueprint(
-      supabase,
-      userId,
-      job.id,
-      existingBlueprint.id
-    );
-  }
-
-  for (const stage of normalizedBlueprint.stages) {
-    for (const question of stage.questions) {
-      await createEmployerJobInterviewQuestion(supabase, {
-        employerUserId: userId,
-        employerJobId: job.id,
-        interviewBlueprintId: blueprintRecord.id,
-        stageLabel: stage.stageLabel,
-        stageOrder: stage.stageOrder,
-        question
-      });
+    if (existingBlueprint) {
+      await deleteEmployerJobInterviewQuestionsByBlueprint(
+        supabase,
+        userId,
+        job.id,
+        existingBlueprint.id
+      );
     }
+
+    for (const stage of normalizedBlueprint.stages) {
+      for (const question of stage.questions) {
+        await createEmployerJobInterviewQuestion(supabase, {
+          employerUserId: userId,
+          employerJobId: job.id,
+          interviewBlueprintId: blueprintRecord.id,
+          stageLabel: stage.stageLabel,
+          stageOrder: stage.stageOrder,
+          question
+        });
+      }
+    }
+  } catch (error) {
+    if (isMissingInterviewBlueprintTableError(error)) {
+      throw new Error(
+        "Interview blueprint storage is not available yet. Apply the latest Supabase migrations and refresh the schema cache."
+      );
+    }
+
+    throw error;
   }
 
   redirect(`/employer/jobs/${job.id}`);

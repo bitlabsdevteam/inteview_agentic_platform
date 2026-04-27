@@ -58,6 +58,7 @@ type ReadinessFlagsState = {
 };
 
 type EmployerJobAgentChatProps = {
+  assistantName: string;
   jobId: string;
   initialSession: ChatSessionState | null;
   initialMessages: ChatMessage[];
@@ -67,14 +68,16 @@ type EmployerJobAgentChatProps = {
   initialReadinessFlags?: ReadinessFlagsState;
 };
 
-function formatRole(role: ChatMessage["role"]) {
+function getSpeakerLabel(role: ChatMessage["role"], assistantName: string) {
   if (role === "agent") {
-    return "Agent";
+    return assistantName;
   }
+
   if (role === "employer") {
-    return "Employer";
+    return "You";
   }
-  return "System";
+
+  return "Workspace";
 }
 
 function summarizeReadiness(session: ChatSessionState | null) {
@@ -89,7 +92,22 @@ function summarizeReadiness(session: ChatSessionState | null) {
   return "No critical fields missing.";
 }
 
+function getInitials(name: string) {
+  const parts = name
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2);
+
+  if (!parts.length) {
+    return "AI";
+  }
+
+  return parts.map((part) => part[0]?.toUpperCase() ?? "").join("");
+}
+
 export function EmployerJobAgentChat({
+  assistantName,
   jobId,
   initialSession,
   initialMessages
@@ -103,6 +121,7 @@ export function EmployerJobAgentChat({
   const [messages, setMessages] = useState<ChatMessage[]>(initialMessages);
 
   const readinessLabel = useMemo(() => summarizeReadiness(session), [session]);
+  const assistantInitials = useMemo(() => getInitials(assistantName), [assistantName]);
 
   async function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -161,22 +180,52 @@ export function EmployerJobAgentChat({
 
   return (
     <section className="employer-job-chat" data-testid="employer-job-detail-chat">
+      <header className="employer-job-chat__header">
+        <div className="employer-job-chat__identity">
+          <div aria-hidden="true" className="employer-job-chat__avatar">
+            {assistantInitials}
+          </div>
+          <div className="employer-job-chat__identity-copy">
+            <p className="employer-section-label">Agent Chat</p>
+            <h3>{assistantName}</h3>
+            <p className="employer-job-chat__status">{readinessLabel}</p>
+          </div>
+        </div>
+      </header>
+
       <div className="employer-job-chat__thread" aria-live="polite">
-        <p className="employer-section-label">JD Agent Chat</p>
-        <p className="employer-job-chat__status">{readinessLabel}</p>
         {messages.length ? (
           messages.map((entry) => (
             <article
               key={entry.id}
-              className={`employer-message employer-message--${entry.role}`}
+              className={`employer-job-chat__message employer-job-chat__message--${entry.role}`}
               data-testid="employer-job-chat-message"
             >
-              <p className="employer-message__speaker">{formatRole(entry.role)}</p>
-              <p className="employer-message__body">{entry.content}</p>
+              {entry.role === "system" ? (
+                <p className="employer-job-chat__system-badge">{entry.content}</p>
+              ) : (
+                <>
+                  <div className="employer-job-chat__bubble-meta">
+                    <span className="employer-message__speaker">
+                      {getSpeakerLabel(entry.role, assistantName)}
+                    </span>
+                  </div>
+                  <p className="employer-job-chat__bubble">{entry.content}</p>
+                </>
+              )}
             </article>
           ))
         ) : (
-          <p className="employer-message__body">No chat history yet.</p>
+          <div className="employer-job-chat__empty-state">
+            <div aria-hidden="true" className="employer-job-chat__avatar employer-job-chat__avatar--large">
+              {assistantInitials}
+            </div>
+            <p className="employer-section-label">Ready To Refine</p>
+            <p className="employer-job-chat__empty-copy">
+              {assistantName} is ready to tighten this draft. Ask for sharper requirements,
+              cleaner language, or stronger hiring signals.
+            </p>
+          </div>
         )}
       </div>
 
@@ -186,20 +235,30 @@ export function EmployerJobAgentChat({
         onSubmit={submit}
       >
         <label className="employer-composer__label" htmlFor="jobChatMessage">
-          Continue refining this JD
+          Message {assistantName}
         </label>
-        <textarea
-          id="jobChatMessage"
-          name="jobChatMessage"
-          className="employer-composer__input"
-          data-testid="employer-job-chat-input"
-          rows={6}
-          placeholder="Tighten the requirements for senior backend ownership and update compensation to $180k-$220k."
-          value={message}
-          onChange={(event) => setMessage(event.currentTarget.value)}
-          onKeyDown={handleComposerKeyDown}
-          required
-        />
+        <div className="employer-job-chat__composer-shell">
+          <textarea
+            id="jobChatMessage"
+            name="jobChatMessage"
+            className="employer-composer__input employer-job-chat__input"
+            data-testid="employer-job-chat-input"
+            rows={4}
+            placeholder="Ask for tighter requirements, clearer scope, stronger screening signals, or a rewritten section."
+            value={message}
+            onChange={(event) => setMessage(event.currentTarget.value)}
+            onKeyDown={handleComposerKeyDown}
+            required
+          />
+          <button
+            className="employer-composer__button employer-job-chat__send"
+            data-testid="employer-job-chat-submit"
+            disabled={isSubmitting || message.trim().length === 0}
+            type="submit"
+          >
+            {isSubmitting ? "Sending..." : "Send"}
+          </button>
+        </div>
         <p className="employer-job-chat__composer-hint">
           Press Enter to send. Use Shift+Enter for a new line.
         </p>

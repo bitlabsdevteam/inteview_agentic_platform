@@ -223,6 +223,25 @@ describe("v15 read-only workspace fixtures", () => {
     expect(markup).not.toContain('data-testid="employer-job-stage-panel-review"');
   });
 
+  it("renders only the read-only artifact shell and leaves chat rendering to the shared assistant pop-up", async () => {
+    const { default: EmployerJobDetailPage } = await import("@/app/employer/jobs/[id]/page");
+    const markup = renderToStaticMarkup(
+      await EmployerJobDetailPage({
+        params: Promise.resolve({ id: "job-1" })
+      })
+    );
+
+    expect(markup).toContain('data-testid="employer-job-detail-layout"');
+    expect(markup).toContain('data-testid="employer-job-detail-primary-column"');
+    expect(markup).not.toContain('data-testid="employer-job-detail-chat-rail"');
+    expect(markup).not.toContain('data-testid="employer-job-detail-chat"');
+    expect(markup).not.toContain("Agent Chat");
+    expect(markup).not.toContain('data-testid="employer-job-assistant-window"');
+    expect(markup).not.toContain("Archive And Remove");
+    expect(markup).not.toContain("Archive Job");
+    expect(markup).not.toContain("Remove Job");
+  });
+
   it("removes leftover stage-routing hooks from the employer job detail route source", () => {
     const pageSource = readFileSync(
       join(process.cwd(), "src/app/employer/jobs/[id]/page.tsx"),
@@ -233,5 +252,10 @@ describe("v15 read-only workspace fixtures", () => {
     expect(pageSource).not.toContain("stageSummary");
     expect(pageSource).not.toContain("searchParams?");
     expect(pageSource).not.toContain("?stage=");
+    expect(pageSource).not.toContain("EmployerJobAgentChat");
+    expect(pageSource).not.toContain("employer-job-detail-chat-rail");
+    expect(pageSource).not.toContain("archiveEmployerJobAction");
+    expect(pageSource).not.toContain("removeEmployerJobAction");
+    expect(pageSource).not.toContain("Archive And Remove");
   });
 });

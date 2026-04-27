@@ -17,16 +17,18 @@ vi.mock("next/navigation", () => ({
 }));
 
 describe("employer job agent chat ui", () => {
-  it("renders a minimal chat thread and composer shell for v15", () => {
+  it("renders the telegram-style chat thread and composer shell for v15", () => {
     const html = renderToStaticMarkup(
       React.createElement(EmployerJobAgentChat, V15_AGENT_CHAT_PROPS_FIXTURE)
     );
 
-    expect(html).toContain("JD Agent Chat");
+    expect(html).toContain("Agent Chat");
+    expect(html).toContain("Scout");
     expect(html).toContain("No critical fields missing.");
-    expect(html).toContain("No chat history yet.");
-    expect(html).toContain("Continue refining this JD");
+    expect(html).toContain("Ready To Refine");
+    expect(html).toContain("Message Scout");
     expect(html).toContain("Press Enter to send. Use Shift+Enter for a new line.");
+    expect(html).toContain("Send");
     expect(html).not.toContain("Role Profile Summary");
     expect(html).not.toContain("Quality Warnings");
     expect(html).not.toContain("Session Memory");
@@ -36,7 +38,7 @@ describe("employer job agent chat ui", () => {
     expect(V15_CHAT_KEYBOARD_EXPECTATIONS).toEqual({
       submitOnEnter: true,
       newlineOnShiftEnter: true,
-      showsVisibleSendButton: false
+      showsVisibleSendButton: true
     });
   });
 
@@ -54,8 +56,7 @@ describe("employer job agent chat ui", () => {
     expect(html).not.toContain("Follow-up Questions");
     expect(html).not.toContain("Role Profile Summary");
     expect(html).not.toContain("Quality Warnings");
-    expect(html).not.toContain("Send To Agent");
-    expect(html).not.toContain('data-testid="employer-job-chat-submit"');
+    expect(html).toContain('data-testid="employer-job-chat-submit"');
   });
 
   it("requires explicit Enter-submit and Shift+Enter-newline keyboard handling in the chat composer", () => {
@@ -68,6 +69,6 @@ describe("employer job agent chat ui", () => {
     expect(source).toContain('event.key === "Enter"');
     expect(source).toContain("event.shiftKey");
     expect(source).toContain("requestSubmit");
-    expect(source).not.toContain("Send To Agent");
+    expect(source).toContain("Message ");
   });
 });

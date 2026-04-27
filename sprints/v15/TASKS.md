@@ -30,13 +30,15 @@
   - Files: `tests/components/employer-job-detail-readonly.test.ts`, `tests/app/api/employer/jobs/agent-chat-route.test.ts`
   - Completed: 2026-04-27 - Added red-first route and API contracts that reject leftover stage-routing hooks in the employer job detail page source and require the job chat response to omit `activeStage` and `stageSummary`; verified expected failing Vitest state plus Semgrep clean and npm audit clean.
 
-- [ ] Task 7: Implement single-workspace page layout and retire stage-based UI wiring (P0)
+- [x] Task 7: Implement single-workspace page layout and retire stage-based UI wiring (P0)
   - Acceptance: The employer job detail page renders the read-only artifact left panel and chat-only right panel, with stage bar and interview blueprint form removed from the page.
-  - Files: `src/app/employer/jobs/[id]/page.tsx`, `src/components/employer-interview-blueprint-panel.tsx`, `src/app/globals.css`
+  - Files: `src/app/employer/jobs/[id]/page.tsx`, `src/app/globals.css`, `tests/components/employer-job-detail-readonly.test.ts`
+  - Completed: 2026-04-27 - Reworked the employer job detail route into a two-column artifact-plus-chat workspace, embedded the minimal chat rail directly in the page, removed leftover stage-query route wiring, and verified with targeted Vitest, Semgrep clean, and npm audit clean.
 
-- [ ] Task 8: Update chat route and refresh flow for artifact-first rendering (P1)
+- [x] Task 8: Update chat route and refresh flow for artifact-first rendering (P1)
   - Acceptance: After each successful chat turn, the route still returns authorized revision results and the page refresh path updates the left-side read-only artifact without relying on stage metadata.
   - Files: `src/app/api/employer/jobs/[id]/agent-chat/route.ts`, `tests/app/api/employer/jobs/agent-chat-route.test.ts`
+  - Completed: 2026-04-27 - Removed leftover stage fallback metadata from the employer job chat API response, locked the route source against stage-summary regressions, and verified with targeted Vitest, Semgrep clean, and npm audit clean.
 
 - [ ] Task 9: Add focused E2E coverage for read-only artifact review plus Enter-to-send chat revision (P1)
   - Acceptance: Playwright verifies the employer sees a read-only artifact, the right rail is chat only, `Enter` sends a revision request, and the artifact updates afterward.

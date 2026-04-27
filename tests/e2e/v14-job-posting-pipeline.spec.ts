@@ -33,6 +33,17 @@ test("employer can complete the staged job-posting pipeline from draft to review
 
   await page.goto("/employer/jobs/new");
   await expect(page.getByTestId("employer-job-agent-form")).toBeVisible();
+  await expect(page.getByTestId("employer-job-assistant-window")).toBeVisible();
+  await expect(page.getByTestId("employer-job-assistant-window")).toHaveAttribute(
+    "data-assistant-mode",
+    "create"
+  );
+  await page.getByTestId("employer-job-assistant-toggle").click();
+  await expect(page.getByTestId("employer-job-assistant-window")).toHaveAttribute(
+    "data-collapsed",
+    "true"
+  );
+  await page.getByTestId("employer-job-assistant-toggle").click();
   await page.getByTestId("employer-job-prompt-composer").fill(
     "We need a senior AI platform engineer to own employer recruiting workflow quality for remote US customers."
   );
@@ -46,6 +57,11 @@ test("employer can complete the staged job-posting pipeline from draft to review
   await expect(page).toHaveURL(/\/employer\/jobs\/[^/]+$/);
 
   await expect(page.getByTestId("employer-job-detail-pipeline")).toBeVisible();
+  await expect(page.getByTestId("employer-job-assistant-window")).toBeVisible();
+  await expect(page.getByTestId("employer-job-assistant-window")).toHaveAttribute(
+    "data-assistant-mode",
+    "refine"
+  );
   await expect(page.getByTestId("employer-job-stage-panel-interview_structure")).toBeVisible();
   await expect(page.getByTestId("employer-interview-blueprint-panel")).toBeVisible();
   await expect(page.locator('[data-stage-key="job_posting"]')).toContainText("Build Job Posting");
