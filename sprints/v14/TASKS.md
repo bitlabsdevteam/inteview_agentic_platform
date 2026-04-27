@@ -50,9 +50,10 @@
   - Files: `tests/app/api/employer/jobs/agent-chat-route.test.ts`
   - Completed: 2026-04-27 — Added red-first API contract coverage requiring stage-aware chat response fields for active stage, pipeline summary, and interview blueprint summary while preserving the existing response shape. Verified failing state with targeted Vitest run because the route does not yet return those fields.
 
-- [ ] Task 11: Implement stage-aware orchestration and response metadata (P0)
+- [x] Task 11: Implement stage-aware orchestration and response metadata (P0)
   - Acceptance: Job chat orchestration surfaces stage-targeted recommendations and returns pipeline/interview blueprint summaries with safe defaults.
   - Files: `src/lib/agents/job-posting/follow-up.ts`, `src/app/api/employer/jobs/[id]/agent-chat/route.ts`, `src/lib/agents/job-posting/prompts.ts`
+  - Completed: 2026-04-27 — Implemented stage-aware chat orchestration metadata with derived pipeline summaries, safe-default interview blueprint summaries, interview-structure blocker detection, route response plumbing, and prompt guidance for stage-targeted employer recommendations. Verified with targeted Vitest, Semgrep clean, `npm audit --audit-level=high` clean, and graph rebuild.
 
 - [ ] Task 12: Add failing UI tests for employer job-detail pipeline shell (P1)
   - Acceptance: Tests verify a visible status bar, active-stage switching, and blocked Stage 3 behavior when Stage 1 or Stage 2 is incomplete.

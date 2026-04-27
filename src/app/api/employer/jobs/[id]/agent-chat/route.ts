@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { createJobPostingE2EStubInferenceResult, isJobPostingE2EStubMode } from "@/lib/agents/job-posting/e2e-stub";
+import { buildJobPostingPipelineStages } from "@/lib/agents/job-posting/job-pipeline";
 import { reviseEmployerJobDraftFromChatTurn } from "@/lib/agents/job-posting/follow-up";
 import { getOpenAIClientConfig } from "@/lib/agents/job-posting/openai-client";
 import { createStaticJobCreatorPromptVersion } from "@/lib/agents/job-posting/prompts";
@@ -35,6 +36,27 @@ function sanitizeErrorMessage(error: unknown) {
   }
 
   return "Unable to revise this job draft right now. Please try again.";
+}
+
+function hasText(value: unknown): value is string {
+  return typeof value === "string" && value.trim().length > 0;
+}
+
+function buildDefaultInterviewBlueprintSummary() {
+  return {
+    id: null,
+    status: "draft" as const,
+    responseMode: null,
+    toneProfile: null,
+    parsingStrategy: null,
+    benchmarkSummary: "",
+    questionCount: 0,
+    completenessGaps: [
+      "Select response mode for the interview plan.",
+      "Select parsing strategy for interview evaluation.",
+      "Add at least one benchmark summary for evaluator guidance."
+    ]
+  };
 }
 
 export async function POST(
@@ -94,6 +116,21 @@ export async function POST(
       blocksReview: qualityChecks.some((check) => check.status === "fail"),
       requiresEmployerFix: qualityChecks.some((check) => check.status !== "pass")
     };
+    const interviewBlueprintSummary =
+      result.interviewBlueprintSummary ?? buildDefaultInterviewBlueprintSummary();
+    const fallbackStageSummary = buildJobPostingPipelineStages({
+      jobStatus: result.job.status,
+      hasRoleProfile: hasText(result.roleProfileSummary?.title),
+      qualityCheckStatuses: qualityChecks.map((check) => check.status),
+      interviewBlueprint: interviewBlueprintSummary.id
+        ? {
+            hasBlueprint: true,
+            completenessGaps: interviewBlueprintSummary.completenessGaps
+          }
+        : null
+    });
+    const stageSummary = result.stageSummary ?? fallbackStageSummary;
+    const activeStage = result.activeStage ?? stageSummary.activeStageKey;
 
     return NextResponse.json({
       session: {
@@ -125,6 +162,9 @@ export async function POST(
       roleProfileSummary: result.roleProfileSummary ?? null,
       qualityChecks,
       readinessFlags,
+      activeStage,
+      stageSummary,
+      interviewBlueprintSummary,
       messages: result.messages.map((message) => ({
         id: message.id,
         role: message.role,

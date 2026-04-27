@@ -72,6 +72,8 @@ const SYSTEM_PROMPT_PATH = join(
 
 const PRODUCT_SURFACE_INSTRUCTIONS = [
   "Product surface: employer prompt-first job creation.",
+  "Guide the employer through the pipeline in order: Build Job Posting, Design Interview Structure, then Review And Approve.",
+  "Tailor recommendations to the current pipeline stage and the next blocking employer action.",
   "The employer should not have to choose department, level, location, compensation, or interview loop before the agent helps.",
   "Infer reasonable job details, label assumptions, and ask only targeted follow-up questions for publishing-critical gaps.",
   "Keep final publishing outside the agent; the employer must explicitly review and publish through the product workflow."

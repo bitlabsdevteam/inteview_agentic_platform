@@ -241,7 +241,41 @@ function createRevisionClient() {
   return { client, calls, updatedSession, jobRecord };
 }
 
-function createChatTurnClient(options?: { missingMemoryTables?: boolean }) {
+function createChatTurnClient(options?: {
+  missingMemoryTables?: boolean;
+  interviewBlueprintRecord?: {
+    id: string;
+    employer_user_id: string;
+    employer_job_id: string;
+    status: "draft";
+    title: string;
+    objective: string;
+    response_mode: "text" | "voice_agent";
+    tone_profile: "direct" | "supportive" | "neutral" | "high-precision";
+    parsing_strategy: "keyword_match" | "evidence_extraction" | "rubric_scoring" | "hybrid";
+    benchmark_summary: string;
+    approval_notes: string;
+    created_at: string;
+    updated_at: string;
+  } | null;
+  interviewQuestions?: Array<{
+    id: string;
+    interview_blueprint_id: string;
+    employer_user_id: string;
+    employer_job_id: string;
+    stage_label: string;
+    stage_order: number;
+    question_order: number;
+    question_text: string;
+    intent: string;
+    evaluation_focus: string;
+    strong_signal: string;
+    failure_signal: string;
+    follow_up_prompt: string;
+    created_at: string;
+    updated_at: string;
+  }>;
+}) {
   const calls: Array<Record<string, unknown>> = [];
   const jobRecord = {
     id: "job-1",
@@ -590,6 +624,70 @@ function createChatTurnClient(options?: { missingMemoryTables?: boolean }) {
         };
       }
 
+      if (table === "employer_job_interview_blueprints") {
+        return {
+          select(columns: string) {
+            calls.push({ select: columns });
+            return {
+              eq(column: string, value: string) {
+                calls.push({ eq: [column, value] });
+                return {
+                  eq(secondColumn: string, secondValue: string) {
+                    calls.push({ eq: [secondColumn, secondValue] });
+                    return {
+                      maybeSingle: async () => ({
+                        data: options?.interviewBlueprintRecord ?? null,
+                        error: null
+                      })
+                    };
+                  }
+                };
+              }
+            };
+          }
+        };
+      }
+
+      if (table === "employer_job_interview_questions") {
+        return {
+          select(columns: string) {
+            calls.push({ select: columns });
+            return {
+              eq(column: string, value: string) {
+                calls.push({ eq: [column, value] });
+                return {
+                  eq(secondColumn: string, secondValue: string) {
+                    calls.push({ eq: [secondColumn, secondValue] });
+                    return {
+                      eq(thirdColumn: string, thirdValue: string) {
+                        calls.push({ eq: [thirdColumn, thirdValue] });
+                        return {
+                          order(orderColumn: string, orderOptions: { ascending: boolean }) {
+                            calls.push({ order: [orderColumn, orderOptions] });
+                            return {
+                              order(
+                                nextOrderColumn: string,
+                                nextOrderOptions: { ascending: boolean }
+                              ) {
+                                calls.push({ order: [nextOrderColumn, nextOrderOptions] });
+                                return Promise.resolve({
+                                  data: options?.interviewQuestions ?? [],
+                                  error: null
+                                });
+                              }
+                            };
+                          }
+                        };
+                      }
+                    };
+                  }
+                };
+              }
+            };
+          }
+        };
+      }
+
       return {
         insert(values: unknown) {
           calls.push({ insert: values });
@@ -754,9 +852,121 @@ describe("job posting follow-up handling", () => {
       department: "Engineering"
     });
     expect(result.qualityChecks.length).toBeGreaterThan(0);
+    expect(result.activeStage).toBe("job_posting");
+    expect(result.stageSummary).toMatchObject({
+      activeStageKey: "job_posting",
+      stages: [
+        {
+          key: "job_posting",
+          state: "current"
+        },
+        {
+          key: "interview_structure",
+          state: "upcoming"
+        },
+        {
+          key: "review",
+          state: "upcoming"
+        }
+      ]
+    });
+    expect(result.interviewBlueprintSummary).toEqual({
+      id: null,
+      status: "draft",
+      responseMode: null,
+      toneProfile: null,
+      parsingStrategy: null,
+      benchmarkSummary: "",
+      questionCount: 0,
+      completenessGaps: [
+        "Select response mode for the interview plan.",
+        "Select parsing strategy for interview evaluation.",
+        "Add at least one benchmark summary for evaluator guidance."
+      ]
+    });
     expect(result.readinessFlags).toEqual({
       blocksReview: true,
       requiresEmployerFix: true
+    });
+  });
+
+  it("returns blocked interview-structure metadata when a saved blueprint is incomplete", async () => {
+    const readyForStageTwoOutput: JobPostingAgentOutput = {
+      ...revisedOutput,
+      draftDescription: [
+        "Senior AI Product Engineer",
+        "",
+        "Hiring problem:",
+        "Build reliable AI interview workflows that help employers create stronger job postings and structured interview plans.",
+        "",
+        "Requirements:",
+        "Next.js, Supabase, Postgres, and agent orchestration experience. Strong written communication, backend ownership, and production incident debugging are required.",
+        "",
+        "Interview process:",
+        "Recruiter screen, technical architecture interview, and employer review focused on evidence-backed hiring judgment."
+      ].join("\n")
+    };
+    const { client } = createChatTurnClient({
+      interviewBlueprintRecord: {
+        id: "blueprint-1",
+        employer_user_id: "employer-user-1",
+        employer_job_id: "job-1",
+        status: "draft",
+        title: "Backend Ownership Interview",
+        objective: "Measure architectural ownership and debugging depth.",
+        response_mode: "voice_agent",
+        tone_profile: "high-precision",
+        parsing_strategy: "hybrid",
+        benchmark_summary:
+          "Advance candidates who show clear production debugging evidence and strong architectural tradeoff reasoning.",
+        approval_notes: "Employer review required before rollout.",
+        created_at: "2026-04-26T00:00:00.000Z",
+        updated_at: "2026-04-26T00:00:00.000Z"
+      },
+      interviewQuestions: []
+    });
+
+    const result = await reviseEmployerJobDraftFromChatTurn({
+      client,
+      employerUserId: "employer-user-1",
+      employerJobId: "job-1",
+      sessionId: "session-1",
+      message: "Tighten the job posting for technical ownership.",
+      config,
+      promptVersion,
+      runInference: async () => ({
+        ...inferenceResult,
+        output: readyForStageTwoOutput
+      }),
+      createOutputChecksum: () => "output-checksum"
+    });
+
+    expect(result.activeStage).toBe("interview_structure");
+    expect(result.stageSummary).toMatchObject({
+      activeStageKey: "interview_structure",
+      stages: [
+        {
+          key: "job_posting",
+          state: "complete"
+        },
+        {
+          key: "interview_structure",
+          state: "blocked",
+          blockers: ["Add at least one interview question to define the interview plan."]
+        },
+        {
+          key: "review",
+          state: "upcoming"
+        }
+      ]
+    });
+    expect(result.interviewBlueprintSummary).toMatchObject({
+      id: "blueprint-1",
+      responseMode: "voice_agent",
+      toneProfile: "high-precision",
+      parsingStrategy: "hybrid",
+      questionCount: 0,
+      completenessGaps: ["Add at least one interview question to define the interview plan."]
     });
   });
 

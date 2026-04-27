@@ -1,6 +1,22 @@
 import { createHash } from "node:crypto";
 
 import {
+  deriveInterviewBlueprintCompletenessGaps,
+  type InterviewBlueprint,
+  type InterviewBlueprintQuestion
+} from "@/lib/agents/job-posting/interview-blueprint";
+import {
+  getEmployerJobInterviewBlueprintByJob,
+  listEmployerJobInterviewQuestionsByBlueprint,
+  type EmployerJobInterviewBlueprintRecord,
+  type EmployerJobInterviewQuestionRecord
+} from "@/lib/agents/job-posting/interview-blueprint-persistence";
+import {
+  buildJobPostingPipelineStages,
+  type JobPostingPipelineStageKey,
+  type JobPostingPipelineStageSummary
+} from "@/lib/agents/job-posting/job-pipeline";
+import {
   runJobPostingInference,
   type JobPostingInferenceInput,
   type JobPostingInferenceResult
@@ -67,9 +83,22 @@ type ChatTurnRevisionClient =
     Parameters<typeof upsertAgentMemorySummary>[0] &
     Parameters<typeof upsertEmployerJobRoleProfile>[0] &
     Parameters<typeof createEmployerJobQualityCheck>[0] &
+    Parameters<typeof getEmployerJobInterviewBlueprintByJob>[0] &
+    Parameters<typeof listEmployerJobInterviewQuestionsByBlueprint>[0] &
     Parameters<typeof getEmployerJob>[0];
 
 type RunInference = (input: JobPostingInferenceInput) => Promise<JobPostingInferenceResult>;
+
+export type JobPostingInterviewBlueprintSummary = {
+  id: string | null;
+  status: InterviewBlueprint["status"];
+  responseMode: InterviewBlueprint["responseMode"] | null;
+  toneProfile: InterviewBlueprint["toneProfile"] | null;
+  parsingStrategy: InterviewBlueprint["parsingStrategy"] | null;
+  benchmarkSummary: string;
+  questionCount: number;
+  completenessGaps: string[];
+};
 
 export type FollowUpRevisionInput = {
   client: FollowUpRevisionClient;
@@ -120,6 +149,139 @@ function parseBulletLikeLines(value: string) {
     .split("\n")
     .map((line) => line.replace(/^[\-\*\d\.\)\s]+/, "").trim())
     .filter((line) => line.length > 0);
+}
+
+function hasText(value: string | null | undefined): value is string {
+  return typeof value === "string" && value.trim().length > 0;
+}
+
+function dedupe(items: string[]) {
+  return [...new Set(items.map((item) => item.trim()).filter(Boolean))];
+}
+
+function buildDefaultInterviewBlueprintSummary(): JobPostingInterviewBlueprintSummary {
+  return {
+    id: null,
+    status: "draft",
+    responseMode: null,
+    toneProfile: null,
+    parsingStrategy: null,
+    benchmarkSummary: "",
+    questionCount: 0,
+    completenessGaps: [
+      "Select response mode for the interview plan.",
+      "Select parsing strategy for interview evaluation.",
+      "Add at least one benchmark summary for evaluator guidance."
+    ]
+  };
+}
+
+function buildInterviewStagesFromQuestions(
+  questions: EmployerJobInterviewQuestionRecord[]
+): InterviewBlueprint["stages"] {
+  const groupedStages = new Map<
+    number,
+    {
+      stageLabel: string;
+      stageOrder: number;
+      questions: InterviewBlueprintQuestion[];
+    }
+  >();
+
+  questions.forEach((question) => {
+    const existing = groupedStages.get(question.stage_order) ?? {
+      stageLabel: question.stage_label,
+      stageOrder: question.stage_order,
+      questions: []
+    };
+
+    existing.questions.push({
+      questionOrder: question.question_order,
+      questionText: question.question_text,
+      intent: question.intent,
+      evaluationFocus: question.evaluation_focus,
+      strongSignal: question.strong_signal,
+      failureSignal: question.failure_signal,
+      followUpPrompt: question.follow_up_prompt
+    });
+    groupedStages.set(question.stage_order, existing);
+  });
+
+  return [...groupedStages.values()]
+    .sort((left, right) => left.stageOrder - right.stageOrder)
+    .map((stage) => ({
+      stageLabel: stage.stageLabel,
+      stageOrder: stage.stageOrder,
+      questions: stage.questions.sort((left, right) => left.questionOrder - right.questionOrder)
+    }));
+}
+
+function buildInterviewBlueprintSummary(input: {
+  blueprintRecord: EmployerJobInterviewBlueprintRecord | null;
+  questions: EmployerJobInterviewQuestionRecord[];
+}): JobPostingInterviewBlueprintSummary {
+  if (!input.blueprintRecord) {
+    return buildDefaultInterviewBlueprintSummary();
+  }
+
+  const stages = buildInterviewStagesFromQuestions(input.questions);
+  const completenessGaps = dedupe([
+    ...deriveInterviewBlueprintCompletenessGaps({
+      status: input.blueprintRecord.status,
+      title: input.blueprintRecord.title,
+      objective: input.blueprintRecord.objective,
+      responseMode: input.blueprintRecord.response_mode,
+      toneProfile: input.blueprintRecord.tone_profile,
+      parsingStrategy: input.blueprintRecord.parsing_strategy,
+      benchmarkSummary: input.blueprintRecord.benchmark_summary,
+      approvalNotes: input.blueprintRecord.approval_notes,
+      stages
+    }),
+    ...(input.questions.length === 0
+      ? ["Add at least one interview question to define the interview plan."]
+      : [])
+  ]);
+
+  return {
+    id: input.blueprintRecord.id,
+    status: input.blueprintRecord.status,
+    responseMode: input.blueprintRecord.response_mode,
+    toneProfile: input.blueprintRecord.tone_profile,
+    parsingStrategy: input.blueprintRecord.parsing_strategy,
+    benchmarkSummary: input.blueprintRecord.benchmark_summary,
+    questionCount: input.questions.length,
+    completenessGaps
+  };
+}
+
+function buildStageMetadata(input: {
+  jobStatus: EmployerJobRecord["status"];
+  roleProfileSummary:
+    | {
+        title: string;
+      }
+    | null;
+  qualityChecks: Array<{
+    status: "pass" | "warn" | "fail";
+  }>;
+  interviewBlueprintSummary: JobPostingInterviewBlueprintSummary;
+}) {
+  const stageSummary = buildJobPostingPipelineStages({
+    jobStatus: input.jobStatus,
+    hasRoleProfile: hasText(input.roleProfileSummary?.title),
+    qualityCheckStatuses: input.qualityChecks.map((check) => check.status),
+    interviewBlueprint: input.interviewBlueprintSummary.id
+      ? {
+          hasBlueprint: true,
+          completenessGaps: input.interviewBlueprintSummary.completenessGaps
+        }
+      : null
+  });
+
+  return {
+    activeStage: stageSummary.activeStageKey,
+    stageSummary
+  };
 }
 
 export function getFollowUpSessionIdFromFormData(formData: FormData) {
@@ -592,6 +754,33 @@ export async function reviseEmployerJobDraftFromChatTurn({
   }
 
   const messages = await listAgentJobMessagesBySession(client, employerUserId, session.id);
+  const interviewBlueprintRecord = await getEmployerJobInterviewBlueprintByJob(
+    client,
+    employerUserId,
+    employerJobId
+  );
+  const interviewQuestions = interviewBlueprintRecord
+    ? await listEmployerJobInterviewQuestionsByBlueprint(
+        client,
+        employerUserId,
+        employerJobId,
+        interviewBlueprintRecord.id
+      )
+    : [];
+  const interviewBlueprintSummary = buildInterviewBlueprintSummary({
+    blueprintRecord: interviewBlueprintRecord,
+    questions: interviewQuestions
+  });
+  const stageMetadata = buildStageMetadata({
+    jobStatus: updatedJob.status,
+    roleProfileSummary: {
+      title: roleProfileResult.profile.title
+    },
+    qualityChecks: qualityResult.checks.map((check) => ({
+      status: check.status
+    })),
+    interviewBlueprintSummary
+  });
 
   return {
     job: updatedJob,
@@ -618,6 +807,9 @@ export async function reviseEmployerJobDraftFromChatTurn({
       issues: check.issues,
       suggestedRewrite: check.suggestedRewrite
     })),
-    readinessFlags: qualityResult.readinessFlags
+    readinessFlags: qualityResult.readinessFlags,
+    activeStage: stageMetadata.activeStage,
+    stageSummary: stageMetadata.stageSummary,
+    interviewBlueprintSummary
   };
 }

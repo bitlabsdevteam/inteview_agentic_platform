@@ -89,6 +89,17 @@ describe("job posting prompt assembly", () => {
     expect(assembled.messages[5].content).not.toContain("Prefer concise postings");
   });
 
+  it("adds pipeline-stage guidance to the developer instructions", () => {
+    const assembled = assembleJobPostingPrompt({
+      promptVersion: createStaticJobCreatorPromptVersion("system policy body"),
+      employerPrompt: "We need a senior product engineer."
+    });
+
+    expect(assembled.messages[1].content).toContain("Build Job Posting");
+    expect(assembled.messages[1].content).toContain("Design Interview Structure");
+    expect(assembled.messages[1].content).toContain("Review And Approve");
+  });
+
   it("rejects missing employer prompts before assembly", () => {
     expect(() =>
       assembleJobPostingPrompt({
