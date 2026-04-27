@@ -5,9 +5,10 @@
   - Files: `tests/components/employer-job-detail-readonly.test.ts`, `tests/components/employer-job-agent-chat.test.ts`
   - Completed: 2026-04-27 - Added reusable v15 workspace fixtures for the two-panel read-only artifact layout, artifact section inventory, shared chat props, and keyboard-submit expectations; verified with targeted Vitest, Semgrep clean, npm audit clean, and graph rebuild.
 
-- [ ] Task 2: Add failing tests for the read-only employer job workspace shell (P0)
+- [x] Task 2: Add failing tests for the read-only employer job workspace shell (P0)
   - Acceptance: Tests require the job detail page to render one read-only artifact surface, no stage bar, and no stage query navigation.
   - Files: `tests/components/employer-job-detail-readonly.test.ts`
+  - Completed: 2026-04-27 - Added red-first route coverage requiring a single read-only workspace surface, no stage pipeline, no stage query navigation, and no editable artifact controls; verified expected failing Vitest state plus Semgrep clean and npm audit clean.
 
 - [ ] Task 3: Implement a read-only workspace presenter for employer job detail data (P0)
   - Acceptance: A deterministic view-model helper assembles the full artifact sections needed by the read-only workspace from persisted job, role-profile, quality, and interview data.
