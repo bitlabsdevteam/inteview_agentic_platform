@@ -55,9 +55,10 @@
   - Files: `src/lib/agents/job-posting/follow-up.ts`, `src/app/api/employer/jobs/[id]/agent-chat/route.ts`, `src/lib/agents/job-posting/prompts.ts`
   - Completed: 2026-04-27 — Implemented stage-aware chat orchestration metadata with derived pipeline summaries, safe-default interview blueprint summaries, interview-structure blocker detection, route response plumbing, and prompt guidance for stage-targeted employer recommendations. Verified with targeted Vitest, Semgrep clean, `npm audit --audit-level=high` clean, and graph rebuild.
 
-- [ ] Task 12: Add failing UI tests for employer job-detail pipeline shell (P1)
+- [x] Task 12: Add failing UI tests for employer job-detail pipeline shell (P1)
   - Acceptance: Tests verify a visible status bar, active-stage switching, and blocked Stage 3 behavior when Stage 1 or Stage 2 is incomplete.
-  - Files: `tests/components/employer-job-detail-pipeline.test.tsx`
+  - Files: `tests/components/employer-job-detail-pipeline.test.ts`
+  - Completed: 2026-04-27 — Added red-first page-shell coverage that renders the employer job detail route with mocked job, role-profile, quality, and interview-blueprint state, then requires a visible pipeline status bar, active-stage panel switching, and blocked review-stage shell behavior. Verified failing state with targeted Vitest run because the page still renders the legacy flat form layout without the pipeline shell.
 
 - [ ] Task 13: Implement top-level status bar and stage-aware job detail layout (P1)
   - Acceptance: Employer job detail page renders the three-stage pipeline header and shows stage-specific content instead of one flat workspace.
