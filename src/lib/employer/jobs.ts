@@ -1,8 +1,14 @@
-export const EMPLOYER_JOB_STATUSES = ["draft", "needs_review", "published", "closed"] as const;
+export const EMPLOYER_JOB_STATUSES = [
+  "draft",
+  "needs_review",
+  "published",
+  "closed",
+  "archived"
+] as const;
 
 export type EmployerJobStatus = (typeof EMPLOYER_JOB_STATUSES)[number];
 
-export type EmployerJobAction = "submit_for_review" | "publish" | "close";
+export type EmployerJobAction = "submit_for_review" | "publish" | "close" | "archive";
 
 export type EmployerJobInput = {
   title: string;
@@ -49,11 +55,21 @@ export type EmployerJobPrimaryAction = {
   intent: "continue" | "review" | "view";
 };
 
+export type EmployerJobQualityStatus = "pass" | "warn" | "fail";
+
+export type EmployerJobReviewGate = {
+  canSubmitForReview: boolean;
+  blocksReview: boolean;
+  requiresEmployerFix: boolean;
+  warningMessage: string | null;
+};
+
 type EmployerJobsClient = {
   from: (table: "employer_jobs") => {
     select: (columns: string) => unknown;
     insert: (values: EmployerJobDraftInsert) => unknown;
     update: (values: Partial<EmployerJobDraftInsert>) => unknown;
+    delete: () => unknown;
   };
 };
 
@@ -156,6 +172,10 @@ export function getNextEmployerJobStatus(
     return "closed";
   }
 
+  if (status !== "archived" && action === "archive") {
+    return "archived";
+  }
+
   return null;
 }
 
@@ -169,6 +189,47 @@ export function getEmployerJobPrimaryAction(status: EmployerJobStatus): Employer
   }
 
   return { label: "View", intent: "view" };
+}
+
+export function getEmployerJobReviewGate(input: {
+  status: EmployerJobStatus;
+  qualityCheckStatuses: EmployerJobQualityStatus[];
+}): EmployerJobReviewGate {
+  if (input.status !== "draft") {
+    return {
+      canSubmitForReview: false,
+      blocksReview: false,
+      requiresEmployerFix: false,
+      warningMessage: null
+    };
+  }
+
+  const blocksReview = input.qualityCheckStatuses.includes("fail");
+  if (blocksReview) {
+    return {
+      canSubmitForReview: false,
+      blocksReview: true,
+      requiresEmployerFix: true,
+      warningMessage: "Critical quality failures must be fixed before this job can move to review."
+    };
+  }
+
+  const requiresEmployerFix = input.qualityCheckStatuses.includes("warn");
+  if (requiresEmployerFix) {
+    return {
+      canSubmitForReview: true,
+      blocksReview: false,
+      requiresEmployerFix: true,
+      warningMessage: "Quality warnings are present. Resolve them before review when possible."
+    };
+  }
+
+  return {
+    canSubmitForReview: true,
+    blocksReview: false,
+    requiresEmployerFix: false,
+    warningMessage: null
+  };
 }
 
 export function formatEmployerJobStatus(status: EmployerJobStatus) {
@@ -294,4 +355,33 @@ export async function transitionEmployerJobStatus(
       .single(),
     "transition job status"
   );
+}
+
+export async function removeEmployerJob(
+  client: EmployerJobsClient,
+  employerUserId: string,
+  jobId: string
+) {
+  const query = client.from("employer_jobs").delete() as {
+    eq: (column: string, value: string) => {
+      eq: (column: string, value: string) => {
+        select: (columns: string) => {
+          maybeSingle: () => Promise<QueryResult<{ id: string } | null>>;
+        };
+      };
+    };
+  };
+
+  const deleted = assertQueryResult(
+    await query
+      .eq("id", jobId)
+      .eq("employer_user_id", employerUserId)
+      .select("id")
+      .maybeSingle(),
+    "remove employer job"
+  );
+
+  if (!deleted) {
+    throw new Error("Unable to remove employer job.");
+  }
 }

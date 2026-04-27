@@ -2,13 +2,29 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 
 import { AccountHeader, getAccountHeaderState } from "@/components/account-header";
+import { EmployerJobAgentChat } from "@/components/employer-job-agent-chat";
 import {
+  archiveEmployerJobAction,
   publishEmployerJobAction,
+  removeEmployerJobAction,
   saveEmployerJobDraftAction,
   submitEmployerJobForReviewAction
 } from "@/app/employer/jobs/actions";
+import {
+  getAgentMemorySummaryBySession,
+  toMemorySummaryRecord
+} from "@/lib/agents/job-posting/memory";
+import {
+  getEmployerJobRoleProfileBySession,
+  listEmployerJobQualityChecksBySession
+} from "@/lib/agents/job-posting/step1-step2-persistence";
+import { QUALITY_CHECK_TYPES } from "@/lib/agents/job-posting/quality-controls";
+import {
+  getLatestAgentJobSessionByJobId,
+  listAgentJobMessagesBySession
+} from "@/lib/agents/job-posting/persistence";
 import { enforceRouteAccess } from "@/lib/auth/enforce-route-access";
-import { formatEmployerJobStatus, getEmployerJob } from "@/lib/employer/jobs";
+import { formatEmployerJobStatus, getEmployerJob, getEmployerJobReviewGate } from "@/lib/employer/jobs";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
@@ -38,8 +54,28 @@ export default async function EmployerJobDetailPage({ params }: EmployerJobDetai
     notFound();
   }
 
-  const canSubmitForReview = job.status === "draft";
+  const latestSession = await getLatestAgentJobSessionByJobId(supabase, data.user.id, job.id);
+  const [sessionMessages, memorySummary, roleProfileSummary, qualityChecks] = latestSession
+    ? await Promise.all([
+        listAgentJobMessagesBySession(supabase, data.user.id, latestSession.id),
+        getAgentMemorySummaryBySession(supabase, data.user.id, job.id, latestSession.id),
+        getEmployerJobRoleProfileBySession(supabase, data.user.id, job.id, latestSession.id),
+        listEmployerJobQualityChecksBySession(supabase, data.user.id, job.id, latestSession.id)
+      ])
+    : [[], null, null, []];
+  const memoryState = toMemorySummaryRecord(memorySummary);
+  const currentQualityChecks = qualityChecks.slice(-QUALITY_CHECK_TYPES.length);
+  const reviewGate = getEmployerJobReviewGate({
+    status: job.status,
+    qualityCheckStatuses: currentQualityChecks.map((check) => check.status)
+  });
+  const canSubmitForReview = reviewGate.canSubmitForReview;
   const canPublish = job.status === "needs_review";
+  const canArchive = job.status !== "archived";
+  const readinessFlags = {
+    blocksReview: currentQualityChecks.some((check) => check.status === "fail"),
+    requiresEmployerFix: currentQualityChecks.some((check) => check.status !== "pass")
+  };
 
   return (
     <main className="app-page employer-page">
@@ -112,7 +148,55 @@ export default async function EmployerJobDetailPage({ params }: EmployerJobDetai
           </form>
 
           <aside className="employer-rail">
-            <article className="employer-rail-card">
+            <section className="employer-rail-section">
+              <EmployerJobAgentChat
+                jobId={job.id}
+                initialSession={
+                  latestSession
+                    ? {
+                        id: latestSession.id,
+                        status: latestSession.status,
+                        assumptions: latestSession.assumptions,
+                        missingCriticalFields: latestSession.missing_critical_fields,
+                        followUpQuestions: latestSession.follow_up_questions,
+                        updatedAt: latestSession.updated_at
+                      }
+                    : null
+                }
+                initialMessages={sessionMessages.map((message) => ({
+                  id: message.id,
+                  role: message.role,
+                  content: message.content,
+                  createdAt: message.created_at
+                }))}
+                initialMemory={{
+                  summary: memoryState,
+                  compacted: (memoryState?.compactedMessageCount ?? 0) > 0
+                }}
+                initialRoleProfileSummary={
+                  roleProfileSummary
+                    ? {
+                        title: roleProfileSummary.normalized_profile.title,
+                        department: roleProfileSummary.normalized_profile.department,
+                        level: roleProfileSummary.normalized_profile.level,
+                        locationPolicy: roleProfileSummary.normalized_profile.locationPolicy,
+                        compensationRange: roleProfileSummary.normalized_profile.compensationRange,
+                        unresolvedConstraints: roleProfileSummary.unresolved_constraints,
+                        conflicts: roleProfileSummary.conflicts
+                      }
+                    : null
+                }
+                initialQualityChecks={currentQualityChecks.map((check) => ({
+                  checkType: check.check_type,
+                  status: check.status,
+                  issues: check.issues,
+                  suggestedRewrite: check.suggested_rewrite
+                }))}
+                initialReadinessFlags={readinessFlags}
+              />
+            </section>
+
+            <section className="employer-rail-section">
               <p className="employer-section-label">Review Checklist</p>
               <ul className="employer-guardrail-list">
                 <li>Required fields are complete.</li>
@@ -120,25 +204,58 @@ export default async function EmployerJobDetailPage({ params }: EmployerJobDetai
                 <li>Interview loop is defined.</li>
                 <li>Human approval happens before publishing.</li>
               </ul>
-            </article>
+            </section>
 
-            <article className="employer-rail-card">
+            <section className="employer-rail-section">
               <p className="employer-section-label">Publish Controls</p>
+              {reviewGate.warningMessage ? (
+                <p className="employer-message__body" data-testid="employer-job-review-warning">
+                  {reviewGate.warningMessage}
+                </p>
+              ) : null}
               <div className="employer-composer__actions">
                 <form action={submitEmployerJobForReviewAction}>
                   <input name="jobId" type="hidden" value={job.id} />
-                  <button className="employer-composer__button" disabled={!canSubmitForReview} type="submit">
+                  <button
+                    className="employer-composer__button"
+                    data-testid="employer-job-review-button"
+                    disabled={!canSubmitForReview}
+                    type="submit"
+                  >
                     Mark Ready For Review
                   </button>
                 </form>
                 <form action={publishEmployerJobAction}>
                   <input name="jobId" type="hidden" value={job.id} />
-                  <button className="employer-composer__button" disabled={!canPublish} type="submit">
+                  <button
+                    className="employer-composer__button"
+                    data-testid="employer-job-publish-button"
+                    disabled={!canPublish}
+                    type="submit"
+                  >
                     Publish Job
                   </button>
                 </form>
               </div>
-            </article>
+            </section>
+
+            <section className="employer-rail-section">
+              <p className="employer-section-label">Archive And Remove</p>
+              <div className="employer-composer__actions">
+                <form action={archiveEmployerJobAction}>
+                  <input name="jobId" type="hidden" value={job.id} />
+                  <button className="employer-composer__button employer-composer__button--secondary" disabled={!canArchive} type="submit">
+                    Archive Job
+                  </button>
+                </form>
+                <form action={removeEmployerJobAction}>
+                  <input name="jobId" type="hidden" value={job.id} />
+                  <button className="employer-composer__button employer-composer__button--secondary" type="submit">
+                    Remove Job
+                  </button>
+                </form>
+              </div>
+            </section>
           </aside>
         </section>
       </div>

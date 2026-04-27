@@ -97,7 +97,10 @@ export async function createPromptFirstEmployerJobDraft({
     content: inference.output.draftDescription,
     metadata: {
       providerResponseId: inference.providerResponseId,
-      model: inference.model
+      model: inference.model,
+      reasoningSummary: inference.output.reasoningSummary,
+      thinkingMessages: inference.output.thinkingMessages,
+      actionLog: inference.output.actionLog
     }
   });
 

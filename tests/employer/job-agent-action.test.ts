@@ -9,6 +9,7 @@ import {
   buildAgentJobSessionInsert,
   buildAgentTraceInsert
 } from "@/lib/agents/job-posting/persistence";
+import { scheduleTransientThinkingLifecycle } from "@/lib/agents/job-posting/streaming";
 import type { JobPostingInferenceResult } from "@/lib/agents/job-posting/inference";
 import type { OpenAIClientConfig } from "@/lib/agents/job-posting/openai-client";
 import type { PromptVersion } from "@/lib/agents/job-posting/prompts";
@@ -70,7 +71,15 @@ const agentOutput: JobPostingAgentOutput = {
   draftDescription: "Senior Full-Stack AI Product Engineer\n\nAbout the role\nBuild AI hiring workflows.",
   assumptions: ["Department inferred as Engineering from the technical scope."],
   missingCriticalFields: ["compensationBand"],
-  followUpQuestions: ["What compensation range should appear on the posting?"]
+  followUpQuestions: ["What compensation range should appear on the posting?"],
+  reasoningSummary: [
+    "Inferred role scope from the prompt-first context.",
+    "Flagged compensation as a required follow-up."
+  ],
+  thinkingMessages: [
+    "Prepared concise thinking messages for user-visible transparency."
+  ],
+  actionLog: ["draft_generated", "follow_up_requested:compensationBand"]
 };
 
 const inferenceResult: JobPostingInferenceResult = {
@@ -257,7 +266,10 @@ describe("prompt-first employer job creation", () => {
           content: agentOutput.draftDescription,
           metadata: {
             providerResponseId: "resp_123",
-            model: "gpt-5.5"
+            model: "gpt-5.5",
+            reasoningSummary: agentOutput.reasoningSummary,
+            thinkingMessages: agentOutput.thinkingMessages,
+            actionLog: agentOutput.actionLog
           }
         })
       },
@@ -277,5 +289,58 @@ describe("prompt-first employer job creation", () => {
         })
       }
     ]);
+  });
+
+  it("clears transient lifecycle callbacks during rapid stream restarts to avoid stuck messages", () => {
+    const scheduled: Array<{ id: number; run: () => void }> = [];
+    const cleared = new Set<number>();
+    const visibleCalls: number[] = [];
+    let nextId = 0;
+    const activeMessages = new Set<number>();
+
+    function createMessageLifecycle(messageId: number) {
+      activeMessages.add(messageId);
+      return scheduleTransientThinkingLifecycle(
+        {
+          onVisible: () => {
+            if (activeMessages.has(messageId)) {
+              visibleCalls.push(messageId);
+            }
+          },
+          onFadeOut: () => {},
+          onRemove: () => {
+            activeMessages.delete(messageId);
+          }
+        },
+        {
+          setTimeout(run) {
+            const id = ++nextId;
+            scheduled.push({ id, run });
+            return id;
+          },
+          clearTimeout(handle) {
+            if (typeof handle === "number") {
+              cleared.add(handle);
+            }
+          }
+        }
+      );
+    }
+
+    const cancelFirst = createMessageLifecycle(1);
+    const cancelSecond = createMessageLifecycle(2);
+
+    cancelFirst();
+    cancelSecond();
+    activeMessages.clear();
+
+    scheduled.forEach((entry) => {
+      if (!cleared.has(entry.id)) {
+        entry.run();
+      }
+    });
+
+    expect(visibleCalls).toEqual([]);
+    expect(activeMessages.size).toBe(0);
   });
 });

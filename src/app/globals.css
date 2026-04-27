@@ -1054,6 +1054,18 @@ main {
   gap: 18px;
 }
 
+.employer-rail-section {
+  display: grid;
+  gap: 14px;
+  padding: 0 0 18px;
+  border-bottom: 1px solid rgba(94, 47, 0, 0.12);
+}
+
+.employer-rail-section:last-child {
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+
 .employer-signal-card {
   background:
     radial-gradient(circle at top right, rgba(138, 75, 8, 0.12), transparent 42%),
@@ -1134,6 +1146,47 @@ main {
   gap: 16px;
 }
 
+.employer-job-agent__side {
+  display: grid;
+  gap: 18px;
+  align-content: start;
+}
+
+.employer-job-agent__side-section {
+  display: grid;
+  gap: 10px;
+  padding: 0 0 18px;
+  border-bottom: 1px solid rgba(94, 47, 0, 0.12);
+}
+
+.employer-job-agent__side-section:last-child {
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+
+.employer-job-agent__side-section h2,
+.employer-job-agent__side-section p {
+  margin: 0;
+}
+
+.employer-job-agent__side-section h2 {
+  font-size: 1.08rem;
+  line-height: 1.3;
+}
+
+.employer-job-agent__side-section p,
+.employer-job-agent__side-section li {
+  line-height: 1.6;
+  color: var(--text-muted);
+}
+
+.employer-job-agent__side-section ul {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding-left: 20px;
+}
+
 .employer-job-agent__composer,
 .employer-job-agent__panel {
   border: 1px solid var(--surface-border);
@@ -1170,6 +1223,117 @@ main {
   color: var(--text-muted);
 }
 
+.employer-job-agent__transient-messages {
+  display: grid;
+  gap: 8px;
+  min-height: 0;
+}
+
+.employer-job-agent__transient-message {
+  margin: 0;
+  padding: 10px 12px;
+  border: 1px solid rgba(94, 47, 0, 0.16);
+  border-radius: 10px;
+  background: rgba(255, 249, 240, 0.88);
+  color: var(--text-primary);
+  font-size: 0.92rem;
+  line-height: 1.45;
+}
+
+.employer-job-agent__transient-message--fade-in {
+  animation: employerThinkingFadeIn 180ms ease-out forwards;
+}
+
+.employer-job-agent__transient-message--visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.employer-job-agent__transient-message--fade-out {
+  animation: employerThinkingFadeOut 300ms ease-in forwards;
+}
+
+.employer-job-agent__stream-output {
+  margin: 0;
+  padding: 12px;
+  min-height: 48px;
+  border: 1px solid rgba(94, 47, 0, 0.16);
+  border-radius: 10px;
+  background: rgba(255, 249, 240, 0.6);
+  color: var(--text-primary);
+  font-family: var(--font-body), "IBM Plex Sans", sans-serif;
+  line-height: 1.5;
+  white-space: pre-wrap;
+}
+
+.employer-job-agent__stream-token {
+  display: inline-block;
+  opacity: 0;
+  transform: translateY(2px);
+  will-change: opacity, transform;
+}
+
+.employer-job-agent__stream-token--fade-in {
+  animation: employerThinkingTokenFadeIn 90ms ease-out forwards;
+}
+
+.employer-job-agent__stream-token--visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.employer-job-agent__stream-token--fade-out {
+  animation: employerThinkingTokenFadeOut 180ms ease-in forwards;
+}
+
+@keyframes employerThinkingFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes employerThinkingFadeOut {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  to {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}
+
+@keyframes employerThinkingTokenFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(2px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes employerThinkingTokenFadeOut {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  to {
+    opacity: 0;
+    transform: translateY(-1px);
+  }
+}
+
 .employer-job-agent__panel ul {
   display: grid;
   gap: 8px;
@@ -1180,6 +1344,70 @@ main {
 .employer-job-list {
   display: grid;
   gap: 12px;
+}
+
+.employer-candidate-profile-panel ul {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding-left: 20px;
+}
+
+.employer-assistant-panel,
+.employer-assistant-panel__content {
+  display: grid;
+  gap: 12px;
+}
+
+.employer-assistant-panel form {
+  display: grid;
+}
+
+.employer-assistant-panel__action {
+  margin: 0;
+}
+
+.employer-assistant-panel ul {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding-left: 20px;
+}
+
+.employer-candidate-confidence ul {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding-left: 0;
+  list-style: none;
+}
+
+.employer-candidate-confidence li {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+.employer-candidate-filters {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: end;
+  padding: 14px;
+  border: 1px solid rgba(94, 47, 0, 0.12);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.72);
+}
+
+.employer-candidate-filters .register-field {
+  gap: 6px;
+}
+
+@media (max-width: 840px) {
+  .employer-candidate-filters {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
 
 .employer-job-row {
@@ -1235,6 +1463,116 @@ main {
   background: transparent;
   border: 0;
   box-shadow: none;
+}
+
+.employer-job-chat,
+.employer-job-chat__thread,
+.employer-job-chat__memory,
+.employer-job-chat__composer {
+  display: grid;
+  gap: 12px;
+}
+
+.employer-job-chat {
+  border: 1px solid rgba(94, 47, 0, 0.12);
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.76);
+  padding: 16px;
+}
+
+.employer-job-chat__thread {
+  max-height: 320px;
+  overflow: auto;
+  padding-right: 2px;
+}
+
+.employer-job-chat__status,
+.employer-job-chat__error {
+  margin: 0;
+  font-size: 0.92rem;
+}
+
+.employer-job-chat__status {
+  color: var(--text-muted);
+}
+
+.employer-job-chat__error {
+  color: #a2352f;
+}
+
+.employer-job-chat__composer {
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+.employer-job-chat__composer .employer-composer__input {
+  min-height: 120px;
+}
+
+.employer-job-chat__memory {
+  padding: 14px;
+  border: 1px solid rgba(94, 47, 0, 0.12);
+  border-radius: 16px;
+  background: rgba(255, 249, 240, 0.58);
+}
+
+.employer-job-chat__readiness {
+  display: grid;
+  gap: 8px;
+}
+
+.employer-job-chat__role-profile,
+.employer-job-chat__quality {
+  display: grid;
+  gap: 8px;
+}
+
+.employer-job-chat__kv {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+}
+
+.employer-job-chat__kv div {
+  display: grid;
+  grid-template-columns: 112px minmax(0, 1fr);
+  gap: 8px;
+}
+
+.employer-job-chat__kv dt {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #684424;
+  letter-spacing: 0.01em;
+}
+
+.employer-job-chat__kv dd {
+  margin: 0;
+  color: var(--text-primary);
+}
+
+.employer-job-chat__quality-item {
+  display: grid;
+  gap: 6px;
+  padding: 10px;
+  border-radius: 12px;
+  border: 1px solid rgba(94, 47, 0, 0.14);
+  background: rgba(255, 255, 255, 0.74);
+}
+
+.employer-job-chat__quality-item--warn {
+  border-color: rgba(148, 92, 20, 0.35);
+  background: rgba(255, 246, 230, 0.9);
+}
+
+.employer-job-chat__quality-item--fail {
+  border-color: rgba(162, 53, 47, 0.35);
+  background: rgba(255, 235, 233, 0.92);
+}
+
+.employer-job-chat__readiness-flag {
+  font-weight: 700;
 }
 
 @media (max-width: 980px) {

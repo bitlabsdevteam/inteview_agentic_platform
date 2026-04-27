@@ -1,7 +1,10 @@
 import { describe, expect, it } from "vitest";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 
 import {
   buildEmployerJobDraftInsert,
+  getEmployerJobReviewGate,
   getEmployerJobPrimaryAction,
   getNextEmployerJobStatus,
   type EmployerJobInput
@@ -44,8 +47,11 @@ describe("employer job workflow", () => {
   it("uses review as the required step before publishing", () => {
     expect(getNextEmployerJobStatus("draft", "submit_for_review")).toBe("needs_review");
     expect(getNextEmployerJobStatus("needs_review", "publish")).toBe("published");
+    expect(getNextEmployerJobStatus("published", "archive")).toBe("archived");
+    expect(getNextEmployerJobStatus("closed", "archive")).toBe("archived");
     expect(getNextEmployerJobStatus("draft", "publish")).toBeNull();
     expect(getNextEmployerJobStatus("published", "publish")).toBeNull();
+    expect(getNextEmployerJobStatus("archived", "archive")).toBeNull();
   });
 
   it("returns status-aware primary actions for the employer job list", () => {
@@ -65,5 +71,75 @@ describe("employer job workflow", () => {
       label: "View",
       intent: "view"
     });
+    expect(getEmployerJobPrimaryAction("archived")).toEqual({
+      label: "View",
+      intent: "view"
+    });
+  });
+
+  it("gates draft-to-review transition when critical quality failures exist", () => {
+    expect(
+      getEmployerJobReviewGate({
+        status: "draft",
+        qualityCheckStatuses: ["fail", "warn"]
+      })
+    ).toEqual({
+      canSubmitForReview: false,
+      blocksReview: true,
+      requiresEmployerFix: true,
+      warningMessage: "Critical quality failures must be fixed before this job can move to review."
+    });
+
+    expect(
+      getEmployerJobReviewGate({
+        status: "draft",
+        qualityCheckStatuses: ["warn", "pass"]
+      })
+    ).toEqual({
+      canSubmitForReview: true,
+      blocksReview: false,
+      requiresEmployerFix: true,
+      warningMessage: "Quality warnings are present. Resolve them before review when possible."
+    });
+
+    expect(
+      getEmployerJobReviewGate({
+        status: "needs_review",
+        qualityCheckStatuses: ["pass"]
+      })
+    ).toEqual({
+      canSubmitForReview: false,
+      blocksReview: false,
+      requiresEmployerFix: false,
+      warningMessage: null
+    });
+  });
+
+  it("does not render persistent reasoning or thinking boxes in employer job detail rail", () => {
+    const pageSource = readFileSync(
+      join(process.cwd(), "src/app/employer/jobs/[id]/page.tsx"),
+      "utf8"
+    );
+
+    expect(pageSource).not.toContain("Agent Transparency");
+    expect(pageSource).not.toContain("Reasoning Summary");
+    expect(pageSource).not.toContain("Thinking Messages");
+  });
+
+  it("uses unframed right-side layout sections for employer new/detail job pages", () => {
+    const newPageSource = readFileSync(
+      join(process.cwd(), "src/app/employer/jobs/new/page.tsx"),
+      "utf8"
+    );
+    const detailPageSource = readFileSync(
+      join(process.cwd(), "src/app/employer/jobs/[id]/page.tsx"),
+      "utf8"
+    );
+
+    expect(newPageSource).not.toContain("employer-job-agent__panel");
+    expect(detailPageSource).not.toContain("employer-rail-card");
+    expect(detailPageSource).toContain("getEmployerJobReviewGate");
+    expect(detailPageSource).toContain("reviewGate.warningMessage");
+    expect(detailPageSource).toContain("disabled={!canSubmitForReview}");
   });
 });

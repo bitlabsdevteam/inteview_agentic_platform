@@ -154,4 +154,62 @@ describe("enforceRouteAccess", () => {
 
     expect(redirect).toHaveBeenCalledWith("/employer");
   });
+
+  it("redirects job seeker sessions away from nested employer candidate routes", async () => {
+    getUser.mockResolvedValue({
+      data: {
+        user: {
+          user_metadata: {
+            role: "job_seeker"
+          }
+        }
+      }
+    });
+
+    await import("@/lib/auth/enforce-route-access").then(async ({ enforceRouteAccess }) => {
+      await enforceRouteAccess("/employer/jobs/job-1/candidates/intake-1");
+    });
+
+    expect(redirect).toHaveBeenCalledWith("/job-seeker");
+  });
+
+  it("redirects job seeker sessions away from employer candidate workspace routes with scoring filters", async () => {
+    getUser.mockResolvedValue({
+      data: {
+        user: {
+          user_metadata: {
+            role: "job_seeker"
+          }
+        }
+      }
+    });
+
+    await import("@/lib/auth/enforce-route-access").then(async ({ enforceRouteAccess }) => {
+      await enforceRouteAccess(
+        "/employer/jobs/job-1/candidates?skill=TypeScript&minConfidence=0.8&sortBy=aggregate_score_desc"
+      );
+    });
+
+    expect(redirect).toHaveBeenCalledWith("/job-seeker");
+  });
+
+  it("redirects job seeker sessions away from employer assistant candidate review routes", async () => {
+    getUser.mockResolvedValue({
+      data: {
+        user: {
+          user_metadata: {
+            role: "job_seeker"
+          }
+        }
+      }
+    });
+
+    await import("@/lib/auth/enforce-route-access").then(async ({ enforceRouteAccess }) => {
+      await enforceRouteAccess(
+        "/employer/jobs/job-1/candidates/profile-1?assistant=1&panel=recommendation"
+      );
+    });
+
+    expect(redirect).toHaveBeenCalledWith("/job-seeker");
+  });
 });

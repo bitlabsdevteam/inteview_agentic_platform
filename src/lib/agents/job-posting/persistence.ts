@@ -271,6 +271,37 @@ export async function getAgentJobSession(
   );
 }
 
+export async function getLatestAgentJobSessionByJobId(
+  client: AgentPersistenceClient,
+  employerUserId: string,
+  employerJobId: string
+) {
+  const query = client.from("agent_job_sessions").select("*") as {
+    eq: (column: string, value: string) => {
+      eq: (column: string, value: string) => {
+        order: (
+          column: string,
+          options: { ascending: boolean }
+        ) => {
+          limit: (value: number) => {
+            maybeSingle: () => Promise<QueryResult<AgentJobSessionRecord | null>>;
+          };
+        };
+      };
+    };
+  };
+
+  return assertQueryResult(
+    await query
+      .eq("employer_user_id", employerUserId)
+      .eq("employer_job_id", employerJobId)
+      .order("updated_at", { ascending: false })
+      .limit(1)
+      .maybeSingle(),
+    "load latest agent job session by job id"
+  );
+}
+
 export async function updateAgentJobSession(
   client: AgentPersistenceClient,
   employerUserId: string,
@@ -292,5 +323,30 @@ export async function updateAgentJobSession(
   return assertQueryResult(
     await query.eq("id", sessionId).eq("employer_user_id", employerUserId).select("*").single(),
     "update agent job session"
+  );
+}
+
+export async function listAgentJobMessagesBySession(
+  client: AgentPersistenceClient,
+  employerUserId: string,
+  sessionId: string
+) {
+  const query = client.from("agent_job_messages").select("*") as {
+    eq: (column: string, value: string) => {
+      eq: (column: string, value: string) => {
+        order: (
+          column: string,
+          options: { ascending: boolean }
+        ) => Promise<QueryResult<AgentJobMessageRecord[]>>;
+      };
+    };
+  };
+
+  return assertQueryResult(
+    await query
+      .eq("employer_user_id", employerUserId)
+      .eq("session_id", sessionId)
+      .order("created_at", { ascending: true }),
+    "list agent job messages by session"
   );
 }

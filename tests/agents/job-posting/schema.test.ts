@@ -63,7 +63,16 @@ const validOutput: JobPostingAgentOutput = {
     "Level inferred as Senior because the role owns ambiguous product features."
   ],
   missingCriticalFields: ["compensationBand"],
-  followUpQuestions: ["What compensation range should appear on the posting?"]
+  followUpQuestions: ["What compensation range should appear on the posting?"],
+  reasoningSummary: [
+    "Parsed employer intent as senior full-stack product engineering ownership.",
+    "Inferred missing role metadata from context and marked assumptions."
+  ],
+  thinkingMessages: [
+    "Identified publishing-critical gap: compensation band.",
+    "Prepared one targeted follow-up question."
+  ],
+  actionLog: ["draft_generated", "follow_up_requested:compensationBand"]
 };
 
 describe("job posting agent schema", () => {

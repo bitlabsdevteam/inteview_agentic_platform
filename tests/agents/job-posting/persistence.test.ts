@@ -7,6 +7,8 @@ import {
   buildAgentJobSessionInsert,
   buildAgentTraceInsert,
   createAgentJobSession,
+  listAgentJobMessagesBySession,
+  getLatestAgentJobSessionByJobId,
   listAgentJobSessions,
   type AgentJobSessionInput,
   type AgentTraceInput
@@ -163,6 +165,113 @@ describe("job posting agent persistence", () => {
       { select: "*" },
       { eq: ["employer_user_id", "employer-user-1"] },
       { order: ["updated_at", { ascending: false }] }
+    ]);
+  });
+
+  it("loads the latest session for an employer job id", async () => {
+    const calls: Array<Record<string, unknown>> = [];
+    const client = {
+      from(table: string) {
+        calls.push({ table });
+
+        return {
+          select(columns: string) {
+            calls.push({ select: columns });
+
+            return {
+              eq(column: string, value: string) {
+                calls.push({ eq: [column, value] });
+
+                return {
+                  eq(secondColumn: string, secondValue: string) {
+                    calls.push({ eq: [secondColumn, secondValue] });
+
+                    return {
+                      order(orderColumn: string, options: { ascending: boolean }) {
+                        calls.push({ order: [orderColumn, options] });
+
+                        return {
+                          limit(value: number) {
+                            calls.push({ limit: value });
+
+                            return {
+                              maybeSingle: async () => ({
+                                data: null,
+                                error: null
+                              })
+                            };
+                          }
+                        };
+                      }
+                    };
+                  }
+                };
+              }
+            };
+          }
+        };
+      }
+    };
+
+    await expect(
+      getLatestAgentJobSessionByJobId(client, "employer-user-1", "job-1")
+    ).resolves.toBeNull();
+    expect(calls).toEqual([
+      { table: "agent_job_sessions" },
+      { select: "*" },
+      { eq: ["employer_user_id", "employer-user-1"] },
+      { eq: ["employer_job_id", "job-1"] },
+      { order: ["updated_at", { ascending: false }] },
+      { limit: 1 }
+    ]);
+  });
+
+  it("lists session messages in ascending created order for the employer and session scope", async () => {
+    const calls: Array<Record<string, unknown>> = [];
+    const client = {
+      from(table: string) {
+        calls.push({ table });
+
+        return {
+          select(columns: string) {
+            calls.push({ select: columns });
+
+            return {
+              eq(column: string, value: string) {
+                calls.push({ eq: [column, value] });
+
+                return {
+                  eq(secondColumn: string, secondValue: string) {
+                    calls.push({ eq: [secondColumn, secondValue] });
+
+                    return {
+                      order(orderColumn: string, options: { ascending: boolean }) {
+                        calls.push({ order: [orderColumn, options] });
+
+                        return Promise.resolve({
+                          data: [],
+                          error: null
+                        });
+                      }
+                    };
+                  }
+                };
+              }
+            };
+          }
+        };
+      }
+    };
+
+    await expect(
+      listAgentJobMessagesBySession(client, "employer-user-1", "session-1")
+    ).resolves.toEqual([]);
+    expect(calls).toEqual([
+      { table: "agent_job_messages" },
+      { select: "*" },
+      { eq: ["employer_user_id", "employer-user-1"] },
+      { eq: ["session_id", "session-1"] },
+      { order: ["created_at", { ascending: true }] }
     ]);
   });
 

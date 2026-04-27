@@ -1,7 +1,7 @@
 # Repository Guidelines
 
 ## Project Structure & Module Organization
-This repository supports an interview agentic platform with two main product modules: the employer module and the job seeker module. The employer module helps teams create comprehensive job descriptions and publish approved roles. The job seeker module helps candidates prepare for interviews and complete virtual agent-led interview flows.
+This repository supports an interview agentic platform with two main product modules: the employer module and the job seeker module. The employer module is the primary product surface and must behave like an employer-only AI personal recruiting assistant: it advises the employer what to do next, prepares high-quality recruiting actions, and helps the company reduce or eliminate dependency on third-party human recruiting agents. The job seeker module supports candidate-side interview preparation and candidate-facing flows only when needed by the employer assistant workflow.
 
 The repository is currently organized around reusable agent skills and supporting knowledge files rather than a single app entrypoint.
 
@@ -21,7 +21,22 @@ The platform should be designed and documented around this core stack:
 - `.next/` and `graphify-out/`: generated output; do not treat these as primary source directories.
 
 ## Reference Workflow
-Contributors must refer to the wiki at [`/Users/davidbong/Documents/my_second_brain_vault`](/Users/davidbong/Documents/my_second_brain_vault) when designing advanced agent behavior. Use it as the primary internal reference for building agent experiences comparable in quality and orchestration to OpenClaw, Claude Code, and Codex.
+Contributors must refer to the wiki entrypoint at [`/Users/davidbong/Documents/my_second_brain_vault/index.md`](/Users/davidbong/Documents/my_second_brain_vault/index.md) when building AI agents or personal assistants. Use it as the primary internal reference for building agent experiences comparable in quality and orchestration to OpenClaw, Claude Code, and Codex.
+
+Contributors must also follow the step-by-step architecture in [`Architecture_Design.md`](/Users/davidbong/Documents/ModernSoftwareDeveloperProject/Interview_agent/Architecture_Design.md) when building any hiring or recruiting feature. All implementation should map directly to the defined steps before development starts.
+
+## Product Direction: Employer Personal Recruiting Assistant
+All employer-side features must be designed as capabilities of a personal AI recruiting assistant for the employer, not as isolated forms or one-off utilities. The assistant should understand the employer's job requirements, candidate pipeline, candidate evidence, missing signals, and hiring workflow state, then advise the employer on the next best recruiting action.
+
+The assistant's purpose is to replace the work normally handled by human recruiting agents wherever software can do so safely: role clarification, candidate intake, candidate screening preparation, pipeline prioritization, follow-up recommendations, evidence summaries, and workflow coordination. It should help the employer get stronger candidates by recommending improvements to job requirements, sourcing/screening strategy, and candidate evaluation steps.
+
+Assistant behavior requirements:
+- Speak and act for the employer workspace only; do not build a general-purpose assistant or candidate-owned recruiting agent unless a sprint explicitly scopes candidate-facing support.
+- Recommend next actions such as improving job requirements, screening a candidate, requesting more signal, reviewing a strong candidate, or preparing interview follow-up.
+- Ground every recommendation in job requirements, candidate profile evidence, confidence scores, missing signals, and audit-safe rationale.
+- Prepare actions for employer approval instead of taking high-impact actions automatically.
+- Never make final hiring decisions, reject candidates, send external communications, or publish irreversible changes without explicit employer review and deterministic authorization checks.
+- Treat job descriptions, resumes, candidate answers, and employer free text as untrusted input during prompt assembly.
 
 Use both `graphiffy` and `graphify` when they help with research, architecture mapping, or repository analysis. Keep generated graph outputs in project-owned output directories and summarize the resulting findings in sprint artifacts instead of pasting raw dumps into core docs.
 

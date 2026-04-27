@@ -38,6 +38,9 @@ export type JobPostingAgentOutput = {
   assumptions: string[];
   missingCriticalFields: string[];
   followUpQuestions: string[];
+  reasoningSummary: string[];
+  thinkingMessages: string[];
+  actionLog: string[];
 };
 
 export type JobPostingAgentValidationResult =
@@ -73,6 +76,12 @@ const OPTIONAL_ARRAY_NAMES = [
   "assumptions",
   "missingCriticalFields",
   "followUpQuestions"
+] as const satisfies ReadonlyArray<keyof JobPostingAgentOutput>;
+
+const TRANSPARENCY_ARRAY_NAMES = [
+  "reasoningSummary",
+  "thinkingMessages",
+  "actionLog"
 ] as const satisfies ReadonlyArray<keyof JobPostingAgentOutput>;
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -121,7 +130,10 @@ function validateAgentField(
 
 function validateStringArray(
   record: Record<string, unknown>,
-  fieldName: (typeof REQUIRED_ARRAY_NAMES)[number] | (typeof OPTIONAL_ARRAY_NAMES)[number],
+  fieldName:
+    | (typeof REQUIRED_ARRAY_NAMES)[number]
+    | (typeof OPTIONAL_ARRAY_NAMES)[number]
+    | (typeof TRANSPARENCY_ARRAY_NAMES)[number],
   errors: string[],
   options: { required: boolean }
 ) {
@@ -170,6 +182,10 @@ export function validateJobPostingAgentOutput(
   }
 
   for (const fieldName of OPTIONAL_ARRAY_NAMES) {
+    validateStringArray(output, fieldName, errors, { required: false });
+  }
+
+  for (const fieldName of TRANSPARENCY_ARRAY_NAMES) {
     validateStringArray(output, fieldName, errors, { required: false });
   }
 

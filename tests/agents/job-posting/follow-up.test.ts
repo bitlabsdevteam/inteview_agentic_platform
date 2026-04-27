@@ -5,6 +5,7 @@ import {
   getFollowUpAnswerFromFormData,
   getFollowUpSessionIdFromFormData,
   getTargetedFollowUpQuestions,
+  reviseEmployerJobDraftFromChatTurn,
   reviseEmployerJobDraftFromFollowUp,
   shouldRequestFollowUp
 } from "@/lib/agents/job-posting/follow-up";
@@ -56,7 +57,10 @@ const initialOutput: JobPostingAgentOutput = {
     "Who is the hiring manager?",
     "Which timezone range should candidates overlap?",
     "What start date should candidates target?"
-  ]
+  ],
+  reasoningSummary: ["Derived seniority from ownership language in the employer prompt."],
+  thinkingMessages: ["Detected compensation and hiring manager as unresolved gaps."],
+  actionLog: ["draft_generated", "follow_up_requested:compensationBand,hiringManager"]
 };
 
 const revisedOutput: JobPostingAgentOutput = {
@@ -237,6 +241,377 @@ function createRevisionClient() {
   return { client, calls, updatedSession, jobRecord };
 }
 
+function createChatTurnClient(options?: { missingMemoryTables?: boolean }) {
+  const calls: Array<Record<string, unknown>> = [];
+  const jobRecord = {
+    id: "job-1",
+    ...buildEmployerJobDraftInsert("employer-user-1", {
+      title: "Senior AI Product Engineer",
+      department: "Engineering",
+      level: "Senior",
+      location: "Remote US",
+      compensationBand: "$180k-$220k",
+      hiringProblem: "Build reliable AI interview workflows.",
+      outcomes: "- Ship prompt-first job creation.",
+      requirements: "Required:\n- Next.js, Supabase, and LLM product experience.",
+      interviewLoop: "- Recruiter screen\n- Technical panel"
+    }),
+    created_at: "2026-04-25T00:00:00.000Z",
+    updated_at: "2026-04-25T00:00:00.000Z"
+  };
+  const session = {
+    ...sessionRecord,
+    status: "draft_created",
+    latest_employer_prompt: "Need stronger backend ownership in the JD."
+  };
+
+  let messageInsertCount = 0;
+  let messageListCount = 0;
+
+  const client = {
+    from(table: string) {
+      calls.push({ table });
+
+      if (table === "employer_jobs") {
+        return {
+          select(columns: string) {
+            calls.push({ select: columns });
+            return {
+              eq(column: string, value: string) {
+                calls.push({ eq: [column, value] });
+                return {
+                  eq(secondColumn: string, secondValue: string) {
+                    calls.push({ eq: [secondColumn, secondValue] });
+                    return {
+                      maybeSingle: async () => ({ data: jobRecord, error: null })
+                    };
+                  }
+                };
+              }
+            };
+          },
+          update(values: unknown) {
+            calls.push({ update: values });
+            return {
+              eq(column: string, value: string) {
+                calls.push({ eq: [column, value] });
+                return {
+                  eq(secondColumn: string, secondValue: string) {
+                    calls.push({ eq: [secondColumn, secondValue] });
+                    return {
+                      select(columns: string) {
+                        calls.push({ select: columns });
+                        return {
+                          single: async () => ({
+                            data: { ...jobRecord, updated_at: "2026-04-26T00:00:00.000Z" },
+                            error: null
+                          })
+                        };
+                      }
+                    };
+                  }
+                };
+              }
+            };
+          }
+        };
+      }
+
+      if (table === "agent_job_sessions") {
+        return {
+          select(columns: string) {
+            calls.push({ select: columns });
+            return {
+              eq(column: string, value: string) {
+                calls.push({ eq: [column, value] });
+                return {
+                  eq(secondColumn: string, secondValue: string) {
+                    calls.push({ eq: [secondColumn, secondValue] });
+                    return {
+                      maybeSingle: async () => ({ data: session, error: null })
+                    };
+                  }
+                };
+              }
+            };
+          },
+          update(values: unknown) {
+            calls.push({ update: values });
+            return {
+              eq(column: string, value: string) {
+                calls.push({ eq: [column, value] });
+                return {
+                  eq(secondColumn: string, secondValue: string) {
+                    calls.push({ eq: [secondColumn, secondValue] });
+                    return {
+                      select(columns: string) {
+                        calls.push({ select: columns });
+                        return {
+                          single: async () => ({
+                            data: {
+                              ...session,
+                              latest_employer_prompt: "Need stronger backend ownership in the JD.",
+                              generated_fields: revisedOutput
+                            },
+                            error: null
+                          })
+                        };
+                      }
+                    };
+                  }
+                };
+              }
+            };
+          }
+        };
+      }
+
+      if (table === "agent_job_messages") {
+        return {
+          select(columns: string) {
+            calls.push({ select: columns });
+            return {
+              eq(column: string, value: string) {
+                calls.push({ eq: [column, value] });
+                return {
+                  eq(secondColumn: string, secondValue: string) {
+                    calls.push({ eq: [secondColumn, secondValue] });
+                    return {
+                      order(orderColumn: string, options: { ascending: boolean }) {
+                        calls.push({ order: [orderColumn, options] });
+                        messageListCount += 1;
+                        if (messageListCount === 1) {
+                          return Promise.resolve({ data: [], error: null });
+                        }
+                        return Promise.resolve({
+                          data: [
+                            {
+                              id: "msg-employer",
+                              session_id: session.id,
+                              employer_user_id: "employer-user-1",
+                              role: "employer",
+                              content: "Need stronger backend ownership in the JD.",
+                              metadata: {},
+                              created_at: "2026-04-26T00:00:00.000Z"
+                            },
+                            {
+                              id: "msg-agent",
+                              session_id: session.id,
+                              employer_user_id: "employer-user-1",
+                              role: "agent",
+                              content: revisedOutput.draftDescription,
+                              metadata: {},
+                              created_at: "2026-04-26T00:00:01.000Z"
+                            }
+                          ],
+                          error: null
+                        });
+                      }
+                    };
+                  }
+                };
+              }
+            };
+          },
+          insert(values: unknown) {
+            calls.push({ insert: values });
+            return {
+              select(columns: string) {
+                calls.push({ select: columns });
+                return {
+                  single: async () => {
+                    messageInsertCount += 1;
+                    return {
+                      data: {
+                        id: messageInsertCount === 1 ? "msg-employer" : "msg-agent",
+                        created_at: "2026-04-26T00:00:00.000Z"
+                      },
+                      error: null
+                    };
+                  }
+                };
+              }
+            };
+          }
+        };
+      }
+
+      if (table === "agent_memory_summaries") {
+        return {
+          select(columns: string) {
+            calls.push({ select: columns });
+            return {
+              eq(column: string, value: string) {
+                calls.push({ eq: [column, value] });
+                return {
+                  eq(secondColumn: string, secondValue: string) {
+                    calls.push({ eq: [secondColumn, secondValue] });
+                    return {
+                      eq(thirdColumn: string, thirdValue: string) {
+                    calls.push({ eq: [thirdColumn, thirdValue] });
+                    return {
+                          maybeSingle: async () =>
+                            options?.missingMemoryTables
+                              ? {
+                                  data: null,
+                                  error: {
+                                    message:
+                                      "Could not find the table 'public.agent_memory_summaries' in the schema cache"
+                                  }
+                                }
+                              : { data: null, error: null }
+                        };
+                      }
+                    };
+                  }
+                };
+              }
+            };
+          },
+          upsert(values: unknown) {
+            calls.push({ upsert: values });
+            return {
+              select(columns: string) {
+                calls.push({ select: columns });
+                return {
+                  single: async () =>
+                    options?.missingMemoryTables
+                      ? {
+                          data: null,
+                          error: {
+                            message:
+                              'relation "public.agent_memory_summaries" does not exist'
+                          }
+                        }
+                      : {
+                          data: {
+                            id: "mem-sum-1",
+                            employer_user_id: "employer-user-1",
+                            employer_job_id: "job-1",
+                            session_id: "session-1",
+                            summary_text: "summary",
+                            unresolved_gaps: [],
+                            key_decisions: [],
+                            compacted_message_count: 0,
+                            created_at: "2026-04-26T00:00:00.000Z",
+                            updated_at: "2026-04-26T00:00:00.000Z"
+                          },
+                          error: null
+                        }
+                };
+              }
+            };
+          }
+        };
+      }
+
+      if (table === "agent_memory_items") {
+        return {
+          select(columns: string) {
+            calls.push({ select: columns });
+            return {
+              eq(column: string, value: string) {
+                calls.push({ eq: [column, value] });
+                return {
+                  eq(secondColumn: string, secondValue: string) {
+                    calls.push({ eq: [secondColumn, secondValue] });
+                    return {
+                      eq(thirdColumn: string, thirdValue: string) {
+                        calls.push({ eq: [thirdColumn, thirdValue] });
+                        return {
+                          is(isColumn: string, isValue: null) {
+                            calls.push({ is: [isColumn, isValue] });
+                            return {
+                              order(orderColumn: string, options: { ascending: boolean }) {
+                                calls.push({ order: [orderColumn, options] });
+                                return Promise.resolve(
+                                  options?.missingMemoryTables
+                                    ? {
+                                        data: [],
+                                        error: {
+                                          message:
+                                            "Could not find the table 'public.agent_memory_items' in the schema cache"
+                                        }
+                                      }
+                                    : { data: [], error: null }
+                                );
+                              }
+                            };
+                          }
+                        };
+                      }
+                    };
+                  }
+                };
+              }
+            };
+          },
+          insert(values: unknown) {
+            calls.push({ insert: values });
+            return {
+              select(columns: string) {
+                calls.push({ select: columns });
+                return {
+                  single: async () =>
+                    options?.missingMemoryTables
+                      ? {
+                          data: null,
+                          error: {
+                            message: 'relation "public.agent_memory_items" does not exist'
+                          }
+                        }
+                      : {
+                          data: { id: "mem-item-1", created_at: "2026-04-26T00:00:00.000Z" },
+                          error: null
+                        }
+                };
+              }
+            };
+          }
+        };
+      }
+
+      if (table === "employer_job_role_profiles") {
+        return {
+          upsert(values: unknown) {
+            calls.push({ upsert: values });
+            return {
+              select(columns: string) {
+                calls.push({ select: columns });
+                return {
+                  single: async () => ({
+                    data: { id: "role-profile-1", created_at: "2026-04-26T00:00:00.000Z" },
+                    error: null
+                  })
+                };
+              }
+            };
+          }
+        };
+      }
+
+      return {
+        insert(values: unknown) {
+          calls.push({ insert: values });
+          return {
+            select(columns: string) {
+              calls.push({ select: columns });
+              return {
+                single: async () => ({
+                  data: { id: `${table}-1`, created_at: "2026-04-26T00:00:00.000Z" },
+                  error: null
+                })
+              };
+            }
+          };
+        }
+      };
+    }
+  };
+
+  return { client, calls };
+}
+
 describe("job posting follow-up handling", () => {
   it("keeps targeted follow-up questions to at most three non-empty items", () => {
     expect(getTargetedFollowUpQuestions(initialOutput)).toEqual([
@@ -346,5 +721,67 @@ describe("job posting follow-up handling", () => {
         status: "succeeded"
       })
     });
+  });
+
+  it("runs Step 1+2 orchestration in chat-turn flow and persists role-profile + quality artifacts", async () => {
+    const { client, calls } = createChatTurnClient();
+    const inferenceCalls: unknown[] = [];
+
+    const result = await reviseEmployerJobDraftFromChatTurn({
+      client,
+      employerUserId: "employer-user-1",
+      employerJobId: "job-1",
+      sessionId: "session-1",
+      message: "Need stronger backend ownership in the JD.",
+      config,
+      promptVersion,
+      runInference: async (input) => {
+        inferenceCalls.push(input);
+        return inferenceResult;
+      },
+      createOutputChecksum: () => "output-checksum"
+    });
+
+    expect(inferenceCalls).toHaveLength(1);
+    expect(
+      String((inferenceCalls[0] as { employerPrompt: string }).employerPrompt)
+    ).toContain("Current structured job draft:");
+
+    expect(calls).toContainEqual({ table: "employer_job_role_profiles" });
+    expect(calls).toContainEqual({ table: "employer_job_quality_checks" });
+    expect(result.roleProfileSummary).toMatchObject({
+      title: "Senior Role",
+      department: "Engineering"
+    });
+    expect(result.qualityChecks.length).toBeGreaterThan(0);
+    expect(result.readinessFlags).toEqual({
+      blocksReview: true,
+      requiresEmployerFix: true
+    });
+  });
+
+  it("keeps chat-turn refinement working when agent memory tables are not migrated yet", async () => {
+    const { client } = createChatTurnClient({ missingMemoryTables: true });
+
+    const result = await reviseEmployerJobDraftFromChatTurn({
+      client,
+      employerUserId: "employer-user-1",
+      employerJobId: "job-1",
+      sessionId: "session-1",
+      message: "Need stronger backend ownership in the JD.",
+      config,
+      promptVersion,
+      runInference: async () => inferenceResult,
+      createOutputChecksum: () => "output-checksum"
+    });
+
+    expect(result.job.id).toBe("job-1");
+    expect(result.memory.summary).toBeNull();
+    expect(result.memory.retrievedItems).toEqual([]);
+    expect(result.roleProfileSummary).toMatchObject({
+      title: "Senior Role",
+      department: "Engineering"
+    });
+    expect(result.qualityChecks.length).toBeGreaterThan(0);
   });
 });
